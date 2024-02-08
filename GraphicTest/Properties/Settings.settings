@@ -1,0 +1,33 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="GraphicTest.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="DISPLAYMODE" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">5</Value>
+    </Setting>
+    <Setting Name="RECENTFILES" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="SHOWDISPLAYINFO" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="DESKTOPBOUNDS" Type="System.String" Scope="User">
+      <Value Profile="(Default)">10;10;800;800</Value>
+    </Setting>
+    <Setting Name="SHOWSAVEIMAGETOBACKGROUNDWARNING" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="RECTANGLE" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Type="Rectangle" TextAlign="left" VerticalAlign="top" PaddingLeft="5" PaddingBottom="0" PaddingRight="0" PaddingTop="5" X="5" Y="5" Width="50" Height="50" LineColor="#ff0000" LineWidth="2" Transparency="0" ShapeTimeSpan="10000" Right="0" Bottom="0" Left="5" Top="5" BackgroundColor="transparent" Color="Black" FontWeight="normal" FontStyle="normal" FontFamily="Segoe UI" FontSize="10pt" Underline="false" </Value>
+    </Setting>
+    <Setting Name="OVAL" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Type="Oval" TextAlign="left" VerticalAlign="top" PaddingLeft="5" PaddingBottom="0" PaddingRight="0" PaddingTop="5" X="5" Y="5" Width="40" Height="40" ShapeTimeSpan="10000" Right="5" Bottom="0" LineColor="#ff0000" LineWidth="2" Transparency="0" Rotate="0" Anchors="" FontWeight="normal" FontStyle="normal" FontFamily="Segoe UI" FontSize="10pt" Underline="false"  Color="Black" Left="0" Top="5"</Value>
+    </Setting>
+    <Setting Name="POLYLINE" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Type="Polyline" Coordinates="10,10,50,50" ArrowHeadColor="#ff0000" ArrowTailColor="#ff0000" BackgroundColor="#ff0000" BackgroundColorAlt="#ff0000" LineColor="#ff0000" LineWidth="2" VerticalAlign="4" TextAlign="1" PaddingLeft="5" PaddingBottom="0" PaddingRight="0" PaddingTop="5" Conditions=""</Value>
+    </Setting>
+    <Setting Name="RECENTXPATHS" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+  </Settings>
+</SettingsFile>

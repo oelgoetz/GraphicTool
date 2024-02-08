@@ -1,0 +1,52 @@
+﻿using GraphicShapes;
+
+namespace GraphicTest
+{
+    public partial class Display : UserControl
+    {
+        private Bitmap? BackGroundBmp;
+        private Bitmap? PropsFileBmp;
+        private Bitmap? ImageFileBmp;
+        private Graphics graph;
+        private Point displayOffset = Point.Empty;
+        private float zoomFactor = 1.0f;
+        private int drawMode = 5;
+        private GraphicObject root;
+        private Point delta;
+        private Point lastPoint;
+        private mode Mode = mode.Default;
+
+        private enum mode
+        {
+            Default,
+            Paste,
+            Borders,
+            Move,
+            ResizeThis,
+            ResizeObject,
+            SelectColor,
+            EditText,
+            DisplayProperties,
+            SelectImg,
+            ViewOnly,
+            ContextMenu
+        }
+
+        private Point XY;
+        private int mouseOverObject;
+        private int focusedGraphicObject;
+        private int nSelected;
+        private bool multiSelect;
+        
+        public Display()
+        {
+            InitializeComponent();
+            this.DoubleBuffered = true;
+            BackGroundBmp = new Bitmap(this.Width, this.Height);
+            PropsFileBmp = new Bitmap(this.Width, this.Height);
+            ImageFileBmp = new Bitmap(this.Width, this.Height);
+            root = new Root();
+
+        }
+    }
+}
