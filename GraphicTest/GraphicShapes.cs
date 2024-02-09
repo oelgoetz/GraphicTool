@@ -863,12 +863,6 @@ namespace GraphicShapes
 
             _pen = new Pen(penColor, penWidth);
 
-            //if (shape.InnerText != null && shape.InnerText != "")
-            //{
-            //    _text = shape.InnerText;
-            //    getTextAttributes(shape);
-            //}
-
             if (shape.Attributes["ArrowHeadCenterLength"] != null)
                 ArrowHeadCenterLength = Convert.ToSingle(shape.Attributes["ArrowHeadCenterLength"].Value);
             if (shape.Attributes["ArrowHeadLength"] != null)
@@ -885,7 +879,7 @@ namespace GraphicShapes
                 ArrowTailWidth = Convert.ToSingle(shape.Attributes["ArrowTailWidth"].Value);
 
             //ArrowHeads="none","ends","tail","head"
-            //ArrowHeads="head" ist dasselbe wie ArrowHeads==null
+            //ArrowHeads="head" same as ArrowHeads==null
             int n = MarkerPoints.Length;
             if (shape.Attributes["ArrowHeads"] == null)
             {
@@ -1060,25 +1054,14 @@ namespace GraphicShapes
                 if (shape.Attributes["BackgroundColor"] != null)
                 {
                     string sBackGroundColor = shape.Attributes["BackgroundColor"].Value;
-                    //Box zeichnen (außer bei "transparent");
+                    //Draw box - except "transparent";
                     if (sBackGroundColor != "transparent")
                     {
                         Color brushColor = ColorTranslator.FromHtml(sBackGroundColor);
                         _fillBrush = new SolidBrush(brushColor);
                     }
                 }
-
-                //for (int i = 0; i < MarkerPoints.Length; i++)
-                //{
-                //    MarkerPoints[i].X -= Box.X;
-                //    MarkerPoints[i].Y -= Box.Y;
-                //}
             }
-
-            //Box.X = Convert.ToInt32(shape.Attributes["X"].Value);
-            //Box.Y = Convert.ToInt32(shape.Attributes["Y"].Value);
-            //Box.Width = Convert.ToInt32(shape.Attributes["Width"].Value);
-            //Box.Height = Convert.ToInt32(shape.Attributes["Height"].Value);
 
             Color penColor = Color.Black;
             if (shape.Attributes["LineColor"] != null) penColor = ColorTranslator.FromHtml(shape.Attributes["LineColor"].Value);
@@ -1087,20 +1070,10 @@ namespace GraphicShapes
             if (shape.Attributes["LineWidth"] != null) penWidth = Convert.ToInt32(shape.Attributes["LineWidth"].Value);
 
             _pen = new Pen(penColor, penWidth);
-
-            //if (shape.InnerText != null && shape.InnerText != "")
-            //{
-            //    _text = shape.InnerText;
-            //    getTextAttributes(shape);
-            //}
         }
 
         public override void Draw(Graphics g, int extd) //Polygon
         {
-            //g.DrawEllipse(_pen, 0, 0, Box.Width, Box.Height);
-            //g.DrawLines(_pen, MarkerPoints);
-            //setStringFormat();
-            //g.DrawString(_text, _font, _fontBrush, _textBox, _stringFormat);
             if (_fillBrush != null) g.FillPolygon(_fillBrush, MarkerPoints);
             if (_pen.Width > 0) g.DrawPolygon(_pen, MarkerPoints);
 
@@ -1201,22 +1174,8 @@ namespace GraphicShapes
 
         public override void Draw(Graphics g, int extd) //ArrowTip
         {
-            //g.DrawEllipse(_pen,_tip.X - w,_tip.Y -w, 2*w, 2*w);
             g.FillPolygon(_brush, Points);
         }
-
-        //public override Point getSize()
-        //{
-        //    Point Size = new Point(0, 0);
-        //    MessageBox.Show("Sorry, size for Markers is not yet implemented.", "Marker");
-        //    return Size;
-        //}
-
-        //public override bool hit(PointF checkPoint) //ArrowTip
-        //{
-        //    //TODO: Dummy Function!
-        //    return false;
-        //}
 
     }
 

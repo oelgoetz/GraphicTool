@@ -1,9 +1,6 @@
 ﻿using GraphicShapes;
-using System.Drawing;
 using System.Drawing.Imaging;
 using System.Xml;
-using System.Xml.Linq;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
 
 namespace GraphicTool
 {
@@ -113,8 +110,6 @@ namespace GraphicTool
 
         public void LoadOverlays(XmlNode Shapes)
         {
-            Point d = new Point(); d.X = 0; d.Y = 0; //Wird als Offset gebraucht, um gruppierte Shapes zu unterstützen.
-
             foreach (XmlNode shape in Shapes)
             {
                 if (shape.NodeType != XmlNodeType.Element) continue;
@@ -125,8 +120,6 @@ namespace GraphicTool
                 catch (Exception ex)
                 {
                     string s = " ";
-                    //XmlNode node = shape;
-                    //while (node.ParentNode.Name.ToLower() != "file") node = node.ParentNode;
                     if (shape.Attributes["Type"] != null) s += shape.Attributes["Type"].Value;
                     if (shape.ParentNode.Attributes["Type"] != null) s += shape.ParentNode.Attributes["Type"].Value;
                     MessageBox.Show(ex.Message + "\n" + shape.Name + "\n" + s + "\n" + shape.BaseURI, "Display02.addShape");
@@ -153,7 +146,6 @@ namespace GraphicTool
         {
             MyGroup dummy = new MyGroup();
             string grouptype = dummy.GetType().Name.ToString();
-            //Point Offset = getOffset(Object);
             for (int i = 0; i < Object.Children.Count; i++)
             {
                 GraphicObject g = Object.Children[i];
@@ -381,11 +373,10 @@ namespace GraphicTool
 
         public string Image2Base64(Image bImage)
         {
-            //Bitmap bImage = newImage;  // Your Bitmap Image
             System.IO.MemoryStream ms = new MemoryStream();
             bImage.Save(ms, ImageFormat.Png);
             byte[] byteImage = ms.ToArray();
-            return Convert.ToBase64String(byteImage); // Get Base64
+            return Convert.ToBase64String(byteImage);
         }
 
         public void setPaintMode(int mode)
@@ -517,7 +508,6 @@ namespace GraphicTool
             {
                 foreach (GraphicObject g in root.Children)
                     g.UnSelect();
-                //BackGroundSelected = false;
                 focusedGraphicObject = -1;
             }
             switch (mouseOverObject)
@@ -549,18 +539,9 @@ namespace GraphicTool
                     Mode = mode.Move;
                     nSelected++;
                     if (!add)
-                        break; //KEIN MULTISELECT !!!
+                        break;
                 }
             }
-            //if (BackGroundSelected)
-            //{
-            //    //if (SelectedImage != null && SelectedImage.IsSelected())
-            //    //{
-            //    //    BackGroundSelected = false;
-            //    //}
-            //    Mode = mode.Move;
-            //}
-
             this.Invalidate();
         }
 
@@ -596,16 +577,6 @@ namespace GraphicTool
             switch (Mode)
             {
                 case mode.Move:
-                    //if (BackGroundSelected)
-                    //    moveImageBackground(e.Location);
-                    //if (SelectedImage != null && SelectedImage.IsSelected())
-                    //{
-                    //    SelectedImage.Move(new Point(Convert.ToInt32(delta.X), Convert.ToInt32(delta.Y)));
-
-                    //    Selection.X += Convert.ToInt32(delta.X);
-                    //    Selection.Y += Convert.ToInt32(delta.Y);
-                    //}
-                    //else
                     {
                         foreach (GraphicObject g in root.Children)
                         {
@@ -622,9 +593,6 @@ namespace GraphicTool
                             if (g.IsSelected)
                             {
                                 g.Reshape(deltaXY);
-                                //g.reWriteXmlAfterMove();
-                                //g._points[g._SelectedPoint].X += delta.X;
-                                //g._points[g._SelectedPoint].Y += delta.Y;
                             }
                         }
 
