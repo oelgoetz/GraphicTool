@@ -1,5 +1,8 @@
 ﻿using System.Drawing;
+using System.Drawing.Imaging;
 using System.Xml;
+using System.Xml.Linq;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace GraphicShapes
 {
@@ -121,7 +124,9 @@ namespace GraphicShapes
                 case "Polyline":
                     newGraphicObject = new MyPolyline(shape, Parent);
                     break;
-                case "Image": break;
+                case "Image":
+                    newGraphicObject = new MyImage(shape, Parent);
+                    break;
                 case "Bubble": break;
                 case "Cursor": break;
                 default: break;
@@ -479,6 +484,29 @@ namespace GraphicShapes
             return -1;
         }
 
+        internal Image Base642Image(string base64String)
+        {
+            if (base64String == "")
+            {
+                return null;
+            }
+            try
+            {
+                byte[] buffer = Convert.FromBase64String(base64String);
+                if (buffer != null)
+                {
+                    ImageConverter ic = new ImageConverter();
+                    return ic.ConvertFrom(buffer) as Image;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return null;
+            }
+        }
+
         //-----------------------------------------------------------------------------
     }
 
@@ -502,6 +530,98 @@ namespace GraphicShapes
         public override void Reshape(Point d) //Root
         {
             throw new NotImplementedException();
+        }
+    }
+
+    class MyImage : GraphicObject
+    {
+        private Bitmap _image;
+
+        public MyImage(XmlNode shape, GraphicObject parent) //MyImage
+        {
+            Parent = parent;
+
+            Box.X = Convert.ToInt32(shape.Attributes["X"].Value);
+            Box.Y = Convert.ToInt32(shape.Attributes["Y"].Value);
+            Box.Width = Convert.ToInt32(shape.Attributes["Width"].Value);
+            Box.Height = Convert.ToInt32(shape.Attributes["Height"].Value);
+
+            //wenn das Objekt zu klein zum selektieren wird
+            if (Box.Width < 2)
+            {
+                Box.X -= 2;
+                Box.Width = 4;
+            }
+            if (Box.Height < 2)
+            {
+                Box.Y -= 2;
+                Box.Height = 4;
+            }
+
+            string base64String = shape.InnerText;
+            _image = (Bitmap)Base642Image(base64String);
+            if (_image != null && (_image.Size.Width != Box.Width || _image.Size.Height != Box.Height))
+                _image = new Bitmap(_image, new Size(Box.Width, Box.Height));
+
+            MarkerPoints = new Point[]
+            {               
+                new Point(Box.Width / 2, 0),
+                new Point(Box.Width / 2, Box.Height),
+                new Point(0, Box.Height / 2),
+                new Point(Box.Width, Box.Height/2)
+           };
+        }
+
+        public override void Draw(Graphics g, int extd) //MyImage
+        {
+            g.TranslateTransform(Box.X, Box.Y);
+
+            if (this._image != null)
+                g.DrawImage(_image, Point.Empty);
+            if (extd > 0 && this.IsSelected)
+            {
+                Brush solidBrush = new SolidBrush(Color.FromArgb(64, 255, 0, 0));
+                g.FillRectangle(solidBrush, 0, 0, Box.Width, Box.Height);
+                for (int i = 0; i < MarkerPoints.Length; i++)
+                {
+                    if (SelectedMarker == i)
+                        g.FillRectangle(Brushes.Black, new Rectangle(new Point(MarkerPoints[i].X - 4, MarkerPoints[i].Y - 4), new Size(8, 8)));
+                    else
+                    {
+                        g.DrawRectangle(DarkMarkerPen, new Rectangle(new Point(MarkerPoints[i].X - 4, MarkerPoints[i].Y - 4), new Size(8, 8)));
+                    }
+                }
+            }
+            g.TranslateTransform(-Box.X, -Box.Y);
+        }
+
+        public override void Move(Point d)  //MyImage
+        {
+            Box.X += d.X;
+            Box.Y += d.Y;
+        }
+
+        public override void Reshape(Point d) //MyImage
+        {
+            switch (SelectedMarker)
+            {
+                case 0: //Top
+                    Box.Y += d.Y;
+                    Box.Height -= d.Y;
+                    break;
+                case 1: //Bottom
+                    Box.Height += d.Y;
+                    break;
+                case 2: //Left
+                    Box.Width -= d.X;
+                    Box.X += d.X;
+                    break;
+                case 3: //Right
+                    Box.Width += d.X;
+                    break;
+            }
+            MarkerPoints = Rectangle2Array(Box);
+            updateTextBox();
         }
     }
 

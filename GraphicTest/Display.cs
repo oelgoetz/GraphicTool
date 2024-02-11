@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
+using System.Windows.Forms;
 using System.Xml;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
 
@@ -92,6 +93,7 @@ namespace GraphicTool
             displayOffset = Point.Empty;
             BackgroundOffset = Point.Empty;
             backGroundSelected = false;
+            textBox1.Clear();
             root = new Root();
 
             if (fileName.EndsWith(".props"))
@@ -127,7 +129,7 @@ namespace GraphicTool
                 displayOffset.X = this.Width / 2 - BackGroundBmp.Width / 2;
                 displayOffset.Y = this.Height / 2 - (BackGroundBmp.Height + infoBox.Height) / 2;
             }
-            if(BackGroundBmp != null)
+            if (BackGroundBmp != null)
             {
                 if (displayOffset.X + BackGroundBmp.Width > this.Width) displayOffset.X = 0;
                 if (displayOffset.Y + BackGroundBmp.Height + infoBox.Height > this.Height) displayOffset.Y = 0;
@@ -455,7 +457,7 @@ namespace GraphicTool
                 BackGroundBmp = new Bitmap(this.Width, this.Height);
 
             //if (graphic == null) 
-            
+
             graphic = Graphics.FromImage(BackGroundBmp);
             //graphic.TextRenderingHint = TextRenderingHint.AntiAlias;
             if ((drawMode & 6) > 1)
@@ -682,6 +684,11 @@ namespace GraphicTool
                                 if (g.IsSelected)
                                 {
                                     g.Reshape(deltaXY);
+                                    if (textBox1.Visible)
+                                    {
+                                        textBox1.Location = new Point(g.Box.X + displayOffset.X + 1, g.Box.Y + displayOffset.Y + 1);
+                                        textBox1.Size = new Size(g._textBox.Size.Width - 2, g._textBox.Size.Height - 2);
+                                    }
                                 }
                             }
 
@@ -816,26 +823,26 @@ namespace GraphicTool
                                         groupToolStripMenuItem.Click += groupToolStripMenuItem_Click;
                                         contextMenu.Items.AddRange(new ToolStripItem[] { groupToolStripMenuItem });
                                     }
-                                    
+
                                     contextMenu.Show(Cursor.Position);
                                     Mode = mode.ContextMenu;
                                     this.Invalidate();
                                 }
-                                else
-                                {
-                                    if (g != null)
-                                    {
-                                        GraphicShapeDialog textForm = new GraphicShapeDialog(this, g);
+                                //else
+                                //{
+                                //    if (g != null)
+                                //    {
+                                //        GraphicShapeDialog textForm = new GraphicShapeDialog(this, g);
 
-                                        if (textForm.ShowDialog() == DialogResult.OK)
-                                        {
+                                //        if (textForm.ShowDialog() == DialogResult.OK)
+                                //        {
 
-                                        }
+                                //        }
 
-                                        textForm.Dispose();
-                                        this.Invalidate();
-                                    }
-                                }
+                                //        textForm.Dispose();
+                                //        this.Invalidate();
+                                //    }
+                                //}
                             }
                         }
                         break;
@@ -843,7 +850,13 @@ namespace GraphicTool
             }
             else //MouseButtons.Left
             {
-                if (mouseOverObject == -2) backGroundSelected = false;
+                if (mouseOverObject == -2)
+                {
+                    backGroundSelected = false;
+                    textBox1.Visible = false;
+                    textBox1.Clear();
+                }
+                //if (Mode != mode.ResizeObject && mouseOverObject < 0) 
                 int index = -1;
                 foreach (GraphicObject g in root.Children)
                 {
@@ -905,6 +918,51 @@ namespace GraphicTool
         private void Display_Resize(object sender, EventArgs e)
         {
             Center();
+        }
+
+        private void Display_DoubleClick(object sender, EventArgs e)
+        {
+            if (mouseOverObject > -1)
+            {
+                GraphicObject g;
+                if (focusedGraphicObject > 0)
+                    g = root.Children[focusedGraphicObject];
+                else
+                    g = root.Children[mouseOverObject];
+                if (g != null && nSelected == 1 && g.GetType() != typeof(MyGroup))
+                {
+
+                    
+                    textBox1.Location = new Point(g.Box.X + displayOffset.X + 1, g.Box.Y + displayOffset.Y + 1);
+                    textBox1.Size = new Size(g._textBox.Size.Width - 2, g._textBox.Size.Height - 2);
+                    textBox1.Font = g._font;
+                    textBox1.Text = g._text;
+                    textBox1.Visible = true;
+
+                    //GraphicShapeDialog textForm = new GraphicShapeDialog(this, g);
+                    //if (textForm.ShowDialog() == DialogResult.OK)
+                    //{
+
+                    //}
+                    //textForm.Dispose();
+                    //this.Invalidate();
+
+                }
+            }
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            if (mouseOverObject > -1)
+            {
+                GraphicObject g;
+                if (focusedGraphicObject > 0)
+                    g = root.Children[focusedGraphicObject];
+                else
+                    g = root.Children[mouseOverObject];
+                g._text = textBox1.Text;
+            }
+            Invalidate();
         }
     }
 
