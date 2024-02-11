@@ -44,6 +44,8 @@
             MouseDown += Display_MouseDown;
             MouseMove += Display_MouseMove;
             MouseUp += Display_MouseUp;
+            PreviewKeyDown += Display_PreviewKeyDown;
+            Resize += Display_Resize;
             ResumeLayout(false);
         }
 

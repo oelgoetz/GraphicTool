@@ -11,6 +11,7 @@ namespace GraphicShapes
         internal static Brush MarkerBrush = new SolidBrush(Color.Gray);
         internal static Pen SpecialMarkerPen = new Pen(Color.Red, 2);
         internal static Brush SpecialMarkerBrush = new SolidBrush(Color.Red);
+        internal static Font defaultFont = new Font("Arial", 10);
 
         public GraphicObject Parent;
         public List<GraphicObject> Children = new List<GraphicObject>();
@@ -198,8 +199,8 @@ namespace GraphicShapes
             }
             
             //DEFAULT FONT PATCHING
-            //if (_text != "" && _font == null)
-            //    _font = new Font("Segoe UI", 12, _fontStyle, GraphicsUnit.Point);
+            if (_text != "" && _font == null)
+                _font = new Font("Segoe UI", 12, _fontStyle, GraphicsUnit.Point);
 
             //PADDING
             if (node.Attributes["PaddingLeft"] != null) 
@@ -345,12 +346,12 @@ namespace GraphicShapes
             return Pcords;
         }
 
-        public virtual string CoordinateString()
+        public virtual string CoordinateString(Point BGOffset)
         {
             string c = "";
             foreach(Point p in MarkerPoints)
             {
-                c += p.X.ToString() + ',' + p.Y.ToString() + ','; 
+                c += (p.X - BGOffset.X).ToString() + ',' + (p.Y- BGOffset.Y).ToString() + ','; 
             }
             if(c.EndsWith(',')) c = c.Substring(0, c.Length - 1);
             return c;
@@ -387,59 +388,19 @@ namespace GraphicShapes
             return "#" + c.R.ToString("X2") + c.G.ToString("X2") + c.B.ToString("X2");
         }
 
-        public virtual bool detectClipping(string text, Font font, PointF Loc, SizeF rect, StringFormat _stringFormat)
-        {
-            //Font font = new Font("Courier New", 10.0F);
-            Image dummy = new Bitmap(1, 1);
-            Graphics graphics = Graphics.FromImage(dummy);
-            // Set the TextRenderingHint property.
-            graphics.TextRenderingHint =
-                System.Drawing.Text.TextRenderingHint.AntiAlias;
-            //SizeF size = graphics.MeasureString(text, font);
-            //SizeF size = graphics.MeasureString(text, font, Loc, _stringFormat);
-
-
-            //_stringFormat.FormatFlags = _stringFormat.FormatFlags | StringFormatFlags.FitBlackBox;
-            //_stringFormat.FormatFlags = _stringFormat.FormatFlags | StringFormatFlags.MeasureTrailingSpaces;
-            //_stringFormat.FormatFlags = _stringFormat.FormatFlags | StringFormatFlags.NoWrap;
-            //_stringFormat.FormatFlags = _stringFormat.FormatFlags | StringFormatFlags.
-
-
-            _stringFormat.FormatFlags = _stringFormat.FormatFlags | StringFormatFlags.NoClip;
-            SizeF size1 = graphics.MeasureString(text, font, rect, _stringFormat);
-            float area1 = size1.Height * size1.Width;
-            //_stringFormat.FormatFlags = _stringFormat.FormatFlags & ~StringFormatFlags.NoClip;
-            //SizeF size2 = graphics.MeasureString(text, font, rect, _stringFormat);
-            SizeF size2 = graphics.MeasureString(text, font, Loc, _stringFormat);
-            float area2 = size2.Height * size2.Width;
-            return area2 > area1;
-
-        }
-
-        public virtual SizeF getTextSize(string text, Font font, PointF Loc, SizeF rect, StringFormat _stringFormat)
-        {
-            //Font font = new Font("Courier New", 10.0F);
-            Image dummy = new Bitmap(1, 1);
-            Graphics graphics = Graphics.FromImage(dummy);
-            // Set the TextRenderingHint property.
-            graphics.TextRenderingHint =
-                System.Drawing.Text.TextRenderingHint.AntiAlias;
-            //SizeF size = graphics.MeasureString(text, font);
-            //SizeF size = graphics.MeasureString(text, font, Loc, _stringFormat);
-
-
-            //_stringFormat.FormatFlags = _stringFormat.FormatFlags | StringFormatFlags.FitBlackBox;
-            //_stringFormat.FormatFlags = _stringFormat.FormatFlags | StringFormatFlags.MeasureTrailingSpaces;
-            //_stringFormat.FormatFlags = _stringFormat.FormatFlags | StringFormatFlags.NoWrap;
-            //_stringFormat.FormatFlags = _stringFormat.FormatFlags | StringFormatFlags.
-
-
-            _stringFormat.FormatFlags = _stringFormat.FormatFlags | StringFormatFlags.NoClip;
-            SizeF size1 = graphics.MeasureString(text, font, rect, _stringFormat);
-            //_stringFormat.FormatFlags = _stringFormat.FormatFlags & ~StringFormatFlags.NoClip;
-            //SizeF size2 = graphics.MeasureString(text, font, rect, _stringFormat);
-            SizeF size2 = graphics.MeasureString(text, font, Loc, _stringFormat);
-            return size2;
+        public virtual void markClipping(Graphics g, string text, Font font, Rectangle TextBox, StringFormat _stringFormat)
+        {           
+            int charactersFitted;
+            int linesFilled;
+            g.MeasureString(text, font, _textBox.Size, _stringFormat, out charactersFitted, out linesFilled);
+            if(charactersFitted < text.Length)
+            {
+                int marker_pos = 6;
+                int merker_siz = 14;
+                g.FillRectangle(Brushes.Red, new Rectangle(new Point(_textBox.Right + marker_pos, _textBox.Bottom + 1), new Size(1, merker_siz - 3)));
+                g.FillRectangle(Brushes.Red, new Rectangle(new Point(_textBox.Right + 1, _textBox.Bottom + marker_pos), new Size(merker_siz - 3, 1)));
+                g.DrawRectangle(Pens.Red, new Rectangle(new Point(_textBox.Right - 1, _textBox.Bottom - 1), new Size(merker_siz, merker_siz)));
+            }
         }
 
         internal void updatePolyBox()
@@ -604,6 +565,11 @@ namespace GraphicShapes
             {
                 setStringAlignment();
                 g.DrawString(_text, _font, _fontBrush, _textBox, _stringFormat);
+                if (extd > 0)
+                {
+                    markClipping(g, _text, _font, _textBox, _stringFormat);
+                }
+
             }
             if (extd > 0 && this.IsSelected)
             {
@@ -708,12 +674,16 @@ namespace GraphicShapes
         public override void Draw(Graphics g, int extd) //Group
         {
             g.TranslateTransform(Box.X, Box.Y);
-            g.DrawRectangle(LightMarkerPen, 0, 0, Box.Width, Box.Height);
-            if (extd > 0 && this.IsSelected)
+            
+            if (extd > 0)
             {
-                g.DrawRectangle(DarkMarkerPen, 0, 0, Box.Width, Box.Height);
-                Brush solidBrush = new SolidBrush(Color.FromArgb(64, 0, 255, 0));
-                g.FillRectangle(solidBrush, 0, 0, Box.Width, Box.Height);               
+                g.DrawRectangle(LightMarkerPen, 0, 0, Box.Width, Box.Height);
+                if (this.IsSelected)
+                {
+                    g.DrawRectangle(DarkMarkerPen, 0, 0, Box.Width, Box.Height);
+                    Brush solidBrush = new SolidBrush(Color.FromArgb(64, 0, 255, 0));
+                    g.FillRectangle(solidBrush, 0, 0, Box.Width, Box.Height);
+                }                              
             }
             foreach (GraphicObject child in Children)
             {
@@ -787,7 +757,6 @@ namespace GraphicShapes
 
         public override void Draw(Graphics g, int extd) //Oval
         {
-
             g.TranslateTransform(Box.X, Box.Y);
             if (_fillBrush != null) g.FillEllipse(_fillBrush, 0, 0, Box.Width, Box.Height);
             if (_pen.Width > 0) g.DrawEllipse(_pen, 0, 0, Box.Width, Box.Height);
@@ -795,6 +764,10 @@ namespace GraphicShapes
             {
                 setStringAlignment();
                 g.DrawString(_text, _font, _fontBrush, _textBox, _stringFormat);
+                if (extd > 0)
+                {
+                    markClipping(g, _text, _font, _textBox, _stringFormat);
+                }
             }
             if (extd > 0 && this.IsSelected)
             {

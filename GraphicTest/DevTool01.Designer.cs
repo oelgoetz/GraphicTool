@@ -99,13 +99,12 @@
             comboBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             comboBox1.ContextMenuStrip = contextMenuStrip1;
             comboBox1.FormattingEnabled = true;
+            comboBox1.Items.AddRange(new object[] { "//Shape[@Type='Oval' and contains(text(),'')]", "//Shape[@Type='Rectangle' and contains(text(),'Werkzeug')]" });
             comboBox1.Location = new Point(6, 110);
             comboBox1.Name = "comboBox1";
             comboBox1.Size = new Size(638, 23);
             comboBox1.TabIndex = 20;
             comboBox1.Text = "//Shape[@Type='Polyline' and @ArrowHeadCenterLength and @ArrowHeads]";
-            comboBox1.Items.Add("//Shape[@Type='Oval' and contains(text(),'')]"); 
-            comboBox1.Items.Add("//Shape[@Type='Rectangle' and contains(text(),'Werkzeug')]");
             comboBox1.KeyDown += comboBox1_KeyDown;
             // 
             // contextMenuStrip1
@@ -246,12 +245,14 @@
             // actionsToolStripMenuItem
             // 
             actionsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { getAllpropsAttributesToolStripMenuItem, getAttributes049ValuesToolStripMenuItem });
+            actionsToolStripMenuItem.Enabled = false;
             actionsToolStripMenuItem.Name = "actionsToolStripMenuItem";
             actionsToolStripMenuItem.Size = new Size(59, 20);
             actionsToolStripMenuItem.Text = "Actions";
             // 
             // getAllpropsAttributesToolStripMenuItem
             // 
+            getAllpropsAttributesToolStripMenuItem.Enabled = false;
             getAllpropsAttributesToolStripMenuItem.Name = "getAllpropsAttributesToolStripMenuItem";
             getAllpropsAttributesToolStripMenuItem.Size = new Size(209, 22);
             getAllpropsAttributesToolStripMenuItem.Text = "Get all .props Attributes";
@@ -259,6 +260,7 @@
             // 
             // getAttributes049ValuesToolStripMenuItem
             // 
+            getAttributes049ValuesToolStripMenuItem.Enabled = false;
             getAttributes049ValuesToolStripMenuItem.Name = "getAttributes049ValuesToolStripMenuItem";
             getAttributes049ValuesToolStripMenuItem.Size = new Size(209, 22);
             getAttributes049ValuesToolStripMenuItem.Text = "Get Attributes 0-49 values";

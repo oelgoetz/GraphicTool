@@ -16,22 +16,22 @@ namespace GraphicTool
             string loc = Properties.Settings.Default.DESKTOPBOUNDS;
             string[] temp = loc.Split(';');
             this.SetDesktopBounds(Convert.ToInt32(temp[0]), Convert.ToInt32(temp[1]), Convert.ToInt32(temp[2]), Convert.ToInt32(temp[3]));
-            display.PreviewKeyDown += new PreviewKeyDownEventHandler(Display_PreviewKeyDown);
+            //display.PreviewKeyDown += new PreviewKeyDownEventHandler(Display_PreviewKeyDown);
             display.setPaintMode(5);
         }
 
-        public void Display_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
-        {
-            switch (e.KeyCode)
-            {
-                case Keys.Right:
-                case Keys.Left:
-                case Keys.Down:
-                case Keys.Up:
-                    e.IsInputKey = true;
-                    break;
-            }
-        }
+        //public void Display_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        //{
+        //    switch (e.KeyCode)
+        //    {
+        //        case Keys.Right:
+        //        case Keys.Left:
+        //        case Keys.Down:
+        //        case Keys.Up:
+        //            e.IsInputKey = true;
+        //            break;
+        //    }
+        //}
 
         public void LoadImageFile(string fileName, bool doc)
         {
@@ -137,20 +137,20 @@ namespace GraphicTool
         {
             ShowInfoToolStripMenuItem.Checked = Properties.Settings.Default.SHOWDISPLAYINFO;
             ConfirmSaveToToolStripMenuItem.Checked = Properties.Settings.Default.SHOWSAVEIMAGETOBACKGROUNDWARNING;
-            //display1.setPaintMode(Properties.Settings.Default.DISPLAYMODE);
             applyFileOpenMode();
             applyRecentFileList();
             if (_args != null && _args.Length > 0)
             {
                 if (File.Exists(_args[0]))
-                    display.LoadImageFile(_args[0]);//, Properties.Settings.Default.DISPLAYMODE, Properties.Settings.Default.SHOWDISPLAYINFO);
-                //if (oldD) LoadImageFile(_args[0], true);
+                    display.LoadImageFile(_args[0]);
                 else
                     MessageBox.Show(_args[0]);
             }
-            //LoadTestCase("deleteme"); // "4squares"; // "3RectanglesCapture"; //"glSearchFieldExt00UngroupedInCapture"; //deleteme)
+            //LoadTestCase("deleteme");
             //LoadTestCase("FontStyleTest");
-            LoadTestCase("texttest01");
+            //LoadTestCase("texttest01");
+            //LoadTestCase("texttest02");
+            LoadTestCase("textsizetest");
         }
 
         private void LoadTestCase(string testfile) 

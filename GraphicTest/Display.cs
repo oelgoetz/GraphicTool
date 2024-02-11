@@ -1,6 +1,9 @@
 ﻿using GraphicShapes;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing.Imaging;
+using System.Drawing.Text;
 using System.Xml;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
 
 namespace GraphicTool
 {
@@ -18,6 +21,7 @@ namespace GraphicTool
         private Point lastPoint;
         private mode Mode = mode.Default;
         private bool showInfo = false;
+        private Size infoBox;
 
         private enum mode
         {
@@ -36,12 +40,16 @@ namespace GraphicTool
         }
 
         private Point XY;
+
         private Point deltaXY = Point.Empty;
         private int mouseOverObject;
         private int focusedGraphicObject;
         private int nSelected;
         private bool multiSelect;
         private bool backGroundSelected;
+        private Point BackgroundOffset = Point.Empty;
+
+
 
         public Display()
         {
@@ -50,7 +58,22 @@ namespace GraphicTool
             PropsFileBmp = new Bitmap(this.Width, this.Height);
             ImageFileBmp = new Bitmap(this.Width, this.Height);
             root = new Root();
+            //PreviewKeyDown += new PreviewKeyDownEventHandler(Display_PreviewKeyDown);
+
         }
+
+        //public void Display_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        //{
+        //    switch (e.KeyCode)
+        //    {
+        //        case Keys.Right:
+        //        case Keys.Left:
+        //        case Keys.Down:
+        //        case Keys.Up:
+        //            e.IsInputKey = true;
+        //            break;
+        //    }
+        //}
 
         public void DrawOnGraphics(Graphics g)
         {
@@ -66,6 +89,9 @@ namespace GraphicTool
         public void LoadImageFile(string fileName)
         {
             BackGroundBmp = null; PropsFileBmp = null; ImageFileBmp = null;
+            displayOffset = Point.Empty;
+            BackgroundOffset = Point.Empty;
+            backGroundSelected = false;
             root = new Root();
 
             if (fileName.EndsWith(".props"))
@@ -86,9 +112,27 @@ namespace GraphicTool
                 this.LoadOverlays(ShapesNode);
             }
 
-            //Center();
-            //this.setPaintMode(displayMode);
+            Center();
             this.Invalidate();
+        }
+
+        private void Center()
+        {
+            if ((drawMode & 2) == 2 && ImageFileBmp != null)
+                BackGroundBmp = (Bitmap)ImageFileBmp.Clone();
+            if ((drawMode & 4) == 4 && PropsFileBmp != null)
+                BackGroundBmp = (Bitmap)PropsFileBmp.Clone();
+            if (BackGroundBmp != null)
+            {
+                displayOffset.X = this.Width / 2 - BackGroundBmp.Width / 2;
+                displayOffset.Y = this.Height / 2 - (BackGroundBmp.Height + infoBox.Height) / 2;
+            }
+            if(BackGroundBmp != null)
+            {
+                if (displayOffset.X + BackGroundBmp.Width > this.Width) displayOffset.X = 0;
+                if (displayOffset.Y + BackGroundBmp.Height + infoBox.Height > this.Height) displayOffset.Y = 0;
+            }
+            Invalidate();
         }
 
         public void LoadBackGroundImageFromFile(string filename, bool scale = true)
@@ -142,7 +186,7 @@ namespace GraphicTool
         }
 
         //------------------------------------------------------------------
-        private void deserialize(XmlNode ShapesNode, GraphicObject Object)
+        private void deserialize(XmlNode ShapesNode, GraphicObject Object, Point BGOffset)
         {
             MyGroup dummy = new MyGroup();
             string grouptype = dummy.GetType().Name.ToString();
@@ -153,18 +197,18 @@ namespace GraphicTool
                 ShapesNode.AppendChild(Shape);
                 string type = g.GetType().Name.ToString();
                 string writetype = type;
-                if (writetype.StartsWith("My")) 
+                if (writetype.StartsWith("My"))
                     writetype = writetype.Replace("My", "");
                 Attribute(Shape, "Type", writetype);
-    
-                if (writetype == "Polyline" || writetype == "Polygon") 
+
+                if (writetype == "Polyline" || writetype == "Polygon")
                 {
-                    Attribute(Shape, "Coordinates", g.CoordinateString());
+                    Attribute(Shape, "Coordinates", g.CoordinateString(BGOffset));
                 }
                 else
                 {
-                    Attribute(Shape, "X", (g.Box.X).ToString());
-                    Attribute(Shape, "Y", (g.Box.Y).ToString());
+                    Attribute(Shape, "X", (g.Box.X - BGOffset.X).ToString());
+                    Attribute(Shape, "Y", (g.Box.Y - BGOffset.Y).ToString());
                     Attribute(Shape, "Width", g.Box.Width.ToString());
                     Attribute(Shape, "Height", g.Box.Height.ToString());
                 }
@@ -172,21 +216,21 @@ namespace GraphicTool
                 if (g._pen != null && g._pen.Width > 0)
                 {
                     Attribute(Shape, "LineWidth", g._pen.Width.ToString());
-                    Attribute(Shape, "LineColor", ColorTranslator.ToHtml(g._pen.Color));                        
+                    Attribute(Shape, "LineColor", ColorTranslator.ToHtml(g._pen.Color));
                 }
 
-                if(g._fillBrush != null)
+                if (g._fillBrush != null)
                 {
-                    Color BackColor = ((SolidBrush) g._fillBrush).Color;
+                    Color BackColor = ((SolidBrush)g._fillBrush).Color;
                     Attribute(Shape, "BackgroundColor", ColorTranslator.ToHtml(BackColor));
                 }
 
-                if(g._text != "")
+                if (g._text != "")
                 {
                     Shape.InnerText = g._text;
                 }
 
-                if(g._padding != null)
+                if (g._padding != null)
                 {
                     Attribute(Shape, "PaddingLeft", g._padding.Left.ToString());
                     Attribute(Shape, "PaddingTop", g._padding.Top.ToString());
@@ -194,7 +238,7 @@ namespace GraphicTool
                     Attribute(Shape, "PaddingBottom", g._padding.Bottom.ToString());
                 }
 
-                if(g._flags < 4)
+                if (g._flags < 4)
                 {
                     Attribute(Shape, "VerticalAlign", "top");
                     if (g._flags == 0) Attribute(Shape, "TextAlign", "left");
@@ -203,17 +247,17 @@ namespace GraphicTool
                 }
                 else
                 {
-                    if ((g._flags & 1) == 1) 
+                    if ((g._flags & 1) == 1)
                         Attribute(Shape, "TextAlign", "center");
                     else
-                        if ((g._flags & 2) == 2) 
-                            Attribute(Shape, "TextAlign", "right");
-                        else
-                            Attribute(Shape, "TextAlign", "left");
+                        if ((g._flags & 2) == 2)
+                        Attribute(Shape, "TextAlign", "right");
+                    else
+                        Attribute(Shape, "TextAlign", "left");
                     if ((g._flags & 4) == 4) Attribute(Shape, "VerticalAlign", "center");
                     if ((g._flags & 8) == 8) Attribute(Shape, "VerticalAlign", "bottom");
 
-                }                
+                }
 
                 if (g._font != null)
                 {
@@ -242,10 +286,9 @@ namespace GraphicTool
 
                 }
 
-
-                //Recursion call for Groups
+                //Recursive call for Groups
                 if (type == grouptype)
-                    deserialize(Shape, g);                
+                    deserialize(Shape, g, BGOffset);
             }
 
             //----------//OK:
@@ -268,13 +311,11 @@ namespace GraphicTool
             //FontFamily
             //FontSize
             //FontWeight
-            //Underline
-
-            //----------//TODO:                        
+            //Underline                        
             //TextAlign
             //VerticalAlign
 
-            //NICE TO HAVE:
+            //NOT SUPPORTED:
             //CornerRadius
             //Rotation
             //ShapeTimeSpan
@@ -310,13 +351,13 @@ namespace GraphicTool
 
             XmlNode ShapesNode = propsFile.SelectSingleNode("//Shapes");
             //Save Shapes as Xml
-            deserialize(ShapesNode, root);
+            deserialize(ShapesNode, root, BackgroundOffset);
             //Draw Shapes on Graphic
             PaintOnGraphicInstance(graph, 0, Color.White);
             //Save Graphic
             BackGroundBmp.Save(fileName);
             //Update Image File in memory
-            ImageFileBmp = (Bitmap)BackGroundBmp.Clone();
+            //ImageFileBmp = (Bitmap)BackGroundBmp.Clone();
             propsFile.Save(fileName + ".props");
             //tools1.BeautifyXml(fileName + ".props", fileName + ".props");
         }
@@ -395,19 +436,31 @@ namespace GraphicTool
             showInfo = Info;
             Invalidate();
         }
+
         public void setZoomFactor(int f)
         {
-            zoomFactor = (float) f/100;
+            zoomFactor = (float)f / 100;
             //Center();
             this.Invalidate();
         }
 
         private void PaintOnGraphicInstance(Graphics graphic, int marker, Color ClearColor)
         {
-            if (graphic == null) graphic = Graphics.FromImage(BackGroundBmp);
+            //if ((drawMode & 2) == 2 && ImageFileBmp != null)
+            //    BackGroundBmp = (Bitmap)ImageFileBmp.Clone();
+            //if ((drawMode & 4) == 4 && PropsFileBmp != null)
+            if (BackGroundBmp != null)
+                BackGroundBmp = (Bitmap)PropsFileBmp.Clone();
+            else
+                BackGroundBmp = new Bitmap(this.Width, this.Height);
+
+            //if (graphic == null) 
+            
+            graphic = Graphics.FromImage(BackGroundBmp);
+            //graphic.TextRenderingHint = TextRenderingHint.AntiAlias;
             if ((drawMode & 6) > 1)
             {
-                graphic.DrawImage(BackGroundBmp, 0, 0, BackGroundBmp.Width, BackGroundBmp.Height);
+                graphic.DrawImage(BackGroundBmp, BackgroundOffset.X, BackgroundOffset.Y, BackGroundBmp.Width, BackGroundBmp.Height);
             }
             else
             {
@@ -429,17 +482,18 @@ namespace GraphicTool
 
         private void Display_Paint(object sender, PaintEventArgs e)
         {
-
             if ((drawMode & 2) == 2 && ImageFileBmp != null)
                 BackGroundBmp = (Bitmap)ImageFileBmp.Clone();
             if ((drawMode & 4) == 4 && PropsFileBmp != null)
                 BackGroundBmp = (Bitmap)PropsFileBmp.Clone();
 
             e.Graphics.ScaleTransform(zoomFactor, zoomFactor);
+            e.Graphics.TranslateTransform(displayOffset.X / zoomFactor, displayOffset.Y / zoomFactor);
+            //e.Graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
 
             if (BackGroundBmp != null)
             {
-                e.Graphics.DrawImage((Bitmap)BackGroundBmp, new Rectangle(0, 0, BackGroundBmp.Width, BackGroundBmp.Height));
+                e.Graphics.DrawImage((Bitmap)BackGroundBmp, new Rectangle(BackgroundOffset.X, BackgroundOffset.Y, BackGroundBmp.Width, BackGroundBmp.Height));
             }
             if ((drawMode & 1) == 1)
             {
@@ -451,8 +505,9 @@ namespace GraphicTool
             if (backGroundSelected)
             {
                 Brush solidBrush = new SolidBrush(Color.FromArgb(64, 0, 0, 255));
-                e.Graphics.FillRectangle(solidBrush, new Rectangle(0,0,BackGroundBmp.Width,BackGroundBmp.Height));
+                e.Graphics.FillRectangle(solidBrush, new Rectangle(BackgroundOffset.X, BackgroundOffset.Y, BackGroundBmp.Width, BackGroundBmp.Height));
             }
+
             if (showInfo)
             {
                 if (BackGroundBmp != null || root != null)
@@ -482,8 +537,9 @@ namespace GraphicTool
                     if (BackGroundBmp != null) h = BackGroundBmp.Height; else h = 10;
                     int newlines = msg.Split("\n").Length;
                     int x = 5;
-                    int y = displayOffset.Y + h; // - newlines * 25;
-
+                    int y = 10 + h;//displayOffset.Y + h; // - newlines * 25;
+                    infoBox.Height = y;
+                    infoBox.Width = x;
                     Font stringFont = new Font("Courier New", 10);
                     float size = getTextSize(msg, stringFont);
                     e.Graphics.DrawRectangle(new Pen(Color.Red, 1), x, y, size, newlines * 15 + 2);
@@ -492,6 +548,8 @@ namespace GraphicTool
                     e.Graphics.DrawString(msg, stringFont, Brushes.Black, new Point(x, y));
                 }
             }
+            else
+                infoBox = Size.Empty;
         }
 
         private float getTextSize(string text, Font font)
@@ -519,7 +577,7 @@ namespace GraphicTool
                     //BackGroundSelected = true;
                     break;
                 case -1:
-                    //BackGroundSelected = true;
+                    backGroundSelected = true;
                     break;
                 default:
                     //if (SelectedImage != null)
@@ -545,10 +603,36 @@ namespace GraphicTool
             this.Invalidate();
         }
 
+        private void replaceBackgroundFromClipboard()
+        {
+            //MessageBox.Show("Ctrl & V = Loop.");  
+            //return;
+            if (Clipboard.ContainsImage())
+            {
+                Bitmap _ImgBufferBmp = (Bitmap)
+                    Clipboard.GetImage();
+                if ((drawMode & 2) == 2)
+                    ImageFileBmp = (Bitmap)_ImgBufferBmp.Clone();
+                if ((drawMode & 4) == 4)
+                    PropsFileBmp = (Bitmap)_ImgBufferBmp.Clone();
+                BackGroundBmp = _ImgBufferBmp;
+                //Background.Size = .Size;
+                //this.Size = Background.Size;
+                //drawOriginalImage = true;
+                backGroundSelected = true;
+                this.Invalidate();
+            }
+            else
+            {
+                MessageBox.Show("Clipboard is empty. Please Copy Image.");
+            }
+        }
+
+
         private void Display_MouseMove(object sender, MouseEventArgs e)
         {
-            delta.X = e.X - lastPoint.X;
-            delta.Y = e.Y - lastPoint.Y;
+            delta.X = e.X - lastPoint.X;// - Offset.X;
+            delta.Y = e.Y - lastPoint.Y;// - Offset.Y;
             lastPoint.X = e.X;
             lastPoint.Y = e.Y;
             XY.X = Convert.ToInt32((e.X - displayOffset.X) / zoomFactor);
@@ -571,38 +655,49 @@ namespace GraphicTool
             }
             if (mouseOverObject == -2)
             {
-                if (BackGroundBmp != null && XY.X < BackGroundBmp.Width && XY.Y < BackGroundBmp.Height)
+                if (BackGroundBmp != null &&
+                    XY.X < BackgroundOffset.X + BackGroundBmp.Width &&
+                    XY.Y < BackgroundOffset.Y + BackGroundBmp.Height &&
+                    XY.X > BackgroundOffset.X &&
+                    XY.Y > BackgroundOffset.Y)
                     mouseOverObject = -1;
-            }                 
-            switch (Mode)
+            }
+            if (e.Button == MouseButtons.Left)
             {
-                case mode.Move:
-                    {
-                        foreach (GraphicObject g in root.Children)
+                switch (Mode)
+                {
+                    case mode.Move:
                         {
-                            if (g.IsSelected && (XY.X >= 0) && (XY.Y >= 0))
-                                g.Move(new Point(deltaXY.X, deltaXY.Y));
-                        }
-                    }
-                    break;
-                case mode.ResizeObject:
-                    if (e.Button == MouseButtons.Left)
-                    {
-                        foreach (GraphicObject g in root.Children)
-                        {
-                            if (g.IsSelected)
+                            foreach (GraphicObject g in root.Children)
                             {
-                                g.Reshape(deltaXY);
+                                if (g.IsSelected) // && (XY.X >= 0) && (XY.Y >= 0))
+                                    g.Move(new Point(deltaXY.X, deltaXY.Y));
                             }
                         }
+                        break;
+                    case mode.ResizeObject:
+                        {
+                            foreach (GraphicObject g in root.Children)
+                            {
+                                if (g.IsSelected)
+                                {
+                                    g.Reshape(deltaXY);
+                                }
+                            }
 
-                    }
-                    break;
+                        }
+                        break;
+                }
+                if (backGroundSelected)
+                {
+                    BackgroundOffset.X += deltaXY.X;
+                    BackgroundOffset.Y += deltaXY.Y;
+                }
             }
             Invalidate();
         }
 
-        private void Display_KeyDown(object sender, KeyEventArgs e)
+        private void Display_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
             if (e.KeyCode == Keys.ControlKey)
             {
@@ -616,64 +711,69 @@ namespace GraphicTool
             //Objekt(e) mit Pfeiltasten bewegen
             if (e.KeyCode == Keys.Left)
             {
-                delta.X = -1;
-                delta.Y = 0;
+                deltaXY.X = -1;
+                deltaXY.Y = 0;
             }
             if (e.KeyCode == Keys.Right)
             {
-                delta.X = 1;
-                delta.Y = 0;
+                deltaXY.X = 1;
+                deltaXY.Y = 0;
             }
             if (e.KeyCode == Keys.Up)
             {
-                delta.X = 0;
-                delta.Y = -1;
+                deltaXY.X = 0;
+                deltaXY.Y = -1;
             }
             if (e.KeyCode == Keys.Down)
             {
-                delta.X = 0;
-                delta.Y = 1;
+                deltaXY.X = 0;
+                deltaXY.Y = 1;
             }
-            if (delta.X != 0 || delta.Y != 0)
+            if (deltaXY.X != 0 || deltaXY.Y != 0)
             {
                 //CAUTION! _mode = mode.Move; is not working here!
                 if (Mode == mode.Default)
                 {
                     foreach (GraphicObject g in root.Children)
                     {
-                        if (g.IsSelected && (XY.X >= 0) && (XY.Y >= 0))
+                        if (g.IsSelected) // && (XY.X >= 0) && (XY.Y >= 0) && (XY.X < this.Width - displayOffset.X) && (XY.Y < this.Height - displayOffset.Y))
                         {
-                            //_mode = mode.Move;
                             g.Move(deltaXY);
                         }
                     }
                     if (backGroundSelected)
                     {
-                        //_mode = mode.Move;
-                        //BackgroundBox.X += delta.X;
-                        //BackgroundBox.Y += delta.Y;
+                        BackgroundOffset.X += deltaXY.X;
+                        BackgroundOffset.Y += deltaXY.Y;
                     }
+                    deltaXY.X = 0;
+                    deltaXY.Y = 0;
                     delta.X = 0;
                     delta.Y = 0;
+
                 }
+            }
+            //Neues Hintergrundbild einfügen.
+            if (e.Control)
+            {
+                if (e.KeyCode == Keys.V)
+                    replaceBackgroundFromClipboard();
             }
             if (e.KeyCode == Keys.Escape)
             {
-                //SelectedImage = null;
-                //Selection = Rectangle.Empty;
                 multiSelect = false;
-
-                //if (Mode == mode.EditText) textEditBox.Visible = false;
-                //if (Mode == mode.DisplayProperties) DG.Visible = false;
                 foreach (GraphicObject g in root.Children)
                     g.UnSelect();
-                //BackGroundSelected = false;
+                backGroundSelected = false;
                 focusedGraphicObject = -1;
-
                 Mode = mode.Default;
-
             }
             Invalidate();
+        }
+
+        private void Display_KeyDown(object sender, KeyEventArgs e)
+        {
+
         }
 
         private void Display_KeyUp(object sender, KeyEventArgs e)
@@ -716,36 +816,49 @@ namespace GraphicTool
                                         groupToolStripMenuItem.Click += groupToolStripMenuItem_Click;
                                         contextMenu.Items.AddRange(new ToolStripItem[] { groupToolStripMenuItem });
                                     }
+                                    
                                     contextMenu.Show(Cursor.Position);
                                     Mode = mode.ContextMenu;
                                     this.Invalidate();
                                 }
+                                else
+                                {
+                                    if (g != null)
+                                    {
+                                        GraphicShapeDialog textForm = new GraphicShapeDialog(this, g);
+
+                                        if (textForm.ShowDialog() == DialogResult.OK)
+                                        {
+
+                                        }
+
+                                        textForm.Dispose();
+                                        this.Invalidate();
+                                    }
+                                }
                             }
-                        }                        
+                        }
                         break;
                 }
             }
             else //MouseButtons.Left
             {
+                if (mouseOverObject == -2) backGroundSelected = false;
                 int index = -1;
                 foreach (GraphicObject g in root.Children)
                 {
                     if (g.IsSelected)
                     {
                         index = g.getMarkerPoint(XY);
-                        if (index >= 0) 
+                        if (index >= 0)
                         {
                             Mode = mode.ResizeObject;
                             return;
-                        }                         
+                        }
                     }
                 }
                 //if(MarkerPointSelected < 0)
                 selectObjects(multiSelect);
-                if (mouseOverObject == -1)
-                    backGroundSelected = true;
-                else
-                    backGroundSelected = false;
             }
             this.Invalidate();
         }
@@ -787,6 +900,11 @@ namespace GraphicTool
                 i++;
             }
             Invalidate();
+        }
+
+        private void Display_Resize(object sender, EventArgs e)
+        {
+            Center();
         }
     }
 
