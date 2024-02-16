@@ -44,6 +44,8 @@
             toolsToolStripMenuItem = new ToolStripMenuItem();
             devToolsToolStripMenuItem = new ToolStripMenuItem();
             splitContainer1 = new SplitContainer();
+            button6 = new Button();
+            button5 = new Button();
             button2 = new Button();
             button3 = new Button();
             button4 = new Button();
@@ -106,14 +108,14 @@
             // loadToolStripMenuItem
             // 
             loadToolStripMenuItem.Name = "loadToolStripMenuItem";
-            loadToolStripMenuItem.Size = new Size(180, 22);
+            loadToolStripMenuItem.Size = new Size(134, 22);
             loadToolStripMenuItem.Text = "Load";
             loadToolStripMenuItem.Click += loadToolStripMenuItem_Click;
             // 
             // saveToolStripMenuItem
             // 
             saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            saveToolStripMenuItem.Size = new Size(180, 22);
+            saveToolStripMenuItem.Size = new Size(134, 22);
             saveToolStripMenuItem.Text = "Save";
             saveToolStripMenuItem.Click += saveToolStripMenuItem_Click;
             // 
@@ -121,19 +123,19 @@
             // 
             saveAsToolStripMenuItem.Enabled = false;
             saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            saveAsToolStripMenuItem.Size = new Size(180, 22);
+            saveAsToolStripMenuItem.Size = new Size(134, 22);
             saveAsToolStripMenuItem.Text = "Save as";
             // 
             // quitToolStripMenuItem
             // 
             quitToolStripMenuItem.Name = "quitToolStripMenuItem";
-            quitToolStripMenuItem.Size = new Size(180, 22);
+            quitToolStripMenuItem.Size = new Size(134, 22);
             quitToolStripMenuItem.Text = "Quit";
             // 
             // recentFilesToolStripMenuItem
             // 
             recentFilesToolStripMenuItem.Name = "recentFilesToolStripMenuItem";
-            recentFilesToolStripMenuItem.Size = new Size(180, 22);
+            recentFilesToolStripMenuItem.Size = new Size(134, 22);
             recentFilesToolStripMenuItem.Text = "Recent files";
             // 
             // toolStripMenuItem1
@@ -186,6 +188,8 @@
             // 
             // splitContainer1.Panel1
             // 
+            splitContainer1.Panel1.Controls.Add(button6);
+            splitContainer1.Panel1.Controls.Add(button5);
             splitContainer1.Panel1.Controls.Add(button2);
             splitContainer1.Panel1.Controls.Add(button3);
             splitContainer1.Panel1.Controls.Add(button4);
@@ -203,6 +207,30 @@
             splitContainer1.Size = new Size(1095, 663);
             splitContainer1.SplitterDistance = 140;
             splitContainer1.TabIndex = 2;
+            // 
+            // button6
+            // 
+            button6.FlatAppearance.BorderColor = Color.Silver;
+            button6.FlatStyle = FlatStyle.Flat;
+            button6.Image = Properties.Resources._newArrow;
+            button6.Location = new Point(85, 98);
+            button6.Name = "button6";
+            button6.Size = new Size(34, 34);
+            button6.TabIndex = 10;
+            button6.UseVisualStyleBackColor = true;
+            button6.Click += button6_Click;
+            // 
+            // button5
+            // 
+            button5.FlatAppearance.BorderColor = Color.Silver;
+            button5.FlatStyle = FlatStyle.Flat;
+            button5.Image = Properties.Resources._newOval;
+            button5.Location = new Point(47, 98);
+            button5.Name = "button5";
+            button5.Size = new Size(34, 34);
+            button5.TabIndex = 9;
+            button5.UseVisualStyleBackColor = true;
+            button5.Click += button5_Click;
             // 
             // button2
             // 
@@ -440,5 +468,7 @@
         private Button button4;
         private ToolStripMenuItem toolsToolStripMenuItem;
         private ToolStripMenuItem devToolsToolStripMenuItem;
+        private Button button6;
+        private Button button5;
     }
 }

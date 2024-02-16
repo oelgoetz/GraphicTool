@@ -4,7 +4,6 @@ using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.Windows.Forms;
 using System.Xml;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
 
 namespace GraphicTool
 {
@@ -23,6 +22,7 @@ namespace GraphicTool
         private mode Mode = mode.Default;
         private bool showInfo = false;
         private Size infoBox;
+        TextBox textBox1;
 
         private enum mode
         {
@@ -93,7 +93,7 @@ namespace GraphicTool
             displayOffset = Point.Empty;
             BackgroundOffset = Point.Empty;
             backGroundSelected = false;
-            textBox1.Clear();
+            //textBox1.Clear();
             root = new Root();
 
             if (fileName.EndsWith(".props"))
@@ -118,6 +118,34 @@ namespace GraphicTool
             this.Invalidate();
         }
 
+        public void AddShape(string xml)
+        {
+            XmlDocument tempDoc = new XmlDocument();
+            tempDoc.LoadXml(xml);
+            XmlElement shape = tempDoc.DocumentElement;
+            try
+            {
+                root.Add(shape, root);
+            }
+            catch (Exception ex)
+            {
+                string s = " ";
+                if (shape.Attributes["Type"] != null) s += shape.Attributes["Type"].Value;
+                if (shape.ParentNode.Attributes["Type"] != null) s += shape.ParentNode.Attributes["Type"].Value;
+                MessageBox.Show(ex.Message + "\n" + shape.Name + "\n" + s + "\n" + shape.BaseURI, "Display02.addShape");
+            }
+            Invalidate();
+        }
+
+        private Color GetColorAt(int x, int y)
+        {
+            Bitmap bmp = new Bitmap(1, 1);
+            Rectangle bounds = new Rectangle(x, y, 1, 1);
+            using (Graphics g = Graphics.FromImage(bmp))
+                g.CopyFromScreen(bounds.Location, Point.Empty, bounds.Size);
+            return bmp.GetPixel(0, 0);
+        }
+
         private void Center()
         {
             if ((drawMode & 2) == 2 && ImageFileBmp != null)
@@ -128,9 +156,6 @@ namespace GraphicTool
             {
                 displayOffset.X = this.Width / 2 - BackGroundBmp.Width / 2;
                 displayOffset.Y = this.Height / 2 - (BackGroundBmp.Height + infoBox.Height) / 2;
-            }
-            if (BackGroundBmp != null)
-            {
                 if (displayOffset.X + BackGroundBmp.Width > this.Width) displayOffset.X = 0;
                 if (displayOffset.Y + BackGroundBmp.Height + infoBox.Height > this.Height) displayOffset.Y = 0;
             }
@@ -188,7 +213,7 @@ namespace GraphicTool
         }
 
         //------------------------------------------------------------------
-        private void deserialize(XmlNode ShapesNode, GraphicObject Object, Point BGOffset)
+        private void deserialize(XmlNode ShapesNode, GraphicObject Object, Point BGOffset) //move this into GraphicShapes!
         {
             MyGroup dummy = new MyGroup();
             string grouptype = dummy.GetType().Name.ToString();
@@ -684,11 +709,11 @@ namespace GraphicTool
                                 if (g.IsSelected)
                                 {
                                     g.Reshape(deltaXY);
-                                    if (textBox1.Visible)
-                                    {
-                                        textBox1.Location = new Point(g.Box.X + displayOffset.X + 1, g.Box.Y + displayOffset.Y + 1);
-                                        textBox1.Size = new Size(g._textBox.Size.Width - 2, g._textBox.Size.Height - 2);
-                                    }
+                                    //if (textBox1.Visible)
+                                    //{
+                                    //    textBox1.Location = new Point(g.Box.X + displayOffset.X + 1, g.Box.Y + displayOffset.Y + 1);
+                                    //    textBox1.Size = new Size(g._textBox.Size.Width - 2, g._textBox.Size.Height - 2);
+                                    //}
                                 }
                             }
 
@@ -706,6 +731,57 @@ namespace GraphicTool
 
         private void Display_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
+            //if (Mode == mode.Default && nSelected == 1)
+            //{
+            //    int i = 0;
+            //    foreach (GraphicObject g in root.Children)
+            //    {
+            //        if (g.IsSelected)
+            //        {
+            //            backGroundSelected = false; //focusedGraphicObject = ?;
+
+            //            textBox1 = new TextBox();
+            //            //textBox1.BackColor = Color.Blue;
+            //            textBox1.Multiline = true;
+            //            textBox1.TextChanged += textBox1_TextChanged;
+            //            //TODO: compensate zoom settings
+            //            textBox1.Location = new Point(g.Box.X + displayOffset.X + 1, g.Box.Y + displayOffset.Y + 1);
+            //            textBox1.Size = new Size(g._textBox.Size.Width - 2, g._textBox.Size.Height - 2);
+            //            textBox1.Font = g._font;
+            //            //g._text;
+            //            //textBox1.SelectAll();
+            //            textBox1.Visible = true;
+            //            this.Controls.Add(textBox1);
+            //            this.Controls.SetChildIndex(textBox1, 0);
+            //            textBox1.ResetText();                        
+            //            if(g._text != "")
+            //            {
+            //                textBox1.Text = g._text;
+            //                textBox1.SelectAll();
+            //            }
+            //            else
+            //            {
+            //                KeysConverter converter = new KeysConverter();
+            //                string key = (string)converter.ConvertTo(e.KeyCode, typeof(String));
+            //                if (key.Length == 1)
+            //                    textBox1.Text = e.KeyData.ToString();
+            //                textBox1.SelectionStart = textBox1.Text.Length;
+            //                textBox1.SelectionLength = 0;
+            //            }
+            //            textBox1.Focus();
+            //            textBox1.Show();
+            //            //textBox1.Dispose();
+            //            //this.Invalidate();
+            //            Mode = mode.EditText;
+            //            this.Invalidate();
+
+            //            break;
+            //        }
+            //        i++;
+            //    }
+            //    return;
+            //}
+
             if (e.KeyCode == Keys.ControlKey)
             {
                 multiSelect = true;
@@ -780,6 +856,49 @@ namespace GraphicTool
 
         private void Display_KeyDown(object sender, KeyEventArgs e)
         {
+            //if(e.KeyCode == Keys.Control)
+            //{
+            //    multiSelect = true;
+            //    Invalidate();
+            //    return;
+            //}
+            //if (Mode == mode.Default && nSelected == 1)
+            //{
+            //    int i = 0;
+            //    foreach (GraphicObject g in root.Children)
+            //    {
+            //        if (g.IsSelected)
+            //        {
+            //            backGroundSelected = false; //focusedGraphicObject = ?;
+
+            //            textBox1 = new TextBox();
+            //            //textBox1.BackColor = Color.Blue;
+            //            textBox1.Multiline = true;
+            //            textBox1.TextChanged += textBox1_TextChanged;
+            //            textBox1.Location = new Point(g.Box.X + displayOffset.X + 1, g.Box.Y + displayOffset.Y + 1);
+            //            textBox1.Size = new Size(g._textBox.Size.Width - 2, g._textBox.Size.Height - 2);
+            //            textBox1.Font = g._font;
+            //            //g._text;
+            //            //textBox1.SelectAll();
+            //            textBox1.Visible = true;
+            //            this.Controls.Add(textBox1);
+            //            this.Controls.SetChildIndex(textBox1, 0);
+            //            textBox1.ResetText();
+            //            textBox1.Focus();
+            //            textBox1.Show();
+            //            textBox1.Text = e.KeyData.ToString();
+            //            textBox1.SelectionStart = textBox1.Text.Length;
+            //            textBox1.SelectionLength = 0;
+            //            //textBox1.Dispose();
+            //            //this.Invalidate();
+            //            Mode = mode.EditText;
+            //            this.Invalidate();
+
+            //            break;
+            //        }
+            //        i++;
+            //    }
+            //}
 
         }
 
@@ -850,11 +969,18 @@ namespace GraphicTool
             }
             else //MouseButtons.Left
             {
+                if (Mode == mode.EditText) 
+                {
+                    textBox1.Dispose();
+                    Mode = mode.Default;
+                    Invalidate();
+                    return;
+                }
                 if (mouseOverObject == -2)
                 {
                     backGroundSelected = false;
-                    textBox1.Visible = false;
-                    textBox1.Clear();
+                    //textBox1.Visible = false;
+                    //textBox1.Clear();
                 }
                 //if (Mode != mode.ResizeObject && mouseOverObject < 0) 
                 int index = -1;
@@ -930,14 +1056,13 @@ namespace GraphicTool
                 else
                     g = root.Children[mouseOverObject];
                 if (g != null && nSelected == 1 && g.GetType() != typeof(MyGroup))
-                {
-
-                    
-                    textBox1.Location = new Point(g.Box.X + displayOffset.X + 1, g.Box.Y + displayOffset.Y + 1);
-                    textBox1.Size = new Size(g._textBox.Size.Width - 2, g._textBox.Size.Height - 2);
-                    textBox1.Font = g._font;
-                    textBox1.Text = g._text;
-                    textBox1.Visible = true;
+                {                   
+                    //textBox1.Location = new Point(g.Box.X + displayOffset.X + 1, g.Box.Y + displayOffset.Y + 1);
+                    //textBox1.Size = new Size(g._textBox.Size.Width - 2, g._textBox.Size.Height - 2);
+                    //textBox1.Font = g._font;
+                    //textBox1.Text = g._text;
+                    //textBox1.SelectAll();
+                    //textBox1.Visible = true;
 
                     //GraphicShapeDialog textForm = new GraphicShapeDialog(this, g);
                     //if (textForm.ShowDialog() == DialogResult.OK)

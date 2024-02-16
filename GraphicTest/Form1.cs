@@ -150,10 +150,11 @@ namespace GraphicTool
             //LoadTestCase("FontStyleTest");
             //LoadTestCase("texttest01");
             //LoadTestCase("texttest02");
-            LoadTestCase("textsizetest");
+            //LoadTestCase("textsizetest");
+            LoadTestCase("texttest04");
         }
 
-        private void LoadTestCase(string testfile) 
+        private void LoadTestCase(string testfile)
         {
             if (File.Exists("C:\\temp\\Backup\\" + testfile + ".png"))
                 File.Copy("C:\\temp\\Backup\\" + testfile + ".png", "C:\\temp\\" + testfile + ".png", true);
@@ -389,13 +390,7 @@ namespace GraphicTool
             }
         }
 
-        private void button2_Click(object sender, EventArgs e)
-        {
-            //if (!ShapesCheckBox.Checked) ShapesCheckBox.Checked = true;
-            //display.AddShape(Properties.Settings.Default.RECTANGLE);
-            //BackgroundXMLRadioButton.Checked = true;
-            //saveDISPLAYMODE();
-        }
+        
 
         private void currentFileLabel_Click(object sender, EventArgs e)
         {
@@ -414,6 +409,30 @@ namespace GraphicTool
         private void ShowInfoToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (!ShapesCheckBox.Checked) ShapesCheckBox.Checked = true;
+            display.AddShape(Properties.Settings.Default.RECTANGLE);
+            BackgroundXMLRadioButton.Checked = true;
+            applyDisplayMode();
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            if (!ShapesCheckBox.Checked) ShapesCheckBox.Checked = true;
+            display.AddShape(Properties.Settings.Default.OVAL);
+            BackgroundXMLRadioButton.Checked = true;
+            applyDisplayMode();
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            if (!ShapesCheckBox.Checked) ShapesCheckBox.Checked = true;
+            display.AddShape(Properties.Settings.Default.POLYLINE);
+            BackgroundXMLRadioButton.Checked = true;
+            applyDisplayMode();
         }
     }
 }

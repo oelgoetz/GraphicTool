@@ -30,7 +30,6 @@
         {
             components = new System.ComponentModel.Container();
             contextMenuStrip1 = new ContextMenuStrip(components);
-            textBox1 = new TextBox();
             SuspendLayout();
             // 
             // contextMenuStrip1
@@ -38,22 +37,11 @@
             contextMenuStrip1.Name = "contextMenuStrip1";
             contextMenuStrip1.Size = new Size(61, 4);
             // 
-            // textBox1
-            // 
-            textBox1.BorderStyle = BorderStyle.None;
-            textBox1.Location = new Point(16, 128);
-            textBox1.Multiline = true;
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(100, 23);
-            textBox1.TabIndex = 1;
-            textBox1.TextChanged += textBox1_TextChanged;
-            // 
             // Display
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.MistyRose;
-            Controls.Add(textBox1);
             DoubleBuffered = true;
             Name = "Display";
             Size = new Size(688, 646);
@@ -67,11 +55,9 @@
             PreviewKeyDown += Display_PreviewKeyDown;
             Resize += Display_Resize;
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
         private ContextMenuStrip contextMenuStrip1;
-        private TextBox textBox1;
     }
 }

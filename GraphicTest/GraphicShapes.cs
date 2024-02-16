@@ -668,11 +668,8 @@ namespace GraphicShapes
                 }
             }
 
-            if (shape.InnerText != null && shape.InnerText != "")
-            {
-                _text = shape.InnerText;
-                getTextAttributes(shape);
-            }
+            getTextAttributes(shape);
+            _text = shape.InnerText;                
         }
 
         public override void Draw(Graphics g, int extd) //Rectangle
@@ -868,11 +865,8 @@ namespace GraphicShapes
                 }
             }
 
-            if (shape.InnerText != null && shape.InnerText != "")
-            {
-                _text = shape.InnerText;
-                getTextAttributes(shape);
-            }
+            getTextAttributes(shape);
+            _text = shape.InnerText;
         }
 
         public override void Draw(Graphics g, int extd) //Oval

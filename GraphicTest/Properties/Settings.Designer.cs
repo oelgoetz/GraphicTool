@@ -85,7 +85,7 @@ namespace GraphicTool.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"Type=""Rectangle"" TextAlign=""left"" VerticalAlign=""top"" PaddingLeft=""5"" PaddingBottom=""0"" PaddingRight=""0"" PaddingTop=""5"" X=""5"" Y=""5"" Width=""50"" Height=""50"" LineColor=""#ff0000"" LineWidth=""2"" Transparency=""0"" ShapeTimeSpan=""10000"" Right=""0"" Bottom=""0"" Left=""5"" Top=""5"" BackgroundColor=""transparent"" Color=""Black"" FontWeight=""normal"" FontStyle=""normal"" FontFamily=""Segoe UI"" FontSize=""10pt"" Underline=""false"" ")]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"<Shape Type=""Rectangle"" TextAlign=""left"" VerticalAlign=""top"" PaddingLeft=""5"" PaddingBottom=""0"" PaddingRight=""0"" PaddingTop=""5"" X=""5"" Y=""5"" Width=""50"" Height=""50"" LineColor=""#ff0000"" LineWidth=""2"" Transparency=""0"" ShapeTimeSpan=""10000"" Right=""0"" Bottom=""0"" Left=""5"" Top=""5"" BackgroundColor=""transparent"" Color=""Black"" FontWeight=""normal"" FontStyle=""normal"" FontFamily=""Segoe UI"" FontSize=""10pt"" Underline=""false""/>")]
         public string RECTANGLE {
             get {
                 return ((string)(this["RECTANGLE"]));
@@ -97,7 +97,7 @@ namespace GraphicTool.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"Type=""Oval"" TextAlign=""left"" VerticalAlign=""top"" PaddingLeft=""5"" PaddingBottom=""0"" PaddingRight=""0"" PaddingTop=""5"" X=""5"" Y=""5"" Width=""40"" Height=""40"" ShapeTimeSpan=""10000"" Right=""5"" Bottom=""0"" LineColor=""#ff0000"" LineWidth=""2"" Transparency=""0"" Rotate=""0"" Anchors="""" FontWeight=""normal"" FontStyle=""normal"" FontFamily=""Segoe UI"" FontSize=""10pt"" Underline=""false""  Color=""Black"" Left=""0"" Top=""5""")]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"<Shape Type=""Oval"" TextAlign=""left"" VerticalAlign=""top"" PaddingLeft=""5"" PaddingBottom=""0"" PaddingRight=""0"" PaddingTop=""5"" X=""5"" Y=""5"" Width=""40"" Height=""40"" ShapeTimeSpan=""10000"" Right=""5"" Bottom=""0"" LineColor=""#ff0000"" LineWidth=""2"" Transparency=""0"" Rotate=""0"" Anchors="""" FontWeight=""normal"" FontStyle=""normal"" FontFamily=""Segoe UI"" FontSize=""10pt"" Underline=""false""  Color=""Black"" Left=""0"" Top=""5""/>")]
         public string OVAL {
             get {
                 return ((string)(this["OVAL"]));
@@ -109,7 +109,7 @@ namespace GraphicTool.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"Type=""Polyline"" Coordinates=""10,10,50,50"" ArrowHeadColor=""#ff0000"" ArrowTailColor=""#ff0000"" BackgroundColor=""#ff0000"" BackgroundColorAlt=""#ff0000"" LineColor=""#ff0000"" LineWidth=""2"" VerticalAlign=""4"" TextAlign=""1"" PaddingLeft=""5"" PaddingBottom=""0"" PaddingRight=""0"" PaddingTop=""5"" Conditions=""""")]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"<Shape Type=""Polyline"" Coordinates=""10,10,50,50"" ArrowHeadColor=""#ff0000"" ArrowTailColor=""#ff0000"" BackgroundColor=""#ff0000"" BackgroundColorAlt=""#ff0000"" LineColor=""#ff0000"" LineWidth=""2"" VerticalAlign=""4"" TextAlign=""1"" PaddingLeft=""5"" PaddingBottom=""0"" PaddingRight=""0"" PaddingTop=""5"" Conditions=""""/>")]
         public string POLYLINE {
             get {
                 return ((string)(this["POLYLINE"]));
