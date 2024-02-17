@@ -62,6 +62,7 @@ namespace GraphicShapes
 
         public Rectangle Box = new Rectangle();
         public string _text = "";
+        public string _type;
         public StringFormat? _stringFormat;
         public Rectangle _textBox;
         public Padding _padding = new Padding(0, 0, 0, 0);
@@ -151,7 +152,7 @@ namespace GraphicShapes
         public Point getOffset(GraphicObject Parent)
         {
             Point result = Point.Empty;
-            while (Parent != null && Parent.GetType().Name != "Root")
+            while (Parent != null && Parent._type == "Root") //GetType().Name != "Root")
             {
                 result.X += Parent.Box.Location.X;
                 result.Y += Parent.Box.Location.Y;
@@ -454,7 +455,8 @@ namespace GraphicShapes
             {
                 for (int i = 0; i < MarkerPoints.Length; i++)
                 {
-                    if(this.GetType().Name.Contains("Rectangle") || this.GetType().Name.Contains("Oval"))
+                    //if(this.GetType().Name.Contains("Rectangle") || this.GetType().Name.Contains("Oval"))
+                    if (this._type == "Rectangle" || this._type == "Oval")
                     {
                         //Funktioniert mit Rectangular Objects, nit mit Polyline Objects
                         if (Math.Abs(Box.X + MarkerPoints[i].X - MousePosition.X) < 4)
@@ -466,7 +468,8 @@ namespace GraphicShapes
                             }
                         }
                     }
-                    if (this.GetType().Name.Contains("Polyline") || this.GetType().Name.Contains("Polygon"))
+                    //if (this.GetType().Name.Contains("Polyline") || this.GetType().Name.Contains("Polygon"))
+                    if (this._type == "Polyline" || this._type == "Polygon")                        
                     {
                         //Funktioniert mit Rectangular Objects, nit mit Polyline Objects
                         if (Math.Abs(MarkerPoints[i].X - MousePosition.X) < 4)
@@ -540,7 +543,7 @@ namespace GraphicShapes
         public MyImage(XmlNode shape, GraphicObject parent) //MyImage
         {
             Parent = parent;
-
+            _type = "Image";
             Box.X = Convert.ToInt32(shape.Attributes["X"].Value);
             Box.Y = Convert.ToInt32(shape.Attributes["Y"].Value);
             Box.Width = Convert.ToInt32(shape.Attributes["Width"].Value);
@@ -630,7 +633,7 @@ namespace GraphicShapes
         public MyRectangle(XmlNode shape, GraphicObject parent) //Rectangle
         {
             Parent = parent;
-
+            _type = "Rectangle";
             Box.X = Convert.ToInt32(shape.Attributes["X"].Value);
             Box.Y = Convert.ToInt32(shape.Attributes["Y"].Value);
             Box.Width = Convert.ToInt32(shape.Attributes["Width"].Value);
@@ -740,7 +743,7 @@ namespace GraphicShapes
         public MyGroup(XmlNode shape, GraphicObject parent) //Group
         {
             Parent = parent;
-
+            _type = "Group";
             Box.X = Convert.ToInt32(shape.Attributes["X"].Value);
             Box.Y = Convert.ToInt32(shape.Attributes["Y"].Value);
             Box.Width = Convert.ToInt32(shape.Attributes["Width"].Value);
@@ -756,6 +759,7 @@ namespace GraphicShapes
         {
             Children = new List<GraphicObject>();
             Parent = parent;
+            _type = "Group";
             Point Offset = getOffset(Parent);
 
             int minX = objects[0].Box.X;
@@ -785,7 +789,8 @@ namespace GraphicShapes
         }
 
         public MyGroup() 
-        { 
+        {
+            _type = "Group";
         }
 
         public override void Draw(Graphics g, int extd) //Group
@@ -826,7 +831,7 @@ namespace GraphicShapes
         public MyOval(XmlNode shape, GraphicObject parent) //Oval
         {
             Parent = parent;
-
+            _type = "Oval";
             Box.X = Convert.ToInt32(shape.Attributes["X"].Value);
             Box.Y = Convert.ToInt32(shape.Attributes["Y"].Value);
             Box.Width = Convert.ToInt32(shape.Attributes["Width"].Value);
@@ -938,7 +943,7 @@ namespace GraphicShapes
         public MyPolyline(XmlNode shape, GraphicObject parent) //Polyline
         {
             Parent = parent;
-
+            _type = "Polyline";
             MarkerPoints = Coordinates2Array(shape.Attributes["Coordinates"].Value);
             updatePolyBox();
 
@@ -1094,7 +1099,7 @@ namespace GraphicShapes
         public MyPolygon(XmlNode shape, GraphicObject parent) //Polygon
         {
             Parent = parent;
-
+            _type = "Polygon";
             MarkerPoints = Coordinates2Array(shape.Attributes["Coordinates"].Value);
             int n = MarkerPoints.Length;
 
@@ -1212,6 +1217,7 @@ namespace GraphicShapes
 
         public ArrowTip(PointF p1, PointF p2, Pen pen, float Width, float Length, float CenterLength, float rot)
         {
+            _type = "ArrowTip";
             _tip.X = p1.X;
             _tip.Y = p1.Y;
             _orientation = Orientation(p1, p2);

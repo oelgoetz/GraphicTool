@@ -50,6 +50,8 @@ namespace GraphicTool
         private bool backGroundSelected;
         private Point BackgroundOffset = Point.Empty;
 
+        private string currentFile;
+
 
 
         public Display()
@@ -114,6 +116,7 @@ namespace GraphicTool
                 this.LoadOverlays(ShapesNode);
             }
 
+            currentFile = fileName;
             Center();
             this.Invalidate();
         }
@@ -202,7 +205,7 @@ namespace GraphicTool
         private Point getOffset(GraphicObject Parent)
         {
             Point result = Point.Empty;
-            while (Parent != null && Parent.GetType().Name != "Root")
+            while (Parent != null && Parent._type != "Root") //GetType().Name.ToString() != "Root";
             {
                 result.X += Parent.Box.X;
                 result.Y += Parent.Box.Y;
@@ -216,13 +219,13 @@ namespace GraphicTool
         private void deserialize(XmlNode ShapesNode, GraphicObject Object, Point BGOffset) //move this into GraphicShapes!
         {
             MyGroup dummy = new MyGroup();
-            string grouptype = dummy.GetType().Name.ToString();
+            string grouptype = dummy._type;// = "Group"; GetType().Name.ToString();
             for (int i = 0; i < Object.Children.Count; i++)
             {
                 GraphicObject g = Object.Children[i];
                 XmlElement Shape = ShapesNode.OwnerDocument.CreateElement("Shape");
                 ShapesNode.AppendChild(Shape);
-                string type = g.GetType().Name.ToString();
+                string type = g._type; // GetType().Name.ToString();
                 string writetype = type;
                 if (writetype.StartsWith("My"))
                     writetype = writetype.Replace("My", "");
@@ -477,17 +480,19 @@ namespace GraphicTool
             //    BackGroundBmp = (Bitmap)ImageFileBmp.Clone();
             //if ((drawMode & 4) == 4 && PropsFileBmp != null)
             if (BackGroundBmp != null)
-                BackGroundBmp = (Bitmap)PropsFileBmp.Clone();
+                BackGroundBmp = (Bitmap) PropsFileBmp.Clone();
             else
+            {
                 BackGroundBmp = new Bitmap(this.Width, this.Height);
-
-            //if (graphic == null) 
+                MessageBox.Show("No BackgroundImage. Created a white background as big as the work area.");
+            }
 
             graphic = Graphics.FromImage(BackGroundBmp);
+            graphic.TranslateTransform(-BackgroundOffset.X, -BackgroundOffset.Y);
             //graphic.TextRenderingHint = TextRenderingHint.AntiAlias;
             if ((drawMode & 6) > 1)
             {
-                graphic.DrawImage(BackGroundBmp, BackgroundOffset.X, BackgroundOffset.Y, BackGroundBmp.Width, BackGroundBmp.Height);
+                graphic.DrawImage(BackGroundBmp, BackGroundBmp.Width, BackGroundBmp.Height);
             }
             else
             {
@@ -531,8 +536,8 @@ namespace GraphicTool
             }
             if (backGroundSelected)
             {
-                Brush solidBrush = new SolidBrush(Color.FromArgb(64, 0, 0, 255));
-                e.Graphics.FillRectangle(solidBrush, new Rectangle(BackgroundOffset.X, BackgroundOffset.Y, BackGroundBmp.Width, BackGroundBmp.Height));
+                //Brush solidBrush = new SolidBrush(Color.FromArgb(64, 0, 0, 255));
+                e.Graphics.DrawRectangle(new Pen(Color.Gray, 1), new Rectangle(BackgroundOffset.X, BackgroundOffset.Y, BackGroundBmp.Width, BackGroundBmp.Height));
             }
 
             if (showInfo)
@@ -544,6 +549,7 @@ namespace GraphicTool
                         msg += "Test";
                         msg += "mode :  " + Mode.ToString() + " ";
                         string m = ""; if (multiSelect) m += "m"; else m += " ";
+                        if(backGroundSelected) m += " bg"; else m += "   ";
                         msg += "\nDmode:  " + drawMode.ToString() + " " + m;
                         msg += "\nn obj:  " + root.Children.Count.ToString();
                         msg += "\nn Sel:  " + nSelected.ToString();
@@ -552,7 +558,9 @@ namespace GraphicTool
                         //msg += "\nview mode: " + drawMode.ToString();
                         //msg += "\nview: " + ViewBox.X.ToString() + " " + ViewBox.Y.ToString() + " " + ViewBox.Width.ToString() + " " + ViewBox.Height.ToString();
                         //msg += "\nPOS : " + Convert.ToInt16((lastPoint.X/* - centerOfView.X*/) * 100 / zoomFactor).ToString() + " " + Convert.ToInt16((lastPoint.Y/* - centerOfView.Y*/) * 100 / zoomFactor).ToString() + " ";
-                        msg += "\nXY: " + XY.X.ToString() + " " + XY.Y.ToString();
+                        msg += "\nXY : " + XY.X.ToString() + " " + XY.Y.ToString();
+                        msg += "\nBGO: " + BackgroundOffset.X.ToString() + " " + BackgroundOffset.Y.ToString();
+
                         msg += "\nmouse over: " + mouseOverObject.ToString();
                         //msg += "\nx:" + origin.X.ToString() + " y:" + origin.Y.ToString();
                         //msg += "\nSEL: x:" + Selection.X.ToString() + " y:" + Selection.Y.ToString() + " w:" + Selection.Width.ToString() + " h:" + Selection.Height.ToString();
@@ -837,11 +845,22 @@ namespace GraphicTool
                 }
             }
             //Neues Hintergrundbild einfügen.
-            if (e.Control)
-            {
-                if (e.KeyCode == Keys.V)
+            if (e.Control && e.KeyCode == Keys.V)
                     replaceBackgroundFromClipboard();
+
+            if (e.Control && e.KeyCode == Keys.A)
+            {
+                foreach (GraphicObject g in root.Children)
+                    g.Select();
+                backGroundSelected = true;
+                multiSelect = true;
             }
+
+            if (e.Control && e.KeyCode == Keys.S)
+            {
+                Save2File(currentFile);
+            }
+
             if (e.KeyCode == Keys.Escape)
             {
                 multiSelect = false;
@@ -904,7 +923,19 @@ namespace GraphicTool
 
         private void Display_KeyUp(object sender, KeyEventArgs e)
         {
-            if (multiSelect) multiSelect = false;
+            if (multiSelect)
+            {
+                multiSelect = false;
+                Invalidate();
+            }
+            //if (e.KeyCode == Keys.Control)
+            //{
+            //    if (multiSelect)
+            //    {
+            //        multiSelect = false;
+            //        Invalidate();
+            //    }
+            //}
         }
 
         private void Display_MouseDown(object sender, MouseEventArgs e)
@@ -923,12 +954,12 @@ namespace GraphicTool
                                 g = root.Children[mouseOverObject];
                             if (g != null)
                             {
-                                if ((nSelected == 1 && g.GetType() == typeof(MyGroup)) || nSelected > 1)
+                                if ((nSelected == 1 && g._type == "Group")/*GetType() == typeof(MyGroup))*/ || nSelected > 1)
                                 {
                                     ContextMenuStrip contextMenu = new ContextMenuStrip();
                                     //string type = g.GetType().Name.ToString();
                                     //MessageBox.Show(child.GetType().Name.ToString());
-                                    if (nSelected == 1 && g.GetType() == typeof(MyGroup))
+                                    if (nSelected == 1 && g._type == "Group") //GetType() == typeof(MyGroup))
                                     {
                                         ToolStripMenuItem ungroupToolStripMenuItem = new ToolStripMenuItem();
                                         ungroupToolStripMenuItem.Text = "ungroup";
@@ -1055,23 +1086,36 @@ namespace GraphicTool
                     g = root.Children[focusedGraphicObject];
                 else
                     g = root.Children[mouseOverObject];
-                if (g != null && nSelected == 1 && g.GetType() != typeof(MyGroup))
-                {                   
-                    //textBox1.Location = new Point(g.Box.X + displayOffset.X + 1, g.Box.Y + displayOffset.Y + 1);
-                    //textBox1.Size = new Size(g._textBox.Size.Width - 2, g._textBox.Size.Height - 2);
-                    //textBox1.Font = g._font;
-                    //textBox1.Text = g._text;
-                    //textBox1.SelectAll();
-                    //textBox1.Visible = true;
 
-                    //GraphicShapeDialog textForm = new GraphicShapeDialog(this, g);
-                    //if (textForm.ShowDialog() == DialogResult.OK)
-                    //{
+                //MyGroup dummyGroup = new MyGroup();
+                //string grouptype = dummyGroup.GetType().Name.ToString();
 
-                    //}
-                    //textForm.Dispose();
+                //if (g.GetType().Name.ToString() != grouptype)
+                if(g._type == "Rectangle" || g._type == "Oval")
+                {
+                    backGroundSelected = false; //focusedGraphicObject = ?;
+                    textBox1 = new TextBox();
+                    textBox1.Multiline = true;
+                    textBox1.TextChanged += textBox1_TextChanged;
+                    textBox1.Location = new Point(g.Box.X + displayOffset.X, g.Box.Y + displayOffset.Y);
+                    textBox1.Size = new Size(g._textBox.Size.Width - 1, g._textBox.Size.Height - 1);
+                    textBox1.Font = g._font;
+                    textBox1.Text = g._text;
+                    textBox1.BorderStyle = BorderStyle.None;
+                    textBox1.SelectAll();
+                    textBox1.Visible = true;
+
+                    this.Controls.Add(textBox1);
+                    this.Controls.SetChildIndex(textBox1, 0);
+                    textBox1.Focus();
+                    textBox1.Show();
+                    //textBox1.Text = e.KeyData.ToString();
+                    //textBox1.SelectionStart = textBox1.Text.Length;
+                    //textBox1.SelectionLength = 0;
+                    //textBox1.Dispose();
                     //this.Invalidate();
-
+                    Mode = mode.EditText;
+                    this.Invalidate();
                 }
             }
         }
