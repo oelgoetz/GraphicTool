@@ -151,7 +151,7 @@ namespace GraphicTool
             //LoadTestCase("texttest01");
             //LoadTestCase("texttest02");
             //LoadTestCase("textsizetest");
-            LoadTestCase("texttest04");
+            LoadTestCase("texttest05");
         }
 
         private void LoadTestCase(string testfile)

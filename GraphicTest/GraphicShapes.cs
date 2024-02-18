@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
+using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
@@ -92,7 +93,7 @@ namespace GraphicShapes
 
         public abstract void Reshape(Point d);
 
-        public virtual void Ungroup(GraphicObject parent)
+        internal void Ungroup(GraphicObject parent)
         {
             foreach (GraphicObject obj in Children)
             {
@@ -103,7 +104,7 @@ namespace GraphicShapes
             parent.Children.Remove(this);
         }
 
-        public virtual void Add(XmlNode shape, GraphicObject Parent)
+        internal void Add(XmlNode shape, GraphicObject Parent)
         {
             if (shape.NodeType != XmlNodeType.Element)
                 return;
@@ -139,12 +140,12 @@ namespace GraphicShapes
 
         }
 
-        public virtual void Select()
+        internal void Select()
         {
             IsSelected = true;
         }
 
-        public virtual void UnSelect()
+        internal void UnSelect()
         {
             IsSelected = false;
         }
@@ -163,7 +164,7 @@ namespace GraphicShapes
 
         //--------------------------------------------------
 
-        public virtual void setStringAlignment()
+        internal void setStringAlignment()
         {
             _stringFormat = StringFormat.GenericTypographic;
             _stringFormat.Alignment = StringAlignment.Near;
@@ -175,7 +176,7 @@ namespace GraphicShapes
             if ((_flags & 8) == 8) _stringFormat.LineAlignment |= StringAlignment.Far;
         }
 
-        public virtual void getTextAttributes(XmlNode node)
+        internal void getTextAttributes(XmlNode node)
         {
             //VERTICAL ALIGNMENT
             if (node.Attributes["VerticalAlign"] == null)
@@ -269,7 +270,7 @@ namespace GraphicShapes
             }
         }
 
-        public virtual double Orientation(PointF p1, PointF p2)
+        internal double Orientation(PointF p1, PointF p2)
         {
             //double radius = Math.Sqrt((x * x) + (y * y));
             double angle = -Math.Atan2(p1.X - p2.X, p1.Y - p2.Y);
@@ -277,7 +278,7 @@ namespace GraphicShapes
             return angle;
         }
 
-        public virtual PointF[] Rotate(PointF[] Pcord, double angle)
+        internal PointF[] Rotate(PointF[] Pcord, double angle)
         {
             PointF[] newPcord = new PointF[Pcord.Length];
             for (int i = 0; i < Pcord.Length; i++)
@@ -291,7 +292,7 @@ namespace GraphicShapes
             return newPcord;
         }
 
-        public virtual Point[] Rotate(Point[] Pcord, double angle)
+        internal Point[] Rotate(Point[] Pcord, double angle)
         {
             Point[] newPcord = new Point[Pcord.Length];
             for (int i = 0; i < Pcord.Length; i++)
@@ -305,7 +306,7 @@ namespace GraphicShapes
             return newPcord;
         }
 
-        public virtual PointF[] Translate(PointF[] Pcord, PointF t)
+        internal PointF[] Translate(PointF[] Pcord, PointF t)
         {
             PointF[] newPcord = new PointF[Pcord.Length];
             for (int i = 0; i < Pcord.Length; i++)
@@ -318,7 +319,7 @@ namespace GraphicShapes
 
         }
 
-        public virtual Point[] Translate(Point[] Pcord, Point t)
+        internal Point[] Translate(Point[] Pcord, Point t)
         {
             Point[] newPcord = new Point[Pcord.Length];
             for (int i = 0; i < Pcord.Length; i++)
@@ -331,12 +332,12 @@ namespace GraphicShapes
 
         }
 
-        public virtual int point2pixels(double ptsize)
+        internal int point2pixels(double ptsize)
         {
             return (int) Math.Round(ptsize, 1, MidpointRounding.AwayFromZero);
         }
 
-        public virtual Point[] Coordinates2Array(string c)
+        internal Point[] Coordinates2Array(string c)
         {
             string[] Scords = c.Split(',');
             Point[] Pcords = new Point[Scords.Length / 2];
@@ -352,7 +353,7 @@ namespace GraphicShapes
             return Pcords;
         }
 
-        public virtual string CoordinateString(Point BGOffset)
+        internal string CoordinateString(Point BGOffset)
         {
             string c = "";
             foreach(Point p in MarkerPoints)
@@ -363,7 +364,7 @@ namespace GraphicShapes
             return c;
         }
 
-        public virtual Point[] Rectangle2Array(Rectangle rect)
+        internal Point[] Rectangle2Array(Rectangle rect)
         {
             Point[] MarkerPoints = new Point[4];
             MarkerPoints[0] = new Point(Box.Width / 2, 0);
@@ -374,7 +375,7 @@ namespace GraphicShapes
             return MarkerPoints;
         }
 
-        public virtual List<Point> Coordinates2List(string c)
+        internal List<Point> Coordinates2List(string c)
         {
             string[] Scords = c.Split(',');
             List<Point> Pcords = new List<Point>();
@@ -389,13 +390,14 @@ namespace GraphicShapes
             return Pcords;
         }
 
-        public virtual string ConvertColor2HexString(Color c)
+        internal string ConvertColor2HexString(Color c)
         {
             return "#" + c.R.ToString("X2") + c.G.ToString("X2") + c.B.ToString("X2");
         }
 
-        public virtual void markClipping(Graphics g, string text, Font font, Rectangle TextBox, StringFormat _stringFormat)
+        internal void markClipping(Graphics g, string text, Font font, Rectangle TextBox, StringFormat _stringFormat)
         {           
+            if (text == null || text.Length == 0) return;
             int charactersFitted;
             int linesFilled;
             g.MeasureString(text, font, _textBox.Size, _stringFormat, out charactersFitted, out linesFilled);
@@ -508,6 +510,49 @@ namespace GraphicShapes
                 MessageBox.Show(ex.Message);
                 return null;
             }
+        }
+
+        internal void SetLineColor(Color color)
+        {
+            _pen.Color = color;
+            if (this._type == "Polyline")
+            {
+                
+            }
+        }
+
+        internal void SetLineWidth(int width)
+        {
+            _pen.Width = width;
+        }
+
+        internal void SetFontSize(int size)
+        {
+            _font = new Font(_font.FontFamily, Convert.ToInt32(size), _fontStyle, GraphicsUnit.Point);
+        }
+
+        internal void SetFontFamily(string f)
+        {
+            try
+            {
+                _font = new Font(f, _font.Size, _fontStyle, GraphicsUnit.Point);
+            }
+            catch
+            {
+                MessageBox.Show(f + " is no valid Font family!");
+            }
+        }
+
+        internal void SetFontStyle(FontStyle f)
+        {
+            _font = new Font(_font.FontFamily, _font.Size, f, GraphicsUnit.Point);
+        }
+
+        internal void SetPadding(Padding padding)
+        {
+            _padding = padding;
+            updateTextBox();
+
         }
 
         //-----------------------------------------------------------------------------
@@ -672,7 +717,9 @@ namespace GraphicShapes
             }
 
             getTextAttributes(shape);
-            _text = shape.InnerText;                
+            _text = shape.InnerText;
+            if (_text != "" && _font == null) _font = defaultFont;
+
         }
 
         public override void Draw(Graphics g, int extd) //Rectangle
@@ -872,6 +919,7 @@ namespace GraphicShapes
 
             getTextAttributes(shape);
             _text = shape.InnerText;
+            if(_text != "" && _font == null) _font = defaultFont;
         }
 
         public override void Draw(Graphics g, int extd) //Oval
@@ -1132,7 +1180,6 @@ namespace GraphicShapes
                     Box.Height = 4;
                 }
 
-
                 Color _penColor = Color.Black;
                 if (shape.Attributes["LineColor"] != null) 
                     _penColor = ColorTranslator.FromHtml(shape.Attributes["LineColor"].Value);
@@ -1162,12 +1209,28 @@ namespace GraphicShapes
             if (shape.Attributes["LineWidth"] != null) penWidth = Convert.ToInt32(shape.Attributes["LineWidth"].Value);
 
             _pen = new Pen(penColor, penWidth);
+
+            getTextAttributes(shape);
+            _text = shape.InnerText;
+            if (_text != "" && _font == null) _font = defaultFont;
         }
 
         public override void Draw(Graphics g, int extd) //Polygon
         {
             if (_fillBrush != null) g.FillPolygon(_fillBrush, MarkerPoints);
             if (_pen.Width > 0) g.DrawPolygon(_pen, MarkerPoints);
+            g.TranslateTransform(Box.X, Box.Y);
+            if (_text != "")
+            {
+                setStringAlignment();
+                g.DrawString(_text, _font, _fontBrush, _textBox, _stringFormat);
+                if (extd > 0)
+                {
+                    markClipping(g, _text, _font, _textBox, _stringFormat);
+                }
+
+            }
+            g.TranslateTransform(-Box.X, -Box.Y);
 
             if (extd > 0 && this.IsSelected)
             {
