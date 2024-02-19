@@ -33,6 +33,7 @@ namespace GraphicTool
         public void setCurrentColor(Color col)
         {
             currentColor.Visible = true;
+            cbTransparent.Checked = false;
             currentColor.SetColor(col);
         }
 
@@ -49,12 +50,26 @@ namespace GraphicTool
                 {
                     if (x.ContainsFocus)
                     {
-                        Color color = x.BackColor;
-                        _callingDialog.ApplyColor(color);
-                        continue;
+                        if (e.Button == MouseButtons.Left)
+                        {
+                
+                            Color color = x.BackColor;
+                            cbTransparent.Checked = false;
+                            _callingDialog.ApplyColor(color);
+                            continue;
+                        }
+                        else
+                        {
+                            ContextMenuStrip contextMenu = new ContextMenuStrip();
+                            ToolStripMenuItem ColorContextMenu = new ToolStripMenuItem();
+                            ColorContextMenu.Text = "Set Color";
+                            //ColorContextMenu.Click += SetColorControl_Click;
+                            contextMenu.Items.AddRange(new ToolStripItem[] { ColorContextMenu });
+                            contextMenu.Show(Cursor.Position);
+                        }
                     }
                 }
-            }
+            }            
         }
 
         private void sendColorToParentControl(Color s)

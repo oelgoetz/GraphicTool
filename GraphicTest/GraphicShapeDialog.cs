@@ -178,7 +178,7 @@ namespace GraphicTool
             {
                 _g._fontBrush = new SolidBrush(c);
             }
-            colorPalette1.setCurrentColor(c);
+            colorPalette1.setCurrentColor(c);            
             _callingDisplay.Invalidate();
 
         }
@@ -187,6 +187,7 @@ namespace GraphicTool
         {
             if (rBBackground.Checked)
                 _g._fillBrush = null;
+            _callingDisplay.Invalidate();
         }
 
         private void UpDownLineWidth_ValueChanged(object sender, EventArgs e)
