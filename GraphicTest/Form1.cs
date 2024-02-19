@@ -142,7 +142,12 @@ namespace GraphicTool
             if (_args != null && _args.Length > 0)
             {
                 if (File.Exists(_args[0]))
+                {
                     display.LoadImageFile(_args[0]);
+                    currentFileLabel.Text = _args[0];
+                    //UNDER CONSTRUCTION!!! saveToolStripMenuItem.Enabled = true;
+                    updateRecentFiles(_args[0]);
+                }                    
                 else
                     MessageBox.Show(_args[0]);
             }
@@ -151,7 +156,8 @@ namespace GraphicTool
             //LoadTestCase("texttest01");
             //LoadTestCase("texttest02");
             //LoadTestCase("textsizetest");
-            LoadTestCase("texttest05");
+            //LoadTestCase("texttest05");
+            LoadTestCase("AutoStockPlaceIndexNumbersEx00");
             //Properties.Settings.Default.COLORS = "#308784;#1d5251;#59d396;#2fa567;#88b720;#628406;#208220;#0b540b;#5ec1e9;#359cbc;#5d8cc2;#306191;#3661a3;#1e457c;#7c67a3;#584877;#f4b425;#c68709;#ef890f;#c66a05;#e56469;#ba363f;#e56493;#b7376c;#8c8c8c;#666666;#636363;#4d4d4d;#ffffff;#dddddd;#000000;#555555";
             //Properties.Settings.Default.Save();
         }

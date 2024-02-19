@@ -22,6 +22,7 @@ namespace GraphicTool
         private mode Mode = mode.Default;
         private bool showInfo = false;
         private Size infoBox;
+        private Rectangle CropRectangle;
         TextBox textBox1;
 
         private enum mode
@@ -109,8 +110,19 @@ namespace GraphicTool
                 XmlDocument propsFile = new XmlDocument();
                 propsFile.Load(fileName + ".props");
 
-                XmlNode OriginalImageNode = propsFile.SelectSingleNode("//OriginalImage");
+                XmlNode OriginalImageNode = propsFile.SelectSingleNode("//OriginalImage");                
                 this.LoadBackgroundImageFromPropsFile(propsFile.SelectSingleNode("//OriginalImage"));
+                //EnableCropRectangle="true" CropRectangle="0,0,801,480"
+                if (OriginalImageNode != null && OriginalImageNode.Attributes["EnableCropRectangle"]!= null)
+                {
+                    if(OriginalImageNode.Attributes["EnableCropRectangle"].Value == "true" && OriginalImageNode.Attributes["CropRectangle"] != null)
+                    {
+                        string[] temp = OriginalImageNode.Attributes["CropRectangle"].Value.Split(',');
+                        CropRectangle = new Rectangle(Convert.ToInt16(temp[0]), Convert.ToInt16(temp[1]), Convert.ToInt16(temp[2]), Convert.ToInt16(temp[3]));
+                        PropsFileBmp = PropsFileBmp.Clone(CropRectangle, PixelFormat.DontCare);
+                    }
+                }
+                
 
                 XmlNode ShapesNode = propsFile.SelectSingleNode("//fileProperties/ImageOverlay/Shapes");
                 this.LoadOverlays(ShapesNode);
@@ -550,7 +562,7 @@ namespace GraphicTool
                 {
                     string msg = "";
                     {
-                        msg += "Test";
+                        //msg += "Test";
                         msg += "mode :  " + Mode.ToString() + " ";
                         string m = ""; if (multiSelect) m += "m"; else m += " ";
                         if(backGroundSelected) m += " bg"; else m += "   ";
