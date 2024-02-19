@@ -24,6 +24,7 @@ namespace GraphicTool
         private Size infoBox;
         private Rectangle CropRectangle;
         TextBox textBox1;
+        XmlNode buffer;
 
         private enum mode
         {
@@ -112,6 +113,7 @@ namespace GraphicTool
 
                 XmlNode OriginalImageNode = propsFile.SelectSingleNode("//OriginalImage");                
                 this.LoadBackgroundImageFromPropsFile(propsFile.SelectSingleNode("//OriginalImage"));
+                
                 //EnableCropRectangle="true" CropRectangle="0,0,801,480"
                 if (OriginalImageNode != null && OriginalImageNode.Attributes["EnableCropRectangle"]!= null)
                 {
@@ -123,7 +125,6 @@ namespace GraphicTool
                     }
                 }
                 
-
                 XmlNode ShapesNode = propsFile.SelectSingleNode("//fileProperties/ImageOverlay/Shapes");
                 this.LoadOverlays(ShapesNode);
             }
@@ -226,157 +227,7 @@ namespace GraphicTool
             return result;
 
         }
-
-        //------------------------------------------------------------------
-        private void deserialize(XmlNode ShapesNode, GraphicObject Object, Point BGOffset) //move this into GraphicShapes!
-        {
-            MyGroup dummy = new MyGroup();
-            string grouptype = dummy._type;// = "Group"; GetType().Name.ToString();
-            for (int i = 0; i < Object.Children.Count; i++)
-            {
-                GraphicObject g = Object.Children[i];
-                XmlElement Shape = ShapesNode.OwnerDocument.CreateElement("Shape");
-                ShapesNode.AppendChild(Shape);
-                string type = g._type; // GetType().Name.ToString();
-                string writetype = type;
-                if (writetype.StartsWith("My"))
-                    writetype = writetype.Replace("My", "");
-                Attribute(Shape, "Type", writetype);
-
-                if (writetype == "Polyline" || writetype == "Polygon")
-                {
-                    Attribute(Shape, "Coordinates", g.CoordinateString(BGOffset));
-                }
-                else
-                {
-                    Attribute(Shape, "X", (g.Box.X - BGOffset.X).ToString());
-                    Attribute(Shape, "Y", (g.Box.Y - BGOffset.Y).ToString());
-                    Attribute(Shape, "Width", g.Box.Width.ToString());
-                    Attribute(Shape, "Height", g.Box.Height.ToString());
-                }
-
-                if (g._pen != null && g._pen.Width > 0)
-                {
-                    Attribute(Shape, "LineWidth", g._pen.Width.ToString());
-                    Attribute(Shape, "LineColor", ColorTranslator.ToHtml(g._pen.Color));
-                }
-
-                if (g._fillBrush != null)
-                {
-                    Color BackColor = ((SolidBrush)g._fillBrush).Color;
-                    Attribute(Shape, "BackgroundColor", ColorTranslator.ToHtml(BackColor));
-                }
-
-                if (g._text != "")
-                {
-                    Shape.InnerText = g._text;
-                }
-
-                if (g._padding != null)
-                {
-                    Attribute(Shape, "PaddingLeft", g._padding.Left.ToString());
-                    Attribute(Shape, "PaddingTop", g._padding.Top.ToString());
-                    Attribute(Shape, "PaddingRight", g._padding.Right.ToString());
-                    Attribute(Shape, "PaddingBottom", g._padding.Bottom.ToString());
-                }
-
-                if (g._flags < 4)
-                {
-                    Attribute(Shape, "VerticalAlign", "top");
-                    if (g._flags == 0) Attribute(Shape, "TextAlign", "left");
-                    if ((g._flags & 1) == 1) Attribute(Shape, "TextAlign", "center");
-                    if ((g._flags & 2) == 2) Attribute(Shape, "TextAlign", "right");
-                }
-                else
-                {
-                    if ((g._flags & 1) == 1)
-                        Attribute(Shape, "TextAlign", "center");
-                    else
-                        if ((g._flags & 2) == 2)
-                        Attribute(Shape, "TextAlign", "right");
-                    else
-                        Attribute(Shape, "TextAlign", "left");
-                    if ((g._flags & 4) == 4) Attribute(Shape, "VerticalAlign", "center");
-                    if ((g._flags & 8) == 8) Attribute(Shape, "VerticalAlign", "bottom");
-
-                }
-
-                if (g._font != null)
-                {
-                    Attribute(Shape, "FontFamily", g._font.Name.ToString());
-                    Attribute(Shape, "FontSize", g._font.Size.ToString());
-                    Attribute(Shape, "FontStyle", g._font.Style.ToString());
-                    string colorstring = ColorTranslator.ToHtml(((SolidBrush)g._fontBrush).Color);
-                    Attribute(Shape, "Color", colorstring);
-
-
-                    if (g._font.Bold)
-                        Attribute(Shape, "FontWeight", "bold");
-                    else
-                        Attribute(Shape, "FontWeight", "normal");
-
-                    if (g._font.Underline)
-                        Attribute(Shape, "Underline", "true");
-                    else
-                        Attribute(Shape, "Underline", "false");
-
-                    if (g._font.Italic)
-                        Attribute(Shape, "FontStyle", "italic");
-                    else
-                        Attribute(Shape, "FontStyle", "normal");
-
-                    if (g._font.Strikeout)
-                        Attribute(Shape, "Strikeout", "true");
-                    else
-                        Attribute(Shape, "Strikeout", "false");
-
-                }
-
-                //Recursive call for Groups
-                if (type == grouptype)
-                    deserialize(Shape, g, BGOffset);
-            }
-
-            //----------//OK:
-            //Type
-            //Coordinates
-            //Width   ?Coordinates?
-            //Height  ?Coordinates?
-            //X
-            //Y
-            //LineWidth
-            //LineColor
-            //BackgroundColor
-
-            //TEXT: InnerText!
-            //PaddingLeft
-            //PaddingBottom
-            //PaddingRight
-            //PaddingTop
-            //FontStyle
-            //FontFamily
-            //FontSize
-            //FontWeight
-            //Underline                        
-            //TextAlign
-            //VerticalAlign
-
-            //NOT SUPPORTED:
-            //CornerRadius
-            //Rotation
-            //ShapeTimeSpan
-            //Transparency
-            //EnableShadow
-            //Right
-            //Bottom
-            //BackgroundColorAlt
-            //Left
-            //Top
-
-            ////Polyine:
-            //ArrowHeadColor
-        }
-
+        
         public void Save2File(string fileName)
         {
             if (fileName == null) return;
@@ -397,7 +248,7 @@ namespace GraphicTool
 
             XmlNode ShapesNode = propsFile.SelectSingleNode("//Shapes");
             //Save Shapes as Xml
-            deserialize(ShapesNode, root, BackgroundOffset);
+            root.deserialize(ShapesNode, BackgroundOffset);
             //Draw Shapes on Graphic
             PaintOnGraphicInstance(graph, 0, Color.White);
             //Save Graphic
@@ -907,11 +758,11 @@ namespace GraphicTool
                                 }
                                 else
                                 {
-                                    
+
                                     //ColorPicker picker = new ColorPicker(this, g, "BackColor");
                                     //picker.Show();
                                     //g.UnSelect();
-                                    
+                                    //deserialize(buffer, g, BackgroundOffset);
                                     GraphicShapeDialog textForm = new GraphicShapeDialog(this, g, Cursor.Position);
                                     textForm.ShowDialog();
                                     textForm.Dispose();

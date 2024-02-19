@@ -15,11 +15,16 @@ namespace GraphicTool
     public partial class ColorPalette : UserControl
     {
         GraphicShapeDialog _callingDialog;
-        string _property;
         string[] colors;
+        mode Mode = mode.Default;
+        enum mode
+        {
+            Default,
+            Rearrange
+        }
         public ColorPalette()
         {
-            InitializeComponent();            
+            InitializeComponent();
         }
 
         public void showCbTransparent(bool check, bool show, bool enabled)
@@ -51,7 +56,7 @@ namespace GraphicTool
                     {
                         if (e.Button == MouseButtons.Left)
                         {
-                
+
                             Color color = x.BackColor;
                             cbTransparent.Checked = false;
                             _callingDialog.ApplyColor(color);
@@ -60,16 +65,44 @@ namespace GraphicTool
                         else
                         {
                             ContextMenuStrip contextMenu = new ContextMenuStrip();
-                            ToolStripMenuItem ColorContextMenu = new ToolStripMenuItem();
-                            ColorContextMenu.Text = "Set Color";
-                            ColorContextMenu.Click += SetColorControl_Click;
-                            contextMenu.Items.AddRange(new ToolStripItem[] { ColorContextMenu });
+                            ToolStripMenuItem ColorContextMenu0 = new ToolStripMenuItem();
+                            ColorContextMenu0.Text = "Update Palette Color";
+                            ColorContextMenu0.Click += SetColorControl_Click;
+                            contextMenu.Items.AddRange(new ToolStripItem[] { ColorContextMenu0 });
+                            //ToolStripMenuItem ColorContextMenu1 = new ToolStripMenuItem();
+                            //ColorContextMenu1.Text = "Add Palette Color";
+                            //ColorContextMenu1.Click += AddColorControl_Click;
+                            //ColorContextMenu1.Enabled = false;
+                            //contextMenu.Items.AddRange(new ToolStripItem[] { ColorContextMenu1 });
+                            //ToolStripMenuItem ColorContextMenu2 = new ToolStripMenuItem();
+                            //ColorContextMenu2.Text = "Remove Palette Color";
+                            //ColorContextMenu2.Click += RemoveColorControl_Click;
+                            //ColorContextMenu2.Enabled = false;
+                            //contextMenu.Items.AddRange(new ToolStripItem[] { ColorContextMenu2 });
+                            //ToolStripMenuItem ColorContextMenu3 = new ToolStripMenuItem();
+                            //ColorContextMenu3.Text = "Move Palette Color";
+                            //ColorContextMenu3.Click += MoveColorControl_Click;
+                            //ColorContextMenu3.Enabled = false;
+                            //contextMenu.Items.AddRange(new ToolStripItem[] { ColorContextMenu3 });
                             contextMenu.Show(Cursor.Position);
                         }
                     }
                 }
-            }            
+            }
         }
+
+        //private void AddColorControl_Click(object? sender, EventArgs e)
+        //{
+        //}
+
+        //private void RemoveColorControl_Click(object? sender, EventArgs e)
+        //{
+        //}
+
+        //private void MoveColorControl_Click(object? sender, EventArgs e)
+        //{
+        //    Mode = mode.Rearrange;
+        //}
 
         private void SetColorControl_Click(object? sender, EventArgs e)
         {
@@ -79,7 +112,7 @@ namespace GraphicTool
                 string s = Properties.Settings.Default.COLORS;
                 string[] colors = s.Split(';');
                 if (x.GetType() == typeof(ColorControl) && x.Name != "currentColor")
-                {                   
+                {
                     if (x.ContainsFocus)
                     {
                         x.BackColor = currentColor.BackColor;
@@ -191,7 +224,7 @@ namespace GraphicTool
                 Color col2 = (Color)converter.ConvertFromString(colors[i + 1]);
                 c.SetBorder(col2);
                 //8x8 Matrix 
-                if (i >= 0 && i % 24 == 0)
+                if (i >= 0 && i % 20 == 0)
                 {
                     y += c.Height + 1;
                     x = 0;
@@ -212,10 +245,11 @@ namespace GraphicTool
         private void cbTransparent_MouseUp(object sender, MouseEventArgs e)
         {
             //MessageBox.Show(cbTransparent.Checked.ToString());
-            if(cbTransparent.Checked)
+            if (cbTransparent.Checked)
             {
                 _callingDialog.ApplyTransparency();
             }
         }
+
     }
 }

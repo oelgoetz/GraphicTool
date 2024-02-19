@@ -76,6 +76,9 @@ namespace GraphicShapes
         public int _flags;
         public int SelectedMarker = -1;
 
+        internal ArrowTip tipEnd = null;
+        internal ArrowTip tailEnd = null;
+
         public Single ArrowHeadCenterLength = 15;
         public Single ArrowHeadLength = 25;
         public Single ArrowHeadWidth = 20;
@@ -555,6 +558,171 @@ namespace GraphicShapes
 
         }
 
+        internal void deserialize(XmlNode Node, Point BGOffset)
+        {
+            for (int i = 0; i < Children.Count; i++)
+            {
+                GraphicObject g = Children[i];
+                XmlElement Shape = Node.OwnerDocument.CreateElement("Shape");
+                Node.AppendChild(Shape);
+                string type = g._type;
+                Attribute(Shape, "Type", type);
+                
+                if (type == "Polyline" || type == "Polygon")
+                {
+                    Attribute(Shape, "Coordinates", g.CoordinateString(BGOffset));
+                    
+                }
+                else
+                {
+                    Attribute(Shape, "X", (g.Box.X - BGOffset.X).ToString());
+                    Attribute(Shape, "Y", (g.Box.Y - BGOffset.Y).ToString());
+                    Attribute(Shape, "Width", g.Box.Width.ToString());
+                    Attribute(Shape, "Height", g.Box.Height.ToString());
+                }
+
+                if (type == "Polyline")
+                {
+                    //ArrowHeads="none","ends","tail","head"
+                    //ArrowHeads="head" same as ArrowHeads==null
+
+                    if (g.tipEnd != null && g.tailEnd != null) Attribute(Shape, "ArrowHeads", "ends");
+                    if (g.tipEnd == null && g.tailEnd == null) Attribute(Shape, "ArrowHeads", "none");
+                    if (g.tipEnd != null && g.tailEnd == null) Attribute(Shape, "ArrowHeads", "head");                    
+                }
+
+                if (g._pen != null && g._pen.Width > 0)
+                {
+                    Attribute(Shape, "LineWidth", g._pen.Width.ToString());
+                    Attribute(Shape, "LineColor", ColorTranslator.ToHtml(g._pen.Color));
+                }
+
+                if (g._fillBrush != null)
+                {
+                    Color BackColor = ((SolidBrush)g._fillBrush).Color;
+                    Attribute(Shape, "BackgroundColor", ColorTranslator.ToHtml(BackColor));
+                }
+
+                if (g._text != "")
+                {
+                    Shape.InnerText = g._text;
+                }
+
+                if (g._padding != null)
+                {
+                    Attribute(Shape, "PaddingLeft", g._padding.Left.ToString());
+                    Attribute(Shape, "PaddingTop", g._padding.Top.ToString());
+                    Attribute(Shape, "PaddingRight", g._padding.Right.ToString());
+                    Attribute(Shape, "PaddingBottom", g._padding.Bottom.ToString());
+                }
+
+                if (g._flags < 4)
+                {
+                    Attribute(Shape, "VerticalAlign", "top");
+                    if (g._flags == 0) Attribute(Shape, "TextAlign", "left");
+                    if ((g._flags & 1) == 1) Attribute(Shape, "TextAlign", "center");
+                    if ((g._flags & 2) == 2) Attribute(Shape, "TextAlign", "right");
+                }
+                else
+                {
+                    if ((g._flags & 1) == 1)
+                        Attribute(Shape, "TextAlign", "center");
+                    else
+                        if ((g._flags & 2) == 2)
+                        Attribute(Shape, "TextAlign", "right");
+                    else
+                        Attribute(Shape, "TextAlign", "left");
+                    if ((g._flags & 4) == 4) Attribute(Shape, "VerticalAlign", "center");
+                    if ((g._flags & 8) == 8) Attribute(Shape, "VerticalAlign", "bottom");
+
+                }
+
+                if (g._font != null)
+                {
+                    Attribute(Shape, "FontFamily", g._font.Name.ToString());
+                    Attribute(Shape, "FontSize", g._font.Size.ToString());
+                    Attribute(Shape, "FontStyle", g._font.Style.ToString());
+                    string colorstring = ColorTranslator.ToHtml(((SolidBrush)g._fontBrush).Color);
+                    Attribute(Shape, "Color", colorstring);
+
+                    if (g._font.Bold)
+                        Attribute(Shape, "FontWeight", "bold");
+                    else
+                        Attribute(Shape, "FontWeight", "normal");
+
+                    if (g._font.Underline)
+                        Attribute(Shape, "Underline", "true");
+                    else
+                        Attribute(Shape, "Underline", "false");
+
+                    if (g._font.Italic)
+                        Attribute(Shape, "FontStyle", "italic");
+                    else
+                        Attribute(Shape, "FontStyle", "normal");
+
+                    if (g._font.Strikeout)
+                        Attribute(Shape, "Strikeout", "true");
+                    else
+                        Attribute(Shape, "Strikeout", "false");
+
+                }                
+
+                    //Recursive call for Groups
+                    if (type == "Group")
+                    deserialize(Shape, BGOffset);
+            }
+
+            //----------//OK:
+            //Type
+            //Coordinates
+            //Width   ?Coordinates?
+            //Height  ?Coordinates?
+            //X
+            //Y
+            //LineWidth
+            //LineColor
+            //BackgroundColor
+
+            //TEXT: InnerText!
+            //PaddingLeft
+            //PaddingBottom
+            //PaddingRight
+            //PaddingTop
+            //FontStyle
+            //FontFamily
+            //FontSize
+            //FontWeight
+            //Underline                        
+            //TextAlign
+            //VerticalAlign
+
+            //NOT SUPPORTED:
+            //CornerRadius
+            //Rotation
+            //ShapeTimeSpan
+            //Transparency
+            //EnableShadow
+            //Right
+            //Bottom
+            //BackgroundColorAlt
+            //Left
+            //Top
+
+            ////Polyine:
+            //ArrowHeadColor
+        }
+
+        private void Attribute(XmlNode node, string name, string value)
+        {
+            if (node.Attributes[name] == null)
+            {
+                XmlAttribute newAtt = node.OwnerDocument.CreateAttribute(name);
+                node.Attributes.Append(newAtt);
+            }
+            node.Attributes[name].Value = value.ToString();
+        }
+
+
         //-----------------------------------------------------------------------------
     }
 
@@ -986,8 +1154,6 @@ namespace GraphicShapes
 
     class MyPolyline : GraphicObject
     {
-        ArrowTip tipEnd = null;
-        ArrowTip tailEnd = null;
         public MyPolyline(XmlNode shape, GraphicObject parent) //Polyline
         {
             Parent = parent;
@@ -1009,7 +1175,6 @@ namespace GraphicShapes
                 ArrowHeadLength = Convert.ToSingle(shape.Attributes["ArrowHeadLength"].Value);
             if (shape.Attributes["ArrowHeadWidth"] != null)
                 ArrowHeadWidth = Convert.ToSingle(shape.Attributes["ArrowHeadWidth"].Value);
-
 
             if (shape.Attributes["ArrowTailCenterLength"] != null)
                 ArrowTailCenterLength = Convert.ToSingle(shape.Attributes["ArrowTailCenterLength"].Value);

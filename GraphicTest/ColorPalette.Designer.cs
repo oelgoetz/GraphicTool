@@ -53,9 +53,9 @@
             // 
             currentColor.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             currentColor.BorderStyle = BorderStyle.FixedSingle;
-            currentColor.Location = new Point(208, 111);
+            currentColor.Location = new Point(248, 72);
             currentColor.Name = "currentColor";
-            currentColor.Size = new Size(32, 32);
+            currentColor.Size = new Size(34, 34);
             currentColor.TabIndex = 20;
             // 
             // cbTransparent
@@ -76,7 +76,7 @@
             button2.FlatAppearance.BorderColor = Color.Silver;
             button2.FlatStyle = FlatStyle.Flat;
             button2.Image = (Image)resources.GetObject("button2.Image");
-            button2.Location = new Point(245, 110);
+            button2.Location = new Point(248, 110);
             button2.Name = "button2";
             button2.Size = new Size(34, 34);
             button2.TabIndex = 18;
