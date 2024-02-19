@@ -173,6 +173,7 @@ namespace GraphicTool
             if (rBBackground.Checked)
             {
                 _g._fillBrush = new SolidBrush(c);
+                colorPalette1.showCbTransparent(false, true, true);
             }
             if (rBText.Checked)
             {
@@ -187,6 +188,7 @@ namespace GraphicTool
         {
             if (rBBackground.Checked)
                 _g._fillBrush = null;
+
             _callingDisplay.Invalidate();
         }
 

@@ -16,14 +16,14 @@ namespace GraphicTool
     {
         Color m_CurrentColor = Color.Empty;
         GraphicObject _g;
-        GraphicShapeDialog _caller;
+        GraphicShapeDialog _callingDialog;
         string _prop;
         public Color CursorEllipseColor { get; set; } = Color.Orange;
 
         public ColorPicker(GraphicShapeDialog caller)
         {
             InitializeComponent();
-            _caller = caller;
+            _callingDialog = caller;
             // TEST !! //this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             // TEST !! //WindowState = FormWindowState.Maximized;
             ResizeRedraw = true;
@@ -87,7 +87,7 @@ namespace GraphicTool
 
         private void ColorPicker_MouseDown(object sender, MouseEventArgs e)
         {
-            _caller.ApplyColor(m_CurrentColor);
+            _callingDialog.ApplyColor(m_CurrentColor);
             this.Close();
         }
     }
