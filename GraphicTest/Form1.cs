@@ -357,8 +357,14 @@ namespace GraphicTool
             if (File.Exists(currentFileLabel.Text + ".props"))
             {
                 try
-                {
-                    Process.Start("C:\\Program Files\\Notepad++\\notepad++.exe", currentFileLabel.Text + ".props");
+                {                    
+                    if (File.Exists("C:\\Program Files\\Notepad++\\notepad++.exe"))
+                        Process.Start("C:\\Program Files\\Notepad++\\notepad++.exe", currentFileLabel.Text + ".props");
+                    else
+                    if (File.Exists("C:\\Program Files (x86)\\Notepad++\\notepad++.exe"))
+                        Process.Start("C:\\Program Files (x86)\\Notepad++\\notepad++.exe", currentFileLabel.Text + ".props");
+                    else
+                        Process.Start("notepad.exe", currentFileLabel.Text + ".props");
                 }
                 catch (Exception ex)
                 {

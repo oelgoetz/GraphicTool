@@ -76,8 +76,11 @@ namespace GraphicShapes
         public int _flags;
         public int SelectedMarker = -1;
 
-        internal ArrowTip tipEnd = null;
-        internal ArrowTip tailEnd = null;
+        internal ArrowHead arrowHead = null;
+        internal ArrowTail arrowTail = null;
+
+        internal ArrowTip tipEndold = null;
+        internal ArrowTip tailEndold = null;
 
         public Single ArrowHeadCenterLength = 15;
         public Single ArrowHeadLength = 25;
@@ -586,9 +589,9 @@ namespace GraphicShapes
                     //ArrowHeads="none","ends","tail","head"
                     //ArrowHeads="head" same as ArrowHeads==null
 
-                    if (g.tipEnd != null && g.tailEnd != null) Attribute(Shape, "ArrowHeads", "ends");
-                    if (g.tipEnd == null && g.tailEnd == null) Attribute(Shape, "ArrowHeads", "none");
-                    if (g.tipEnd != null && g.tailEnd == null) Attribute(Shape, "ArrowHeads", "head");                    
+                    if (g.tipEndold != null && g.tailEndold != null) Attribute(Shape, "ArrowHeads", "ends");
+                    if (g.tipEndold == null && g.tailEndold == null) Attribute(Shape, "ArrowHeads", "none");
+                    if (g.tipEndold != null && g.tailEndold == null) Attribute(Shape, "ArrowHeads", "head");                    
                 }
 
                 if (g._pen != null && g._pen.Width > 0)
@@ -1188,22 +1191,22 @@ namespace GraphicShapes
             int n = MarkerPoints.Length;
             if (shape.Attributes["ArrowHeads"] == null)
             {
-                tipEnd = new ArrowTip(MarkerPoints[n - 1], MarkerPoints[n - 2], _pen, ArrowHeadWidth, ArrowHeadLength, ArrowHeadCenterLength, 0);
+                tipEndold = new ArrowTip(MarkerPoints[n - 1], MarkerPoints[n - 2], _pen, ArrowHeadWidth, ArrowHeadLength, ArrowHeadCenterLength, 0);
             }
             else
             {
                 switch (shape.Attributes["ArrowHeads"].Value)
                 {
                     case "head":
-                        tipEnd = new ArrowTip(MarkerPoints[n - 1], MarkerPoints[n - 2], _pen, ArrowHeadWidth, ArrowHeadLength, ArrowHeadCenterLength, 0);
+                        tipEndold = new ArrowTip(MarkerPoints[n - 1], MarkerPoints[n - 2], _pen, ArrowHeadWidth, ArrowHeadLength, ArrowHeadCenterLength, 0);
                         break;
                     case "tail":
-                        tipEnd = new ArrowTip(MarkerPoints[0], MarkerPoints[1], _pen, ArrowHeadWidth, ArrowHeadLength, ArrowHeadCenterLength, 0);
+                        tipEndold = new ArrowTip(MarkerPoints[0], MarkerPoints[1], _pen, ArrowHeadWidth, ArrowHeadLength, ArrowHeadCenterLength, 0);
                         break;
                     //case "center": break;
                     case "ends":
-                        tipEnd = new ArrowTip(MarkerPoints[n - 1], MarkerPoints[n - 2], _pen, ArrowHeadWidth, ArrowHeadLength, ArrowHeadCenterLength, 0);
-                        tailEnd = new ArrowTip(MarkerPoints[0], MarkerPoints[1], _pen, ArrowHeadWidth, ArrowHeadLength, ArrowHeadCenterLength, 0);
+                        tipEndold = new ArrowTip(MarkerPoints[n - 1], MarkerPoints[n - 2], _pen, ArrowHeadWidth, ArrowHeadLength, ArrowHeadCenterLength, 0);
+                        tailEndold = new ArrowTip(MarkerPoints[0], MarkerPoints[1], _pen, ArrowHeadWidth, ArrowHeadLength, ArrowHeadCenterLength, 0);
                         break;
                     case "none": break;
                     //case "everywhere": break;
@@ -1215,15 +1218,15 @@ namespace GraphicShapes
                     switch (shape.Attributes["ArrowTails"].Value)
                     {
                         case "head":
-                            tailEnd = new ArrowTip(MarkerPoints[n - 1], MarkerPoints[n - 2], _pen, ArrowTailWidth, ArrowTailLength, ArrowTailCenterLength, _PI);
+                            tailEndold = new ArrowTip(MarkerPoints[n - 1], MarkerPoints[n - 2], _pen, ArrowTailWidth, ArrowTailLength, ArrowTailCenterLength, _PI);
                             break;
                         case "tail":
-                            tailEnd = new ArrowTip(MarkerPoints[0], MarkerPoints[1], _pen, ArrowTailWidth, ArrowTailLength, ArrowTailCenterLength, _PI);
+                            tailEndold = new ArrowTip(MarkerPoints[0], MarkerPoints[1], _pen, ArrowTailWidth, ArrowTailLength, ArrowTailCenterLength, _PI);
                             break;
                         case "center": break;
                         case "ends":
-                            tailEnd = new ArrowTip(MarkerPoints[n - 1], MarkerPoints[n - 2], _pen, ArrowTailWidth, ArrowTailLength, ArrowTailCenterLength, _PI);
-                            tipEnd = new ArrowTip(MarkerPoints[0], MarkerPoints[1], _pen, ArrowTailWidth, ArrowTailLength, ArrowTailCenterLength, _PI);
+                            tailEndold = new ArrowTip(MarkerPoints[n - 1], MarkerPoints[n - 2], _pen, ArrowTailWidth, ArrowTailLength, ArrowTailCenterLength, _PI);
+                            tipEndold = new ArrowTip(MarkerPoints[0], MarkerPoints[1], _pen, ArrowTailWidth, ArrowTailLength, ArrowTailCenterLength, _PI);
                             break;
                         case "none": break;
                         case "everywhere": break;
@@ -1238,13 +1241,13 @@ namespace GraphicShapes
         {
             g.DrawLines(_pen, MarkerPoints);
 
-            if (tipEnd != null)
+            if (tipEndold != null)
             {
-                tipEnd.Draw(g, extd);
+                tipEndold.Draw(g, extd);
             }
-            if (tailEnd != null)
+            if (tailEndold != null)
             {
-                tailEnd.Draw(g, extd);
+                tailEndold.Draw(g, extd);
             }
 
             if (extd > 0 && this.IsSelected)
@@ -1274,13 +1277,13 @@ namespace GraphicShapes
                 MarkerPoints[i].Y += d.Y;
             }
 
-            if (tipEnd != null)
+            if (tipEndold != null)
             {
-                tipEnd.Move(d);
+                tipEndold.Move(d);
             }
-            if (tailEnd != null)
+            if (tailEndold != null)
             {
-                tailEnd.Move(d);
+                tailEndold.Move(d);
             }
         }
 
@@ -1294,15 +1297,15 @@ namespace GraphicShapes
 
             updatePolyBox();
 
-            if (tipEnd != null)
+            if (tipEndold != null)
             {
-                if (SelectedMarker == MarkerPoints.Length - 1) tipEnd.Move(d);
-                tipEnd.AdjustDirection((float)Orientation(MarkerPoints[MarkerPoints.Length - 1], MarkerPoints[MarkerPoints.Length - 2]) - (float)oldTipAngle);
+                if (SelectedMarker == MarkerPoints.Length - 1) tipEndold.Move(d);
+                tipEndold.AdjustDirection((float)Orientation(MarkerPoints[MarkerPoints.Length - 1], MarkerPoints[MarkerPoints.Length - 2]) - (float)oldTipAngle);
             }
-            if (tailEnd != null)
+            if (tailEndold != null)
             {
-                if (SelectedMarker == 0) tailEnd.Move(d);
-                tailEnd.AdjustDirection((float)Orientation(MarkerPoints[0], MarkerPoints[1]) - (float)oldTailAngle);
+                if (SelectedMarker == 0) tailEndold.Move(d);
+                tailEndold.AdjustDirection((float)Orientation(MarkerPoints[0], MarkerPoints[1]) - (float)oldTailAngle);
             }
         }
     }
@@ -1431,6 +1434,76 @@ namespace GraphicShapes
             MarkerPoints[SelectedMarker].Y += d.Y;
 
             updatePolyBox();
+        }
+    }
+
+    class ArrowHead : GraphicObject
+    {
+
+        public PointF _tip;
+        double _orientation;
+        Pen _pen;
+        Brush _brush;
+        PointF[] Points = new PointF[4];
+        Point Position = new Point(0, 0);
+
+        public ArrowHead(XmlNode shape, GraphicObject parent)
+        {
+            //ArrowHeadColor = "#0000ff" ArrowTailColor = "#0000cd" BackgroundColor = "#ff0000" LineColor = "#0000ff"
+            //LineWidth = "2" ArrowHeads = "ends" ArrowHeadWidth = "16" ArrowHeadLength = "24" ArrowHeadCenterLength = "16"
+            Parent = parent;
+            _type = "ArrowHead";
+            //_tip.X = p1.X;
+            //_tip.Y = p1.Y;
+            //_orientation = Orientation(p1, p2);
+            //_pen = pen;
+            //_brush = new SolidBrush(pen.Color);
+
+            //Points[0].Y = 0;
+            //Points[0].X = 0;
+            //Points[1].Y = -Width / 2;
+            //Points[1].X = Length;
+            //Points[2].Y = 0;
+            //Points[2].X = CenterLength;
+            //Points[3].Y = Width / 2;
+            //Points[3].X = Length;
+
+            //Points = Rotate(Points, _orientation + rot);
+            //Points = Translate(Points, p1);
+
+        }
+
+        public override void Draw(Graphics g, int extd)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Move(Point d)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Reshape(Point d)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    class ArrowTail : GraphicObject
+    {
+        public override void Draw(Graphics g, int extd)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Move(Point d)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Reshape(Point d)
+        {
+            throw new NotImplementedException();
         }
     }
 
