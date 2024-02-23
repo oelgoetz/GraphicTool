@@ -479,7 +479,7 @@ namespace GraphicTool
                     //BackGroundSelected = true;
                     break;
                 case -1:
-                    backGroundSelected = true;
+                    //backGroundSelected = true;
                     break;
                 default:
                     //if (SelectedImage != null)
@@ -769,9 +769,15 @@ namespace GraphicTool
                                     this.Invalidate();
                                 }
                             }
+                            
                         }
-                        break;
-                }
+                        else
+                        {
+                            if (mouseOverObject == -1)
+                                backGroundSelected = true;
+                        }                              
+                    break;
+                } 
             }
             else //MouseButtons.Left
             {
