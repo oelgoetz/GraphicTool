@@ -758,15 +758,13 @@ namespace GraphicTool
                                 }
                                 else
                                 {
-
-                                    //ColorPicker picker = new ColorPicker(this, g, "BackColor");
-                                    //picker.Show();
-                                    //g.UnSelect();
-                                    //deserialize(buffer, g, BackgroundOffset);
-                                    GraphicShapeDialog textForm = new GraphicShapeDialog(this, g, Cursor.Position);
-                                    textForm.ShowDialog();
-                                    textForm.Dispose();
-                                    this.Invalidate();
+                                    if(nSelected == 1 && g._type != "Group")
+                                    {
+                                        GraphicShapeDialog textForm = new GraphicShapeDialog(this, g, Cursor.Position);
+                                        textForm.ShowDialog();
+                                        textForm.Dispose();
+                                        this.Invalidate();
+                                    }
                                 }
                             }
                             

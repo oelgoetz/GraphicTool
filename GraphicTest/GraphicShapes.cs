@@ -574,8 +574,7 @@ namespace GraphicShapes
                 
                 if (type == "Polyline" || type == "Polygon")
                 {
-                    Attribute(Shape, "Coordinates", g.CoordinateString(BGOffset));
-                    
+                    Attribute(Shape, "Coordinates", g.CoordinateString(BGOffset));                    
                 }
                 else
                 {
@@ -679,8 +678,8 @@ namespace GraphicShapes
                 }                
 
                     //Recursive call for Groups
-                    if (type == "Group")
-                    deserialize(Shape, BGOffset);
+                    if (g._type == "Group")
+                        g.deserialize(Shape, BGOffset);
             }
 
             //----------//OK:
@@ -1334,12 +1333,12 @@ namespace GraphicShapes
 
     class MyPolygon : GraphicObject
     {
+        //TODO: LineDashPattern="5 10" LineStyleName="Dashed Line"
         public MyPolygon(XmlNode shape, GraphicObject parent) //Polygon
         {
             Parent = parent;
             _type = "Polygon";
             MarkerPoints = Coordinates2Array(shape.Attributes["Coordinates"].Value);
-            int n = MarkerPoints.Length;
 
             {
                 int minX = MarkerPoints[0].X; int maxX = MarkerPoints[0].X;
@@ -1374,7 +1373,7 @@ namespace GraphicShapes
                 if (shape.Attributes["LineColor"] != null) 
                     _penColor = ColorTranslator.FromHtml(shape.Attributes["LineColor"].Value);
 
-                int _penWidth = 0;
+                int _penWidth = 1;
                 if (shape.Attributes["LineWidth"] != null) 
                     _penWidth = Convert.ToInt32(shape.Attributes["LineWidth"].Value);
 
@@ -1392,13 +1391,15 @@ namespace GraphicShapes
                 }
             }
 
-            Color penColor = Color.Black;
-            if (shape.Attributes["LineColor"] != null) penColor = ColorTranslator.FromHtml(shape.Attributes["LineColor"].Value);
+            //Color penColor = Color.Black;
+            //if (shape.Attributes["LineColor"] != null) 
+            //    penColor = ColorTranslator.FromHtml(shape.Attributes["LineColor"].Value);
 
-            int penWidth = 1;
-            if (shape.Attributes["LineWidth"] != null) penWidth = Convert.ToInt32(shape.Attributes["LineWidth"].Value);
+            //int penWidth = 1;
+            //if (shape.Attributes["LineWidth"] != null) 
+            //    penWidth = Convert.ToInt32(shape.Attributes["LineWidth"].Value);
 
-            _pen = new Pen(penColor, penWidth);
+            //_pen = new Pen(penColor, penWidth);
 
             getTextAttributes(shape);
             _text = shape.InnerText;
@@ -1471,10 +1472,15 @@ namespace GraphicShapes
             _type = "ArrowHeadAtHead";
             brush = new SolidBrush(c);// Color.Black);
 
-            Points[0].Y = CenterLength; Points[0].X = 0;
-            Points[1].Y = -Length/2; Points[1].X = -Width / 2;
-            Points[2].Y = 0; Points[2].X = 0;
-            Points[3].Y = -Length/2; Points[3].X = Width / 2;
+            //Points[0].Y = CenterLength; Points[0].X = 0;
+            //Points[1].Y = -Length/2; Points[1].X = -Width / 2;
+            //Points[2].Y = 0; Points[2].X = 0;
+            //Points[3].Y = -Length/2; Points[3].X = Width / 2;
+
+            Points[0].Y = 0; Points[0].X = 0;
+            Points[1].Y = -Length; Points[1].X = -Width / 2;
+            Points[2].Y = -Length / 2; Points[2].X = 0;
+            Points[3].Y = -Length; Points[3].X = Width / 2;
 
         }
 
@@ -1578,12 +1584,17 @@ namespace GraphicShapes
         {
             Parent = parent;
             _type = "ArrowHeadAtTail";
-            brush = new SolidBrush(c);//Color.Blue);
+            brush = new SolidBrush(c); //Color.Orange);
 
-            Points[0].Y = 0; Points[0].X = 0;
-            Points[1].Y = Length / 2; Points[1].X = -Width / 2;
-            Points[2].Y = -CenterLength; Points[2].X = 0;
-            Points[3].Y = Length / 2; Points[3].X = Width / 2;
+            //Points[0].Y = 0; Points[0].X = 0;
+            //Points[1].Y = Length / 2; Points[1].X = -Width / 2;
+            //Points[2].Y = -CenterLength; Points[2].X = 0;
+            //Points[3].Y = Length / 2; Points[3].X = Width / 2;
+
+            Points[0].Y = Length / 2; Points[0].X = 0;
+            Points[1].Y = Length; Points[1].X = -Width / 2;
+            Points[2].Y = (Length / 2) - CenterLength; Points[2].X = 0;
+            Points[3].Y = Length; Points[3].X = Width / 2;
         }
 
         public override void Draw(Graphics g, int extd)
