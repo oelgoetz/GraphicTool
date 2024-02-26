@@ -595,16 +595,52 @@ namespace GraphicShapes
                 {
                     //ArrowHeads="none","ends","tail","head"
                     //ArrowHeads="head" same as ArrowHeads==null
-                    
+
+                    ////if (shape.Attributes["ArrowHeadCenterLength"] != null)
+                    ////    ArrowHeadCenter = Convert.ToInt16(shape.Attributes["ArrowHeadCenterLength"].Value);
+                    ////if (shape.Attributes["ArrowHeadLength"] != null)
+                    ////    ArrowHeadLength = Convert.ToInt16(shape.Attributes["ArrowHeadLength"].Value);
+                    ////if (shape.Attributes["ArrowHeadWidth"] != null)
+                    ////    ArrowHeadWidth = Convert.ToInt16(shape.Attributes["ArrowHeadWidth"].Value);
+
+                    ////if (shape.Attributes["ArrowTailCenterLength"] != null)
+                    ////    ArrowTailCenter = Convert.ToInt16(shape.Attributes["ArrowTailCenterLength"].Value);
+                    ////if (shape.Attributes["ArrowTailLength"] != null)
+                    ////    ArrowTailLength = Convert.ToInt16(shape.Attributes["ArrowTailLength"].Value);
+                    ////if (shape.Attributes["ArrowTailWidth"] != null)
+                    ////    ArrowTailWidth = Convert.ToInt16(shape.Attributes["ArrowTailWidth"].Value);
+
+                    ////if (shape.Attributes["ArrowTailColor"] != null)
+                    ////    ArrowTailColor = ColorTranslator.FromHtml(shape.Attributes["ArrowTailColor"].Value);
+                    ////else
+                    ////    if (shape.Attributes["LineColor"] != null)
+                    ////    ArrowTailColor = ColorTranslator.FromHtml(shape.Attributes["LineColor"].Value);
+
                     if (g.arrowHeadAtHead != null && g.arrowHeadAtTail != null) Attribute(Shape, "ArrowHeads", "ends");
                     if (g.arrowHeadAtHead == null && g.arrowHeadAtTail != null) Attribute(Shape, "ArrowHeads", "tail");
                     //if (g.arrowHeadAtHead != null && g.arrowHeadAtTail == null) Attribute(Shape, "ArrowHeads", "head");
                     if (g.arrowHeadAtHead == null && g.arrowHeadAtTail == null) Attribute(Shape, "ArrowHeads", "none");
+                    
+                    if (g.arrowHeadAtHead != null || g.arrowHeadAtHead != null)
+                    {
+                        Attribute(Shape, "ArrowHeadCenterLength", g.ArrowHeadCenter.ToString());
+                        Attribute(Shape, "ArrowHeadLength", g.ArrowHeadLength.ToString());
+                        Attribute(Shape, "ArrowHeadWidth", g.ArrowHeadWidth.ToString());
+                        Attribute(Shape, "ArrowHeadColor", ColorTranslator.ToHtml(g.ArrowHeadColor));
+                    }
 
                     if (g.arrowTailAtTail != null && g.arrowTailAtHead != null) Attribute(Shape, "ArrowTails", "ends");
                     if (g.arrowTailAtTail == null && g.arrowTailAtHead != null) Attribute(Shape, "ArrowTails", "head");
                     if (g.arrowTailAtTail != null && g.arrowTailAtHead == null) Attribute(Shape, "ArrowTails", "tail");
                     if (g.arrowTailAtTail == null && g.arrowTailAtHead == null) Attribute(Shape, "ArrowTails", "none");
+
+                    if (g.arrowTailAtHead != null || g.arrowTailAtTail != null)
+                    {
+                        Attribute(Shape, "ArrowTailCenterLength", g.ArrowTailCenter.ToString());
+                        Attribute(Shape, "ArrowTailLength", g.ArrowTailLength.ToString());
+                        Attribute(Shape, "ArrowTailWidth", g.ArrowTailWidth.ToString());
+                        Attribute(Shape, "ArrowTailColor", ColorTranslator.ToHtml(g.ArrowTailColor));
+                    }
 
                 }
 
