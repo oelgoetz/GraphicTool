@@ -596,26 +596,6 @@ namespace GraphicShapes
                     //ArrowHeads="none","ends","tail","head"
                     //ArrowHeads="head" same as ArrowHeads==null
 
-                    ////if (shape.Attributes["ArrowHeadCenterLength"] != null)
-                    ////    ArrowHeadCenter = Convert.ToInt16(shape.Attributes["ArrowHeadCenterLength"].Value);
-                    ////if (shape.Attributes["ArrowHeadLength"] != null)
-                    ////    ArrowHeadLength = Convert.ToInt16(shape.Attributes["ArrowHeadLength"].Value);
-                    ////if (shape.Attributes["ArrowHeadWidth"] != null)
-                    ////    ArrowHeadWidth = Convert.ToInt16(shape.Attributes["ArrowHeadWidth"].Value);
-
-                    ////if (shape.Attributes["ArrowTailCenterLength"] != null)
-                    ////    ArrowTailCenter = Convert.ToInt16(shape.Attributes["ArrowTailCenterLength"].Value);
-                    ////if (shape.Attributes["ArrowTailLength"] != null)
-                    ////    ArrowTailLength = Convert.ToInt16(shape.Attributes["ArrowTailLength"].Value);
-                    ////if (shape.Attributes["ArrowTailWidth"] != null)
-                    ////    ArrowTailWidth = Convert.ToInt16(shape.Attributes["ArrowTailWidth"].Value);
-
-                    ////if (shape.Attributes["ArrowTailColor"] != null)
-                    ////    ArrowTailColor = ColorTranslator.FromHtml(shape.Attributes["ArrowTailColor"].Value);
-                    ////else
-                    ////    if (shape.Attributes["LineColor"] != null)
-                    ////    ArrowTailColor = ColorTranslator.FromHtml(shape.Attributes["LineColor"].Value);
-
                     if (g.arrowHeadAtHead != null && g.arrowHeadAtTail != null) Attribute(Shape, "ArrowHeads", "ends");
                     if (g.arrowHeadAtHead == null && g.arrowHeadAtTail != null) Attribute(Shape, "ArrowHeads", "tail");
                     //if (g.arrowHeadAtHead != null && g.arrowHeadAtTail == null) Attribute(Shape, "ArrowHeads", "head");
@@ -641,7 +621,6 @@ namespace GraphicShapes
                         Attribute(Shape, "ArrowTailWidth", g.ArrowTailWidth.ToString());
                         Attribute(Shape, "ArrowTailColor", ColorTranslator.ToHtml(g.ArrowTailColor));
                     }
-
                 }
 
                 if (g._pen != null && g._pen.Width > 0)
