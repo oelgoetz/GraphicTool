@@ -13,10 +13,8 @@ namespace GraphicTool
 {
     public enum tipMode
     {
-        HeadAtHead,
-        HeadAtTail,
-        TailAtHead,
-        TailAtTail
+        Heads,
+        Tails
     }
 
     public partial class ArrowTipControl : UserControl
@@ -32,29 +30,25 @@ namespace GraphicTool
         {
             switch (_mode)
             {
-                case tipMode.HeadAtHead:
+                case tipMode.Heads:
                     if (_g.arrowHeadAtHead != null)
-                        btn.BackgroundImage = imageList1.Images[0];
+                        btnAtHeads.BackgroundImage = imageList1.Images[0];
                     else
-                        btn.BackgroundImage = imageList1.Images[1];
-                    break;
-                case tipMode.HeadAtTail:
+                        btnAtHeads.BackgroundImage = imageList1.Images[1];
                     if (_g.arrowHeadAtTail != null)
-                        btn.BackgroundImage = imageList1.Images[2];
+                        btnAtTails.BackgroundImage = imageList1.Images[2];
                     else
-                        btn.BackgroundImage = imageList1.Images[3];
+                        btnAtTails.BackgroundImage = imageList1.Images[3];
                     break;
-                case tipMode.TailAtTail:
+                case tipMode.Tails:
                     if (_g.arrowTailAtTail != null)
-                        btn.BackgroundImage = imageList1.Images[4];
+                        btnAtTails.BackgroundImage = imageList1.Images[4];
                     else
-                        btn.BackgroundImage = imageList1.Images[5];
-                    break;
-                case tipMode.TailAtHead:
+                        btnAtTails.BackgroundImage = imageList1.Images[5];
                     if (_g.arrowTailAtHead != null)
-                        btn.BackgroundImage = imageList1.Images[6];
+                        btnAtHeads.BackgroundImage = imageList1.Images[6];
                     else
-                        btn.BackgroundImage = imageList1.Images[7];
+                        btnAtHeads.BackgroundImage = imageList1.Images[7];
                     break;
                 default: break;
             }
@@ -69,22 +63,8 @@ namespace GraphicTool
 
             switch (_mode)
             {
-                case tipMode.HeadAtHead:
+                case tipMode.Heads:
                     if (_g.arrowHeadAtHead != null)
-                    {
-                        UpDownWidth.Value = g.ArrowTailWidth;
-                        UpDownLength.Value = g.ArrowTailLength;
-                        UpDownCenter.Value = g.ArrowTailCenter;
-                    }
-                    else
-                    {
-                        UpDownWidth.Value = 0;
-                        UpDownLength.Value = 0;
-                        UpDownCenter.Value = 0;
-                    }
-                    break;
-                case tipMode.HeadAtTail:
-                    if (_g.arrowHeadAtTail != null)
                     {
                         UpDownWidth.Value = g.ArrowHeadWidth;
                         UpDownLength.Value = g.ArrowHeadLength;
@@ -97,22 +77,8 @@ namespace GraphicTool
                         UpDownCenter.Value = 0;
                     }
                     break;
-                case tipMode.TailAtHead:
+                case tipMode.Tails:
                     if (_g.arrowTailAtHead != null)
-                    {
-                        UpDownWidth.Value = g.ArrowTailWidth;
-                        UpDownLength.Value = g.ArrowTailLength;
-                        UpDownCenter.Value = g.ArrowTailCenter;
-                    }
-                    else
-                    {
-                        UpDownWidth.Value = 0;
-                        UpDownLength.Value = 0;
-                        UpDownCenter.Value = 0;
-                    }
-                    break;
-                case tipMode.TailAtTail:
-                    if (_g.arrowTailAtTail != null)
                     {
                         UpDownWidth.Value = g.ArrowTailWidth;
                         UpDownLength.Value = g.ArrowTailLength;
@@ -127,7 +93,8 @@ namespace GraphicTool
                     break;
                 default: break;
             }
-            btn.BackgroundImageLayout = ImageLayout.Stretch;
+            btnAtHeads.BackgroundImageLayout = ImageLayout.Stretch;
+            btnAtTails.BackgroundImageLayout = ImageLayout.Stretch;
             updateButtonfaces();
             //sign event handler here, otherwise they'd update too early ...
             UpDownWidth.ValueChanged += ValueChanged;
@@ -135,23 +102,45 @@ namespace GraphicTool
             UpDownLength.ValueChanged += ValueChanged;
         }
 
-        private void btn_Click(object sender, EventArgs e)
+        private void btnAtHeads_Click(object sender, EventArgs e)
         {
             switch (_mode)
             {
-                case tipMode.HeadAtHead:
+                case tipMode.Heads:
                     if (_g.arrowHeadAtHead != null)
                         _g.arrowHeadAtHead = null;
                     else
                     {
                         UpDownWidth.Value = defaultWidth; UpDownLength.Value = defaultLength; UpDownCenter.Value = defaultCenter;
-                        _g.ArrowHeadLength = (int) UpDownLength.Value;
-                        _g.ArrowHeadWidth = (int) UpDownWidth.Value;
-                        _g.ArrowHeadCenter = (int) UpDownCenter.Value;
+                        _g.ArrowHeadLength = (int)UpDownLength.Value;
+                        _g.ArrowHeadWidth = (int)UpDownWidth.Value;
+                        _g.ArrowHeadCenter = (int)UpDownCenter.Value;
                         _g.arrowHeadAtHead = new ArrowHeadAtHead((int)UpDownCenter.Value, (int)UpDownLength.Value, (int)UpDownWidth.Value, _g.ArrowHeadColor, _g);
-                    }                        
+                    }                    
                     break;
-                case tipMode.HeadAtTail:
+                case tipMode.Tails:
+                    if (_g.arrowTailAtHead != null)
+                        _g.arrowTailAtHead = null;
+                    else
+                    {
+                        UpDownWidth.Value = defaultWidth; UpDownLength.Value = defaultLength; UpDownCenter.Value = defaultCenter;
+                        _g.ArrowTailLength = (int)UpDownLength.Value;
+                        _g.ArrowTailWidth = (int)UpDownWidth.Value;
+                        _g.ArrowTailCenter = (int)UpDownCenter.Value;
+                        _g.arrowTailAtHead = new ArrowTailAtHead((int)UpDownCenter.Value, (int)UpDownLength.Value, (int)UpDownWidth.Value, _g.ArrowTailColor, _g);
+                    }                                      
+                    break;
+                default: break;
+            }
+            updateButtonfaces();
+            _caller.Invalidate();
+        }
+
+        private void btnAtTails_Click(object sender, EventArgs e)
+        {
+            switch (_mode)
+            {
+                case tipMode.Heads:
                     if (_g.arrowHeadAtTail != null)
                         _g.arrowHeadAtTail = null;
                     else
@@ -163,7 +152,7 @@ namespace GraphicTool
                         _g.arrowHeadAtTail = new ArrowHeadAtTail((int)UpDownCenter.Value, (int)UpDownLength.Value, (int)UpDownWidth.Value, _g.ArrowHeadColor, _g);
                     }
                     break;
-                case tipMode.TailAtTail:
+                case tipMode.Tails:
                     if (_g.arrowTailAtTail != null)
                         _g.arrowTailAtTail = null;
                     else
@@ -175,29 +164,17 @@ namespace GraphicTool
                         _g.arrowTailAtTail = new ArrowTailAtTail((int)UpDownCenter.Value, (int)UpDownLength.Value, (int)UpDownWidth.Value, _g.ArrowTailColor, _g);
                     }
                     break;
-                case tipMode.TailAtHead:
-                    if (_g.arrowTailAtHead != null)
-                        _g.arrowTailAtHead = null;
-                    else
-                    {
-                        UpDownWidth.Value = defaultWidth; UpDownLength.Value = defaultLength; UpDownCenter.Value = defaultCenter;
-                        _g.ArrowTailLength = (int)UpDownLength.Value;
-                        _g.ArrowTailWidth = (int)UpDownWidth.Value;
-                        _g.ArrowTailCenter = (int)UpDownCenter.Value;
-                        _g.arrowTailAtHead = new ArrowTailAtHead((int)UpDownCenter.Value, (int)UpDownLength.Value, (int)UpDownWidth.Value, _g.ArrowTailColor, _g);
-                    }
-                    break;
                 default: break;
             }
             updateButtonfaces();
             _caller.Invalidate();
         }
-        
+
         private void ValueChanged(object sender, EventArgs e)
         {
             switch (_mode)
             {
-                case tipMode.HeadAtHead:
+                case tipMode.Heads:
                     if (_g.arrowHeadAtHead != null)
                     {
                         _g.ArrowHeadLength = (int)UpDownLength.Value;
@@ -205,8 +182,6 @@ namespace GraphicTool
                         _g.ArrowHeadCenter = (int)UpDownCenter.Value;
                         _g.arrowHeadAtHead = new ArrowHeadAtHead((int)UpDownCenter.Value, (int)UpDownLength.Value, (int)UpDownWidth.Value, _g.ArrowHeadColor, _g);
                     }
-                    break;
-                case tipMode.HeadAtTail:
                     if (_g.arrowHeadAtTail != null)
                     {
                         _g.ArrowHeadLength = (int)UpDownLength.Value;
@@ -215,7 +190,7 @@ namespace GraphicTool
                         _g.arrowHeadAtTail = new ArrowHeadAtTail((int)UpDownCenter.Value, (int)UpDownLength.Value, (int)UpDownWidth.Value, _g.ArrowHeadColor, _g);
                     }
                     break;
-                case tipMode.TailAtTail:                   
+                case tipMode.Tails:
                     if (_g.arrowTailAtTail != null)
                     {
                         _g.ArrowTailLength = (int)UpDownLength.Value;
@@ -223,8 +198,6 @@ namespace GraphicTool
                         _g.ArrowTailCenter = (int)UpDownCenter.Value;
                         _g.arrowTailAtTail = new ArrowTailAtTail((int)UpDownCenter.Value, (int)UpDownLength.Value, (int)UpDownWidth.Value, _g.ArrowHeadColor, _g);
                     }
-                    break;
-                case tipMode.TailAtHead:
                     if (_g.arrowTailAtHead != null)
                     {
                         _g.ArrowTailLength = (int)UpDownLength.Value;
@@ -237,5 +210,6 @@ namespace GraphicTool
             }
             _caller.Invalidate();
         }
+        
     }
 }

@@ -30,46 +30,48 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ArrowTipControl));
-            btn = new Button();
+            btnAtHeads = new Button();
             UpDownWidth = new NumericUpDown();
             UpDownCenter = new NumericUpDown();
             UpDownLength = new NumericUpDown();
             imageList1 = new ImageList(components);
+            btnAtTails = new Button();
             ((System.ComponentModel.ISupportInitialize)UpDownWidth).BeginInit();
             ((System.ComponentModel.ISupportInitialize)UpDownCenter).BeginInit();
             ((System.ComponentModel.ISupportInitialize)UpDownLength).BeginInit();
             SuspendLayout();
             // 
-            // btn
+            // btnAtHeads
             // 
-            btn.BackgroundImageLayout = ImageLayout.None;
-            btn.FlatStyle = FlatStyle.Popup;
-            btn.Location = new Point(3, 3);
-            btn.Name = "btn";
-            btn.Size = new Size(57, 20);
-            btn.TabIndex = 33;
-            btn.UseVisualStyleBackColor = true;
-            btn.Click += btn_Click;
+            btnAtHeads.AccessibleDescription = "";
+            btnAtHeads.BackgroundImageLayout = ImageLayout.None;
+            btnAtHeads.FlatStyle = FlatStyle.Popup;
+            btnAtHeads.Location = new Point(42, 3);
+            btnAtHeads.Name = "btnAtHeads";
+            btnAtHeads.Size = new Size(40, 20);
+            btnAtHeads.TabIndex = 33;
+            btnAtHeads.UseVisualStyleBackColor = true;
+            btnAtHeads.Click += btnAtHeads_Click;
             // 
             // UpDownWidth
             // 
-            UpDownWidth.Location = new Point(2, 26);
+            UpDownWidth.Location = new Point(3, 26);
             UpDownWidth.Name = "UpDownWidth";
-            UpDownWidth.Size = new Size(58, 23);
-            UpDownWidth.TabIndex = 30;            
+            UpDownWidth.Size = new Size(79, 23);
+            UpDownWidth.TabIndex = 30;
             // 
             // UpDownCenter
             // 
-            UpDownCenter.Location = new Point(2, 74);
+            UpDownCenter.Location = new Point(3, 74);
             UpDownCenter.Name = "UpDownCenter";
-            UpDownCenter.Size = new Size(58, 23);
+            UpDownCenter.Size = new Size(79, 23);
             UpDownCenter.TabIndex = 32;
             // 
             // UpDownLength
             // 
-            UpDownLength.Location = new Point(2, 50);
+            UpDownLength.Location = new Point(3, 50);
             UpDownLength.Name = "UpDownLength";
-            UpDownLength.Size = new Size(58, 23);
+            UpDownLength.Size = new Size(79, 23);
             UpDownLength.TabIndex = 31;
             // 
             // imageList1
@@ -86,16 +88,29 @@
             imageList1.Images.SetKeyName(6, "1TailAtTail.png");
             imageList1.Images.SetKeyName(7, "0TailAtTail.png");
             // 
+            // btnAtTails
+            // 
+            btnAtTails.AccessibleDescription = "";
+            btnAtTails.BackgroundImageLayout = ImageLayout.None;
+            btnAtTails.FlatStyle = FlatStyle.Popup;
+            btnAtTails.Location = new Point(3, 3);
+            btnAtTails.Name = "btnAtTails";
+            btnAtTails.Size = new Size(40, 20);
+            btnAtTails.TabIndex = 34;
+            btnAtTails.UseVisualStyleBackColor = true;
+            btnAtTails.Click += btnAtTails_Click;
+            // 
             // ArrowTipControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            Controls.Add(btn);
+            Controls.Add(btnAtTails);
+            Controls.Add(btnAtHeads);
             Controls.Add(UpDownWidth);
             Controls.Add(UpDownCenter);
             Controls.Add(UpDownLength);
             Name = "ArrowTipControl";
-            Size = new Size(62, 98);
+            Size = new Size(87, 98);
             ((System.ComponentModel.ISupportInitialize)UpDownWidth).EndInit();
             ((System.ComponentModel.ISupportInitialize)UpDownCenter).EndInit();
             ((System.ComponentModel.ISupportInitialize)UpDownLength).EndInit();
@@ -104,10 +119,11 @@
 
         #endregion
 
-        private Button btn;
+        private Button btnAtHeads;
         private NumericUpDown UpDownWidth;
         private NumericUpDown UpDownCenter;
         private NumericUpDown UpDownLength;
         private ImageList imageList1;
+        private Button btnAtTails;
     }
 }

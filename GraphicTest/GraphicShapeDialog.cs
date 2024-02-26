@@ -41,9 +41,9 @@ namespace GraphicTool
         bool borderVisible = false;
         bool transparent = false;
 
-        ArrowTipControl HeadAtHead;
+        ArrowTipControl Heads;
         ArrowTipControl HeadAtTail;
-        ArrowTipControl TailAtHead;
+        ArrowTipControl Tails;
         ArrowTipControl TailAtTail;
 
         public GraphicShapeDialog(Display caller, GraphicObject g, Point Location)
@@ -82,25 +82,15 @@ namespace GraphicTool
             {
                 rBBackground.Enabled = false;
 
-                HeadAtHead = new ArrowTipControl(g, caller, tipMode.HeadAtHead);
-                LineTab.Controls.Add(HeadAtHead);
-                HeadAtHead.Location = new Point(56, 18);
-                HeadAtHead.Visible = true;
+                Heads = new ArrowTipControl(g, caller, tipMode.Heads);
+                LineTab.Controls.Add(Heads);
+                Heads.Location = new Point(56, 18);
+                Heads.Visible = true;
 
-                HeadAtTail = new ArrowTipControl(g, caller, tipMode.HeadAtTail);
-                LineTab.Controls.Add(HeadAtTail);
-                HeadAtTail.Location = new Point(120, 18);
-                HeadAtTail.Visible = true;
-
-                TailAtTail = new ArrowTipControl(g, caller, tipMode.TailAtTail);
-                LineTab.Controls.Add(TailAtTail);
-                TailAtTail.Location = new Point(184, 18);
-                TailAtTail.Visible = true;
-
-                TailAtHead = new ArrowTipControl(g, caller, tipMode.TailAtHead);
-                LineTab.Controls.Add(TailAtHead);
-                TailAtHead.Location = new Point(248, 18);
-                TailAtHead.Visible = true;
+                Tails = new ArrowTipControl(g, caller, tipMode.Tails);
+                LineTab.Controls.Add(Tails);
+                Tails.Location = new Point(248, 18);
+                Tails.Visible = true;
             }
             else
             {
