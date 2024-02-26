@@ -86,12 +86,12 @@ namespace GraphicShapes
         int defaultWidth = 12;
         int defaultLength = 16;
 
-        public int ArrowHeadCenter = 8;
-        public int ArrowHeadLength = 16;
-        public int ArrowHeadWidth = 12;
-        public int ArrowTailCenter = 8;
-        public int ArrowTailLength = 16;
-        public int ArrowTailWidth = 12;
+        public int ArrowHeadCenter = 15;
+        public int ArrowHeadLength = 25;
+        public int ArrowHeadWidth = 20;
+        public int ArrowTailCenter = 15;
+        public int ArrowTailLength = 25;
+        public int ArrowTailWidth = 20;
         public Color ArrowHeadColor = Color.Black;
         public Color ArrowTailColor = Color.Black;
 
@@ -469,10 +469,9 @@ namespace GraphicShapes
             {
                 for (int i = 0; i < MarkerPoints.Length; i++)
                 {
-                    //if(this.GetType().Name.Contains("Rectangle") || this.GetType().Name.Contains("Oval"))
                     if (this._type == "Rectangle" || this._type == "Oval")
                     {
-                        //Funktioniert mit Rectangular Objects, nit mit Polyline Objects
+                        //Funktioniert mit Rectangular Objects, nicht mit Polyline Objects
                         if (Math.Abs(Box.X + MarkerPoints[i].X - MousePosition.X) < 4)
                         {
                             if (Math.Abs(Box.Y + MarkerPoints[i].Y - MousePosition.Y) < 4)
@@ -482,10 +481,9 @@ namespace GraphicShapes
                             }
                         }
                     }
-                    //if (this.GetType().Name.Contains("Polyline") || this.GetType().Name.Contains("Polygon"))
                     if (this._type == "Polyline" || this._type == "Polygon")                        
                     {
-                        //Funktioniert mit Rectangular Objects, nit mit Polyline Objects
+                        //Funktioniert mit Rectangular Objects, nicht mit Polyline Objects
                         if (Math.Abs(MarkerPoints[i].X - MousePosition.X) < 4)
                         {
                             if (Math.Abs(MarkerPoints[i].Y - MousePosition.Y) < 4)
@@ -1272,9 +1270,6 @@ namespace GraphicShapes
             if (arrowHeadAtTail != null) arrowHeadAtTail.Draw(g, extd);
             if (arrowTailAtTail != null) arrowTailAtTail.Draw(g, extd);
 
-            //if (tipEndold != null) tipEndold.Draw(g, extd);
-            //if (tailEndold != null) tailEndold.Draw(g, extd);
-
             if (extd > 0 && this.IsSelected)
             {
                 Brush solidBrush = new SolidBrush(Color.FromArgb(64, 255, 0, 0));
@@ -1302,9 +1297,6 @@ namespace GraphicShapes
                 MarkerPoints[i].Y += d.Y;
             }
 
-            //if (tipEndold != null) tipEndold.Move(d);
-            //if (tailEndold != null) tailEndold.Move(d);
-
         }
 
         public override void Reshape(Point d) //Polyline
@@ -1326,17 +1318,6 @@ namespace GraphicShapes
             {
                 arrowTailAtHead.Move(d);
             }
-
-            //if (tipEndold != null)
-            //{
-            //    if (SelectedMarker == MarkerPoints.Length - 1) tipEndold.Move(d);
-            //    tipEndold.AdjustDirection((float)Orientation(MarkerPoints[MarkerPoints.Length - 1], MarkerPoints[MarkerPoints.Length - 2]) - (float)oldTipAngle);
-            //}
-            //if (tailEndold != null)
-            //{
-            //    if (SelectedMarker == 0) tailEndold.Move(d);
-            //    tailEndold.AdjustDirection((float)Orientation(MarkerPoints[0], MarkerPoints[1]) - (float)oldTailAngle);
-            //}
         }
 
     }
@@ -1400,16 +1381,6 @@ namespace GraphicShapes
                     }
                 }
             }
-
-            //Color penColor = Color.Black;
-            //if (shape.Attributes["LineColor"] != null) 
-            //    penColor = ColorTranslator.FromHtml(shape.Attributes["LineColor"].Value);
-
-            //int penWidth = 1;
-            //if (shape.Attributes["LineWidth"] != null) 
-            //    penWidth = Convert.ToInt32(shape.Attributes["LineWidth"].Value);
-
-            //_pen = new Pen(penColor, penWidth);
 
             getTextAttributes(shape);
             _text = shape.InnerText;
@@ -1482,15 +1453,10 @@ namespace GraphicShapes
             _type = "ArrowHeadAtHead";
             brush = new SolidBrush(c);// Color.Black);
 
-            //Points[0].Y = CenterLength; Points[0].X = 0;
-            //Points[1].Y = -Length/2; Points[1].X = -Width / 2;
-            //Points[2].Y = 0; Points[2].X = 0;
-            //Points[3].Y = -Length/2; Points[3].X = Width / 2;
-
-            Points[0].Y = 0; Points[0].X = 0;
-            Points[1].Y = -Length; Points[1].X = -Width / 2;
-            Points[2].Y = -Length / 2; Points[2].X = 0;
-            Points[3].Y = -Length; Points[3].X = Width / 2;
+            Points[0].Y = 0;                Points[0].X = 0;
+            Points[1].Y = -Length;          Points[1].X = - Width / 2;
+            Points[2].Y = -Center;          Points[2].X = 0;
+            Points[3].Y = -Length;          Points[3].X = Width / 2;
 
         }
 
@@ -1500,15 +1466,19 @@ namespace GraphicShapes
             PointF p2 = Parent.MarkerPoints[Parent.MarkerPoints.Length - 2];
             float _orientation = (float)((Orientation(p1 , p2) * 180) / Math.PI);
             g.TranslateTransform(p1.X, p1.Y);
-            g.RotateTransform(_orientation);                        
-            g.FillPolygon(brush, Points);           
+            g.RotateTransform(_orientation);
+            g.FillPolygon(brush, Points);
             g.RotateTransform(-_orientation);
             g.TranslateTransform(-p1.X, -p1.Y);
+            //g.TranslateTransform(0, 0);
+            //g.DrawPolygon(DarkMarkerPen, Points);
+            //g.TranslateTransform(0, 0);
         }
 
         public void SetBrushColor(Color c)
         {
             brush = new SolidBrush(c);
+            Parent.ArrowHeadColor = c;
         }
 
         public override void Move(Point d) { }
@@ -1529,17 +1499,13 @@ namespace GraphicShapes
             brush = new SolidBrush(c);//Color.Green);
 
             Points[0].Y = Center; Points[0].X = 0;
-            Points[1].Y = -Length / 2; Points[1].X = -Width / 2;
+            Points[1].Y = Center - Length; Points[1].X = -Width / 2;
             Points[2].Y = 0; Points[2].X = 0;
-            Points[3].Y = -Length / 2; Points[3].X = Width / 2;
+            Points[3].Y = Center - Length; Points[3].X = Width / 2;
         }
 
         public override void Draw(Graphics g, int extd)
         {
-            //PointF p1 = Parent.MarkerPoints[0];
-            //PointF p2 = Parent.MarkerPoints[1];
-            //float _orientation = (float)((Orientation(p1, p2) * 180) / Math.PI);
-
             PointF p1 = Parent.MarkerPoints[1];
             PointF p2 = Parent.MarkerPoints[0];
             float _orientation = (float)((Orientation(p2, p1) * 180) / Math.PI);
@@ -1548,11 +1514,15 @@ namespace GraphicShapes
             g.FillPolygon(brush, Points);
             g.RotateTransform(-_orientation);
             g.TranslateTransform(-p1.X, -p1.Y);
+            //g.TranslateTransform(80, 0);
+            //g.DrawPolygon(DarkMarkerPen, Points);
+            //g.TranslateTransform(-80, 0);
         }
 
         public void SetBrushColor(Color c)
         {
             brush = new SolidBrush(c);
+            Parent.ArrowTailColor = c;
         }
 
         public override void Move(Point d) { }
@@ -1572,15 +1542,16 @@ namespace GraphicShapes
             _type = "ArrowTailAtTail";
             brush = new SolidBrush(c);//Color.Red);
 
-            Points[0].Y = 0; Points[0].X = 0;
-            Points[1].Y = Length / 2; Points[1].X = -Width / 2;
-            Points[2].Y = -Center; Points[2].X = 0;
-            Points[3].Y = Length / 2; Points[3].X = Width / 2;
+            Points[0].Y = -Center; Points[0].X = 0;
+            Points[1].Y = Length - Center; Points[1].X = -Width / 2;
+            Points[2].Y = 0; Points[2].X = 0;
+            Points[3].Y = Length - Center; Points[3].X = Width / 2;
         }
 
         public void SetBrushColor(Color c)
         {
             brush = new SolidBrush(c);
+            Parent.ArrowTailColor = c;
         }
 
         public override void Draw(Graphics g, int extd)
@@ -1593,6 +1564,9 @@ namespace GraphicShapes
             g.FillPolygon(brush, Points);
             g.RotateTransform(-_orientation);
             g.TranslateTransform(-p1.X, -p1.Y);
+            //g.TranslateTransform(160, 0);
+            //g.DrawPolygon(DarkMarkerPen, Points);
+            //g.TranslateTransform(-160, 0);
         }
 
         public override void Move(Point d) { }
@@ -1611,20 +1585,16 @@ namespace GraphicShapes
             _type = "ArrowHeadAtTail";
             brush = new SolidBrush(c); //Color.Orange);
 
-            //Points[0].Y = 0; Points[0].X = 0;
-            //Points[1].Y = Length / 2; Points[1].X = -Width / 2;
-            //Points[2].Y = -CenterLength; Points[2].X = 0;
-            //Points[3].Y = Length / 2; Points[3].X = Width / 2;
-
-            Points[0].Y = Length / 2; Points[0].X = 0;
+            Points[0].Y = 0; Points[0].X = 0;
             Points[1].Y = Length; Points[1].X = -Width / 2;
-            Points[2].Y = (Length / 2) - Center; Points[2].X = 0;
+            Points[2].Y = Center; Points[2].X = 0;
             Points[3].Y = Length; Points[3].X = Width / 2;
         }
 
         public void SetBrushColor(Color c)
         {
             brush = new SolidBrush(c);
+            Parent.ArrowHeadColor = c;
         }
 
         public override void Draw(Graphics g, int extd)
@@ -1637,6 +1607,9 @@ namespace GraphicShapes
             g.FillPolygon(brush, Points);
             g.RotateTransform(-_orientation);
             g.TranslateTransform(-p1.X, -p1.Y);
+            //g.TranslateTransform(240, 0);
+            //g.DrawPolygon(DarkMarkerPen, Points);
+            //g.TranslateTransform(-240, 0);
         }
 
         public override void Move(Point d) { }

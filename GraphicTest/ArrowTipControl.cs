@@ -25,9 +25,9 @@ namespace GraphicTool
         Display _caller;
         tipMode _mode;
 
-        int defaultCenter = 8;
-        int defaultWidth = 12;
-        int defaultLength = 16;
+        int defaultCenter = 15; //8;
+        int defaultWidth = 20; //12;
+        int defaultLength = 25; //16;
         private void updateButtonfaces()
         {
             switch (_mode)

@@ -69,40 +69,12 @@ namespace GraphicTool
                             ColorContextMenu0.Text = "Update Palette Color";
                             ColorContextMenu0.Click += SetColorControl_Click;
                             contextMenu.Items.AddRange(new ToolStripItem[] { ColorContextMenu0 });
-                            //ToolStripMenuItem ColorContextMenu1 = new ToolStripMenuItem();
-                            //ColorContextMenu1.Text = "Add Palette Color";
-                            //ColorContextMenu1.Click += AddColorControl_Click;
-                            //ColorContextMenu1.Enabled = false;
-                            //contextMenu.Items.AddRange(new ToolStripItem[] { ColorContextMenu1 });
-                            //ToolStripMenuItem ColorContextMenu2 = new ToolStripMenuItem();
-                            //ColorContextMenu2.Text = "Remove Palette Color";
-                            //ColorContextMenu2.Click += RemoveColorControl_Click;
-                            //ColorContextMenu2.Enabled = false;
-                            //contextMenu.Items.AddRange(new ToolStripItem[] { ColorContextMenu2 });
-                            //ToolStripMenuItem ColorContextMenu3 = new ToolStripMenuItem();
-                            //ColorContextMenu3.Text = "Move Palette Color";
-                            //ColorContextMenu3.Click += MoveColorControl_Click;
-                            //ColorContextMenu3.Enabled = false;
-                            //contextMenu.Items.AddRange(new ToolStripItem[] { ColorContextMenu3 });
                             contextMenu.Show(Cursor.Position);
                         }
                     }
                 }
             }
         }
-
-        //private void AddColorControl_Click(object? sender, EventArgs e)
-        //{
-        //}
-
-        //private void RemoveColorControl_Click(object? sender, EventArgs e)
-        //{
-        //}
-
-        //private void MoveColorControl_Click(object? sender, EventArgs e)
-        //{
-        //    Mode = mode.Rearrange;
-        //}
 
         private void SetColorControl_Click(object? sender, EventArgs e)
         {
@@ -132,31 +104,6 @@ namespace GraphicTool
                     i += 2;
                 }
             }
-
-
-            //
-            //int i = 0;
-            //foreach (Control c in this.Controls)
-            //{
-            //    if (c.GetType() == typeof(ColorControl))
-            //    {
-            //        ColorConverter converter = new ColorConverter();
-            //        Color col1 = (Color)converter.ConvertFromString(colors[i]);
-            //        c.BackColor = col1;
-            //        c.Enabled = true;
-            //        i += 2;
-            //    }
-            //}
-        }
-
-        private void sendColorToParentControl(Color s)
-        {
-
-        }
-
-        private void Notify(object sender, EventArgs e)
-        {
-            MessageBox.Show("Button wurde geklickt!");
         }
 
         private void ColorPalette_EnabledChanged(object sender, EventArgs e)

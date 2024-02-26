@@ -134,7 +134,7 @@
             // button1
             // 
             button1.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            button1.Location = new Point(555, 380);
+            button1.Location = new Point(401, 380);
             button1.Name = "button1";
             button1.Size = new Size(81, 29);
             button1.TabIndex = 2;
@@ -153,7 +153,7 @@
             groupBox1.Controls.Add(colorPalette1);
             groupBox1.Location = new Point(8, 192);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(646, 148);
+            groupBox1.Size = new Size(492, 148);
             groupBox1.TabIndex = 15;
             groupBox1.TabStop = false;
             groupBox1.Text = "Color and Width";
@@ -216,13 +216,13 @@
             colorPalette1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             colorPalette1.Location = new Point(125, 14);
             colorPalette1.Name = "colorPalette1";
-            colorPalette1.Size = new Size(511, 128);
+            colorPalette1.Size = new Size(357, 128);
             colorPalette1.TabIndex = 18;
             // 
             // button3
             // 
             button3.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            button3.Location = new Point(464, 380);
+            button3.Location = new Point(310, 380);
             button3.Name = "button3";
             button3.Size = new Size(81, 29);
             button3.TabIndex = 16;
@@ -486,7 +486,7 @@
             TabControl1.Location = new Point(7, 12);
             TabControl1.Name = "TabControl1";
             TabControl1.SelectedIndex = 0;
-            TabControl1.Size = new Size(651, 178);
+            TabControl1.Size = new Size(497, 178);
             TabControl1.TabIndex = 22;
             // 
             // TextTab
@@ -509,7 +509,7 @@
             LineTab.Location = new Point(4, 24);
             LineTab.Name = "LineTab";
             LineTab.Padding = new Padding(3);
-            LineTab.Size = new Size(643, 150);
+            LineTab.Size = new Size(489, 150);
             LineTab.TabIndex = 1;
             LineTab.Text = "Arrows";
             // 
@@ -558,11 +558,12 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(658, 421);
+            ClientSize = new Size(504, 421);
             Controls.Add(TabControl1);
             Controls.Add(button3);
             Controls.Add(groupBox1);
             Controls.Add(button1);
+            MaximumSize = new Size(520, 460);
             MinimumSize = new Size(520, 460);
             Name = "GraphicShapeDialog";
             Text = "GraphicShapeDialog";
