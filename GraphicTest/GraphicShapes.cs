@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using GraphicTool;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
 using System.Xml;
@@ -81,12 +82,16 @@ namespace GraphicShapes
         internal ArrowHeadAtTail arrowHeadAtTail = null;
         internal ArrowTailAtTail arrowTailAtTail = null;
 
-        public int ArrowHeadCenterLength = 15;
-        public int ArrowHeadLength = 25;
-        public int ArrowHeadWidth = 20;
-        public int ArrowTailCenterLength = 15;
-        public int ArrowTailLength = 25;
-        public int ArrowTailWidth = 20;
+        int defaultCenter = 8;
+        int defaultWidth = 12;
+        int defaultLength = 16;
+
+        public int ArrowHeadCenter = 8;
+        public int ArrowHeadLength = 16;
+        public int ArrowHeadWidth = 12;
+        public int ArrowTailCenter = 8;
+        public int ArrowTailLength = 16;
+        public int ArrowTailWidth = 12;
         public Color ArrowHeadColor = Color.Black;
         public Color ArrowTailColor = Color.Black;
 
@@ -524,7 +529,11 @@ namespace GraphicShapes
             _pen.Color = color;
             if (this._type == "Polyline")
             {
-                
+                if (arrowHeadAtHead != null) arrowHeadAtHead.SetBrushColor(color);
+                if (arrowHeadAtTail != null) arrowHeadAtTail.SetBrushColor(color);
+                if (arrowTailAtTail != null) arrowTailAtTail.SetBrushColor(color);
+                if (arrowTailAtHead != null) arrowTailAtHead.SetBrushColor(color);
+
             }
         }
 
@@ -1179,14 +1188,14 @@ namespace GraphicShapes
             _pen = new Pen(penColor, penWidth);
 
             if (shape.Attributes["ArrowHeadCenterLength"] != null)
-                ArrowHeadCenterLength = Convert.ToInt16(shape.Attributes["ArrowHeadCenterLength"].Value);
+                ArrowHeadCenter = Convert.ToInt16(shape.Attributes["ArrowHeadCenterLength"].Value);
             if (shape.Attributes["ArrowHeadLength"] != null)
                 ArrowHeadLength = Convert.ToInt16(shape.Attributes["ArrowHeadLength"].Value);
             if (shape.Attributes["ArrowHeadWidth"] != null)
                 ArrowHeadWidth = Convert.ToInt16(shape.Attributes["ArrowHeadWidth"].Value);
 
             if (shape.Attributes["ArrowTailCenterLength"] != null)
-                ArrowTailCenterLength = Convert.ToInt16(shape.Attributes["ArrowTailCenterLength"].Value);
+                ArrowTailCenter = Convert.ToInt16(shape.Attributes["ArrowTailCenterLength"].Value);
             if (shape.Attributes["ArrowTailLength"] != null)
                 ArrowTailLength = Convert.ToInt16(shape.Attributes["ArrowTailLength"].Value);
             if (shape.Attributes["ArrowTailWidth"] != null)
@@ -1208,22 +1217,22 @@ namespace GraphicShapes
             int n = MarkerPoints.Length;
             if (shape.Attributes["ArrowHeads"] == null)
             {
-                arrowHeadAtHead = new ArrowHeadAtHead(ArrowHeadCenterLength, ArrowHeadLength, ArrowHeadWidth, ArrowHeadColor, this);               
+                arrowHeadAtHead = new ArrowHeadAtHead(ArrowHeadCenter, ArrowHeadLength, ArrowHeadWidth, ArrowHeadColor, this);               
             }
             else
             {
                 switch (shape.Attributes["ArrowHeads"].Value)
                 {
                     case "head":
-                        arrowHeadAtHead = new ArrowHeadAtHead(ArrowHeadCenterLength, ArrowHeadLength, ArrowHeadWidth, ArrowHeadColor, this);
+                        arrowHeadAtHead = new ArrowHeadAtHead(ArrowHeadCenter, ArrowHeadLength, ArrowHeadWidth, ArrowHeadColor, this);
                         break;
                     case "tail":
-                        arrowHeadAtTail = new ArrowHeadAtTail(ArrowHeadCenterLength, ArrowHeadLength, ArrowHeadWidth, ArrowHeadColor, this);
+                        arrowHeadAtTail = new ArrowHeadAtTail(ArrowHeadCenter, ArrowHeadLength, ArrowHeadWidth, ArrowHeadColor, this);
                         break;
                     //case "center": break;
                     case "ends":
-                        arrowHeadAtHead = new ArrowHeadAtHead(ArrowHeadCenterLength, ArrowHeadLength, ArrowHeadWidth, ArrowHeadColor, this);
-                        arrowHeadAtTail = new ArrowHeadAtTail(ArrowHeadCenterLength, ArrowHeadLength, ArrowHeadWidth, ArrowHeadColor, this);
+                        arrowHeadAtHead = new ArrowHeadAtHead(ArrowHeadCenter, ArrowHeadLength, ArrowHeadWidth, ArrowHeadColor, this);
+                        arrowHeadAtTail = new ArrowHeadAtTail(ArrowHeadCenter, ArrowHeadLength, ArrowHeadWidth, ArrowHeadColor, this);
                         break;
                     case "none": break;
                     //case "everywhere": break;
@@ -1235,15 +1244,15 @@ namespace GraphicShapes
                     switch (shape.Attributes["ArrowTails"].Value)
                     {
                         case "head":
-                            arrowTailAtHead = new ArrowTailAtHead(ArrowTailCenterLength, ArrowTailLength, ArrowTailWidth, ArrowTailColor, this);
+                            arrowTailAtHead = new ArrowTailAtHead(ArrowTailCenter, ArrowTailLength, ArrowTailWidth, ArrowTailColor, this);
                             break;
                         case "tail":
-                            arrowTailAtTail = new ArrowTailAtTail(ArrowTailCenterLength, ArrowTailLength, ArrowTailWidth, ArrowTailColor, this);
+                            arrowTailAtTail = new ArrowTailAtTail(ArrowTailCenter, ArrowTailLength, ArrowTailWidth, ArrowTailColor, this);
                             break;
                         case "center": break;
                         case "ends":
-                            arrowTailAtHead = new ArrowTailAtHead(ArrowTailCenterLength, ArrowTailLength, ArrowTailWidth, ArrowTailColor, this);
-                            arrowTailAtTail = new ArrowTailAtTail(ArrowTailCenterLength, ArrowTailLength, ArrowTailWidth, ArrowTailColor, this);
+                            arrowTailAtHead = new ArrowTailAtHead(ArrowTailCenter, ArrowTailLength, ArrowTailWidth, ArrowTailColor, this);
+                            arrowTailAtTail = new ArrowTailAtTail(ArrowTailCenter, ArrowTailLength, ArrowTailWidth, ArrowTailColor, this);
                             break;
                         case "none": break;
                         case "everywhere": break;
@@ -1329,6 +1338,7 @@ namespace GraphicShapes
             //    tailEndold.AdjustDirection((float)Orientation(MarkerPoints[0], MarkerPoints[1]) - (float)oldTailAngle);
             //}
         }
+
     }
 
     class MyPolygon : GraphicObject
@@ -1466,7 +1476,7 @@ namespace GraphicShapes
         PointF[] Points = new PointF[4];
         Brush brush;
 
-        public ArrowHeadAtHead(int CenterLength, int Length, int Width, Color c, GraphicObject parent)
+        public ArrowHeadAtHead(int Center, int Length, int Width, Color c, GraphicObject parent)
         {
             Parent = parent;
             _type = "ArrowHeadAtHead";
@@ -1496,6 +1506,11 @@ namespace GraphicShapes
             g.TranslateTransform(-p1.X, -p1.Y);
         }
 
+        public void SetBrushColor(Color c)
+        {
+            brush = new SolidBrush(c);
+        }
+
         public override void Move(Point d) { }
 
         public override void Reshape(Point d) { }
@@ -1507,13 +1522,13 @@ namespace GraphicShapes
         PointF[] Points = new PointF[4];
         Brush brush;
 
-        public ArrowTailAtHead(int CenterLength, int Length, int Width, Color c, GraphicObject parent)
+        public ArrowTailAtHead(int Center, int Length, int Width, Color c, GraphicObject parent)
         {
             Parent = parent;
             _type = "ArrowTailAtHead";
             brush = new SolidBrush(c);//Color.Green);
 
-            Points[0].Y = CenterLength; Points[0].X = 0;
+            Points[0].Y = Center; Points[0].X = 0;
             Points[1].Y = -Length / 2; Points[1].X = -Width / 2;
             Points[2].Y = 0; Points[2].X = 0;
             Points[3].Y = -Length / 2; Points[3].X = Width / 2;
@@ -1535,6 +1550,11 @@ namespace GraphicShapes
             g.TranslateTransform(-p1.X, -p1.Y);
         }
 
+        public void SetBrushColor(Color c)
+        {
+            brush = new SolidBrush(c);
+        }
+
         public override void Move(Point d) { }
 
         public override void Reshape(Point d) { }
@@ -1546,7 +1566,7 @@ namespace GraphicShapes
         PointF[] Points = new PointF[4];
         Brush brush;
 
-        public ArrowTailAtTail(int CenterLength, int Length, int Width, Color c, GraphicObject parent) 
+        public ArrowTailAtTail(int Center, int Length, int Width, Color c, GraphicObject parent) 
         {
             Parent = parent;
             _type = "ArrowTailAtTail";
@@ -1554,8 +1574,13 @@ namespace GraphicShapes
 
             Points[0].Y = 0; Points[0].X = 0;
             Points[1].Y = Length / 2; Points[1].X = -Width / 2;
-            Points[2].Y = -CenterLength; Points[2].X = 0;
+            Points[2].Y = -Center; Points[2].X = 0;
             Points[3].Y = Length / 2; Points[3].X = Width / 2;
+        }
+
+        public void SetBrushColor(Color c)
+        {
+            brush = new SolidBrush(c);
         }
 
         public override void Draw(Graphics g, int extd)
@@ -1580,7 +1605,7 @@ namespace GraphicShapes
         public PointF _tip;
         PointF[] Points = new PointF[4];
         Brush brush;
-        public ArrowHeadAtTail(int CenterLength, int Length, int Width, Color c, GraphicObject parent) 
+        public ArrowHeadAtTail(int Center, int Length, int Width, Color c, GraphicObject parent) 
         {
             Parent = parent;
             _type = "ArrowHeadAtTail";
@@ -1593,8 +1618,13 @@ namespace GraphicShapes
 
             Points[0].Y = Length / 2; Points[0].X = 0;
             Points[1].Y = Length; Points[1].X = -Width / 2;
-            Points[2].Y = (Length / 2) - CenterLength; Points[2].X = 0;
+            Points[2].Y = (Length / 2) - Center; Points[2].X = 0;
             Points[3].Y = Length; Points[3].X = Width / 2;
+        }
+
+        public void SetBrushColor(Color c)
+        {
+            brush = new SolidBrush(c);
         }
 
         public override void Draw(Graphics g, int extd)

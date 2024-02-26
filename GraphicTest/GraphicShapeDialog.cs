@@ -41,6 +41,10 @@ namespace GraphicTool
         bool borderVisible = false;
         bool transparent = false;
 
+        ArrowTipControl HeadAtHead;
+        ArrowTipControl HeadAtTail;
+        ArrowTipControl TailAtHead;
+        ArrowTipControl TailAtTail;
 
         public GraphicShapeDialog(Display caller, GraphicObject g, Point Location)
         {
@@ -77,55 +81,26 @@ namespace GraphicTool
             if (_g._type == "Polyline")
             {
                 rBBackground.Enabled = false;
-                //ARROWHEADS AND TAILS
-                if (_g.arrowTailAtHead != null)
-                {
-                    btnTailAtHead.BackgroundImage = imageList1.Images[4];
-                    UpDownTailAtHeadWidth.Value = g.ArrowTailWidth;
-                    UpDownTailAtHeadLength.Value = g.ArrowTailLength;
-                    UpDownTailAtHeadCenter.Value = g.ArrowTailCenterLength;
-                }
-                else
-                {
-                    btnTailAtHead.BackgroundImage = imageList1.Images[5];
-                }
-                if (_g.arrowTailAtTail != null)
-                {
-                    btnTailAtTail.BackgroundImage = imageList1.Images[6];
-                    UpDownTailAtTailWidth.Value = g.ArrowTailWidth;
-                    UpDownTailAtTailLength.Value = g.ArrowTailLength;
-                    UpDownTailAtTailCenter.Value = g.ArrowTailCenterLength;
-                }
-                else
-                {
-                    btnTailAtTail.BackgroundImage = imageList1.Images[7];
-                }
-                if (_g.arrowHeadAtTail != null)
-                {
-                    btnHeadAtTail.BackgroundImage = imageList1.Images[2];
-                    UpDownHeadAtTailWidth.Value = g.ArrowHeadWidth;
-                    UpDownHeadAtTailLength.Value = g.ArrowHeadLength;
-                    UpDownHeadAtTailCenter.Value = g.ArrowHeadCenterLength;
-                }
-                else
-                {
-                    btnHeadAtTail.BackgroundImage = imageList1.Images[3];
-                }
-                if (_g.arrowHeadAtHead != null)
-                {
-                    btnHeadAtHead.BackgroundImage = imageList1.Images[0];
-                    UpDownHeadAtHeadWidth.Value = g.ArrowTailWidth;
-                    UpDownHeadAtHeadLength.Value = g.ArrowTailLength;
-                    UpDownHeadAtHeadCenter.Value = g.ArrowTailCenterLength;
-                }
-                else
-                {
-                    btnHeadAtHead.BackgroundImage = imageList1.Images[1];
-                }
-                btnHeadAtHead.BackgroundImageLayout = ImageLayout.Stretch;
-                btnHeadAtTail.BackgroundImageLayout = ImageLayout.Stretch;
-                btnTailAtHead.BackgroundImageLayout = ImageLayout.Stretch;
-                btnTailAtTail.BackgroundImageLayout = ImageLayout.Stretch;
+
+                HeadAtHead = new ArrowTipControl(g, caller, tipMode.HeadAtHead);
+                LineTab.Controls.Add(HeadAtHead);
+                HeadAtHead.Location = new Point(56, 18);
+                HeadAtHead.Visible = true;
+
+                HeadAtTail = new ArrowTipControl(g, caller, tipMode.HeadAtTail);
+                LineTab.Controls.Add(HeadAtTail);
+                HeadAtTail.Location = new Point(120, 18);
+                HeadAtTail.Visible = true;
+
+                TailAtTail = new ArrowTipControl(g, caller, tipMode.TailAtTail);
+                LineTab.Controls.Add(TailAtTail);
+                TailAtTail.Location = new Point(184, 18);
+                TailAtTail.Visible = true;
+
+                TailAtHead = new ArrowTipControl(g, caller, tipMode.TailAtHead);
+                LineTab.Controls.Add(TailAtHead);
+                TailAtHead.Location = new Point(248, 18);
+                TailAtHead.Visible = true;
             }
             else
             {
@@ -375,96 +350,5 @@ namespace GraphicTool
             _callingDisplay.Invalidate();
         }
 
-        private void btnHeadAtHead_Click(object sender, EventArgs e)
-        {
-            if (_g.arrowHeadAtHead != null)
-            {
-                _g.arrowHeadAtHead = null;
-                btnHeadAtHead.BackgroundImage = imageList1.Images[1];
-                UpDownHeadAtHeadCenter.Value = 0;
-                UpDownHeadAtHeadLength.Value = 0;
-                UpDownHeadAtHeadWidth.Value = 0;
-            }
-            else
-            {
-                _g.arrowHeadAtHead = new ArrowHeadAtHead(15, 25, 20, Color.Black, _g);
-                btnHeadAtHead.BackgroundImage = imageList1.Images[0];
-                UpDownHeadAtHeadCenter.Value = 15;
-                UpDownHeadAtHeadLength.Value = 25;
-                UpDownHeadAtHeadWidth.Value = 20;
-            }
-            _callingDisplay.Invalidate();
-        }
-
-        private void btnHeadAtTail_Click(object sender, EventArgs e)
-        {
-            if (_g.arrowHeadAtTail != null)
-            {
-                _g.arrowHeadAtTail = null;
-                btnHeadAtTail.BackgroundImage = imageList1.Images[3];
-                UpDownHeadAtTailCenter.Value = 0;
-                UpDownHeadAtTailLength.Value = 0;
-                UpDownHeadAtTailWidth.Value = 0;
-            }
-            else
-            {
-                _g.arrowHeadAtTail = new ArrowHeadAtTail(15, 25, 20, Color.Black, _g);
-                btnHeadAtTail.BackgroundImage = imageList1.Images[2];
-                UpDownHeadAtTailCenter.Value = 15;
-                UpDownHeadAtTailLength.Value = 25;
-                UpDownHeadAtTailWidth.Value = 20;
-            }
-            _callingDisplay.Invalidate();
-        }
-
-        private void btnTailAtHead_Click(object sender, EventArgs e)
-        {
-            if (_g.arrowTailAtHead != null)
-            {
-                _g.arrowTailAtHead = null;
-                btnTailAtHead.BackgroundImage = imageList1.Images[5];
-                UpDownTailAtHeadCenter.Value = 0;
-                UpDownTailAtHeadLength.Value = 0;
-                UpDownTailAtHeadWidth.Value = 0;
-            }
-            else
-            {
-                _g.arrowTailAtHead = new ArrowTailAtHead(15, 25, 20, Color.Black, _g);
-                btnTailAtHead.BackgroundImage = imageList1.Images[4];
-                UpDownTailAtHeadCenter.Value = 15;
-                UpDownTailAtHeadLength.Value = 25;
-                UpDownTailAtHeadWidth.Value = 20;
-            }
-            _callingDisplay.Invalidate();
-        }
-
-        private void btnTailAtTail_Click(object sender, EventArgs e)
-        {
-            if (_g.arrowTailAtTail != null)
-            {
-                _g.arrowTailAtTail = null;
-                btnTailAtTail.BackgroundImage = imageList1.Images[7];
-                UpDownTailAtTailCenter.Value = 0;
-                UpDownTailAtTailLength.Value = 0;
-                UpDownTailAtTailWidth.Value = 0;
-            }
-            else
-            {
-                _g.arrowTailAtTail = new ArrowTailAtTail(15, 25, 20, Color.Black, _g);
-                btnTailAtTail.BackgroundImage = imageList1.Images[6];
-                UpDownTailAtTailCenter.Value = 15;
-                UpDownTailAtTailLength.Value = 25;
-                UpDownTailAtTailWidth.Value = 20;
-            }
-            _callingDisplay.Invalidate();
-        }
-
-        private void UpDownHeadAtTailWidth_ValueChanged(object sender, EventArgs e)
-        {
-            //if (_g.arrowHeadAtTail != null)
-            //    _g.arrowHeadAtTail.ArrowHeadWidth = (int) UpDownHeadAtTailWidth.Value;
-            //_g.arrowHeadAtTail = new ArrowHeadAtTail(_g.arrowHeadAtTail.ArrowHeadCenterLength, _g.arrowHeadAtTail.ArrowHeadLength, _g.arrowHeadAtTail.ArrowHeadWidth, _g.ArrowHeadColor, _g);
-            //_callingDisplay.Invalidate();
-        }
     }
 }
