@@ -84,12 +84,12 @@ namespace GraphicTool
 
                 Heads = new ArrowTipControl(g, caller, tipMode.Heads);
                 LineTab.Controls.Add(Heads);
-                Heads.Location = new Point(56, 18);
+                Heads.Location = new Point(56, 28);
                 Heads.Visible = true;
 
                 Tails = new ArrowTipControl(g, caller, tipMode.Tails);
                 LineTab.Controls.Add(Tails);
-                Tails.Location = new Point(248, 18);
+                Tails.Location = new Point(146, 28);
                 Tails.Visible = true;
             }
             else
@@ -340,5 +340,9 @@ namespace GraphicTool
             _callingDisplay.Invalidate();
         }
 
+        private void label6_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

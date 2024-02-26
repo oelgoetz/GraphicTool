@@ -66,6 +66,8 @@
             TabControl1 = new TabControl();
             TextTab = new TabPage();
             LineTab = new TabPage();
+            label7 = new Label();
+            label6 = new Label();
             label5 = new Label();
             label3 = new Label();
             label4 = new Label();
@@ -242,7 +244,7 @@
             groupBox3.Controls.Add(a02);
             groupBox3.Controls.Add(a01);
             groupBox3.Controls.Add(a00);
-            groupBox3.Location = new Point(544, 48);
+            groupBox3.Location = new Point(390, 48);
             groupBox3.Name = "groupBox3";
             groupBox3.Size = new Size(90, 96);
             groupBox3.TabIndex = 15;
@@ -384,7 +386,7 @@
             groupBox4.Controls.Add(PdTop);
             groupBox4.Location = new Point(125, 48);
             groupBox4.Name = "groupBox4";
-            groupBox4.Size = new Size(413, 96);
+            groupBox4.Size = new Size(259, 96);
             groupBox4.TabIndex = 16;
             groupBox4.TabStop = false;
             groupBox4.Text = "Padding";
@@ -392,7 +394,7 @@
             // PdBottom
             // 
             PdBottom.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            PdBottom.Location = new Point(299, 67);
+            PdBottom.Location = new Point(145, 67);
             PdBottom.Name = "PdBottom";
             PdBottom.Size = new Size(43, 23);
             PdBottom.TabIndex = 24;
@@ -401,7 +403,7 @@
             // PdRight
             // 
             PdRight.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            PdRight.Location = new Point(348, 43);
+            PdRight.Location = new Point(194, 43);
             PdRight.Name = "PdRight";
             PdRight.Size = new Size(43, 23);
             PdRight.TabIndex = 23;
@@ -410,7 +412,7 @@
             // PdLeft
             // 
             PdLeft.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            PdLeft.Location = new Point(250, 43);
+            PdLeft.Location = new Point(96, 43);
             PdLeft.Name = "PdLeft";
             PdLeft.Size = new Size(43, 23);
             PdLeft.TabIndex = 22;
@@ -419,7 +421,7 @@
             // PdTop
             // 
             PdTop.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            PdTop.Location = new Point(299, 17);
+            PdTop.Location = new Point(145, 17);
             PdTop.Name = "PdTop";
             PdTop.Size = new Size(43, 23);
             PdTop.TabIndex = 21;
@@ -429,7 +431,7 @@
             // 
             label1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label1.AutoSize = true;
-            label1.Location = new Point(544, 5);
+            label1.Location = new Point(390, 5);
             label1.Name = "label1";
             label1.Size = new Size(54, 15);
             label1.TabIndex = 20;
@@ -447,7 +449,7 @@
             // UpDownFontSize
             // 
             UpDownFontSize.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            UpDownFontSize.Location = new Point(544, 24);
+            UpDownFontSize.Location = new Point(390, 24);
             UpDownFontSize.Name = "UpDownFontSize";
             UpDownFontSize.Size = new Size(81, 23);
             UpDownFontSize.TabIndex = 18;
@@ -459,7 +461,7 @@
             CmbFontFamily.FormattingEnabled = true;
             CmbFontFamily.Location = new Point(5, 23);
             CmbFontFamily.Name = "CmbFontFamily";
-            CmbFontFamily.Size = new Size(533, 23);
+            CmbFontFamily.Size = new Size(379, 23);
             CmbFontFamily.TabIndex = 17;
             CmbFontFamily.TextChanged += CmbFontFamily_TextChanged;
             // 
@@ -475,7 +477,7 @@
             fontPanel.Dock = DockStyle.Fill;
             fontPanel.Location = new Point(3, 3);
             fontPanel.Name = "fontPanel";
-            fontPanel.Size = new Size(637, 144);
+            fontPanel.Size = new Size(483, 144);
             fontPanel.TabIndex = 21;
             // 
             // TabControl1
@@ -496,13 +498,15 @@
             TextTab.Location = new Point(4, 24);
             TextTab.Name = "TextTab";
             TextTab.Padding = new Padding(3);
-            TextTab.Size = new Size(643, 150);
+            TextTab.Size = new Size(489, 150);
             TextTab.TabIndex = 0;
             TextTab.Text = "Text";
             // 
             // LineTab
             // 
             LineTab.BackColor = SystemColors.Control;
+            LineTab.Controls.Add(label7);
+            LineTab.Controls.Add(label6);
             LineTab.Controls.Add(label5);
             LineTab.Controls.Add(label3);
             LineTab.Controls.Add(label4);
@@ -513,10 +517,29 @@
             LineTab.TabIndex = 1;
             LineTab.Text = "Arrows";
             // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new Point(175, 9);
+            label7.Name = "label7";
+            label7.Size = new Size(29, 15);
+            label7.TabIndex = 22;
+            label7.Text = "Tails";
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.Location = new Point(82, 9);
+            label6.Name = "label6";
+            label6.Size = new Size(40, 15);
+            label6.TabIndex = 21;
+            label6.Text = "Heads";
+            label6.Click += label6_Click;
+            // 
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(11, 94);
+            label5.Location = new Point(11, 107);
             label5.Name = "label5";
             label5.Size = new Size(42, 15);
             label5.TabIndex = 20;
@@ -525,7 +548,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(11, 46);
+            label3.Location = new Point(11, 59);
             label3.Name = "label3";
             label3.Size = new Size(39, 15);
             label3.TabIndex = 16;
@@ -534,7 +557,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(11, 70);
+            label4.Location = new Point(11, 83);
             label4.Name = "label4";
             label4.Size = new Size(44, 15);
             label4.TabIndex = 18;
@@ -633,5 +656,7 @@
         private Label label4;
         private NumericUpDown UpDownLength;
         private ImageList imageList1;
+        private Label label7;
+        private Label label6;
     }
 }

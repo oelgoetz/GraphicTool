@@ -46,7 +46,7 @@
             btnAtHeads.AccessibleDescription = "";
             btnAtHeads.BackgroundImageLayout = ImageLayout.None;
             btnAtHeads.FlatStyle = FlatStyle.Popup;
-            btnAtHeads.Location = new Point(42, 3);
+            btnAtHeads.Location = new Point(44, 3);
             btnAtHeads.Name = "btnAtHeads";
             btnAtHeads.Size = new Size(40, 20);
             btnAtHeads.TabIndex = 33;
@@ -55,21 +55,21 @@
             // 
             // UpDownWidth
             // 
-            UpDownWidth.Location = new Point(3, 26);
+            UpDownWidth.Location = new Point(5, 26);
             UpDownWidth.Name = "UpDownWidth";
             UpDownWidth.Size = new Size(79, 23);
             UpDownWidth.TabIndex = 30;
             // 
             // UpDownCenter
             // 
-            UpDownCenter.Location = new Point(3, 74);
+            UpDownCenter.Location = new Point(5, 74);
             UpDownCenter.Name = "UpDownCenter";
             UpDownCenter.Size = new Size(79, 23);
             UpDownCenter.TabIndex = 32;
             // 
             // UpDownLength
             // 
-            UpDownLength.Location = new Point(3, 50);
+            UpDownLength.Location = new Point(5, 50);
             UpDownLength.Name = "UpDownLength";
             UpDownLength.Size = new Size(79, 23);
             UpDownLength.TabIndex = 31;
@@ -93,7 +93,7 @@
             btnAtTails.AccessibleDescription = "";
             btnAtTails.BackgroundImageLayout = ImageLayout.None;
             btnAtTails.FlatStyle = FlatStyle.Popup;
-            btnAtTails.Location = new Point(3, 3);
+            btnAtTails.Location = new Point(5, 3);
             btnAtTails.Name = "btnAtTails";
             btnAtTails.Size = new Size(40, 20);
             btnAtTails.TabIndex = 34;
@@ -110,7 +110,7 @@
             Controls.Add(UpDownCenter);
             Controls.Add(UpDownLength);
             Name = "ArrowTipControl";
-            Size = new Size(87, 98);
+            Size = new Size(90, 100);
             ((System.ComponentModel.ISupportInitialize)UpDownWidth).EndInit();
             ((System.ComponentModel.ISupportInitialize)UpDownCenter).EndInit();
             ((System.ComponentModel.ISupportInitialize)UpDownLength).EndInit();
