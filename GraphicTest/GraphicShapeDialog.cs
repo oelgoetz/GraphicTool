@@ -83,18 +83,20 @@ namespace GraphicTool
                 rBBackground.Enabled = false;
 
                 Heads = new ArrowTipControl(g, caller, tipMode.Heads);
-                LineTab.Controls.Add(Heads);
+                ArrowsTab.Controls.Add(Heads);
                 Heads.Location = new Point(56, 28);
                 Heads.Visible = true;
 
                 Tails = new ArrowTipControl(g, caller, tipMode.Tails);
-                LineTab.Controls.Add(Tails);
+                ArrowsTab.Controls.Add(Tails);
                 Tails.Location = new Point(146, 28);
                 Tails.Visible = true;
+                ArrowsTab.Enabled = true;
             }
             else
             {
                 rBBackground.Enabled = true;
+                ArrowsTab.Enabled = false;
             }
             //TEXT PROPERTIES
             if (_g._text != null && _g._text.Length > 0)
@@ -161,8 +163,8 @@ namespace GraphicTool
                 }
             }
             this.Location = Location;
+            updateMenuButtons();
             Invalidate();
-
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -340,9 +342,87 @@ namespace GraphicTool
             _callingDisplay.Invalidate();
         }
 
-        private void label6_Click(object sender, EventArgs e)
+        private void updateMenuButtons()
         {
+            if (_g.Parent.Children.Count == 1)
+            {
+                menuStrip1.Items[0].Enabled = false; //topmost
+                menuStrip1.Items[1].Enabled = false; //lift
+                menuStrip1.Items[2].Enabled = false; //sink
+                menuStrip1.Items[3].Enabled = false; //lowest
+            }
+            else
+            {
+                if (_g.Parent.Children.IndexOf(_g) == 0)
+                {
+                    menuStrip1.Items[0].Enabled = true; //topmost
+                    menuStrip1.Items[1].Enabled = true; //lift
+                    menuStrip1.Items[2].Enabled = false; //sink
+                    menuStrip1.Items[3].Enabled = false; //lowest
+                }
+                else
+                {
+                    if (_g.Parent.Children.IndexOf(_g) < _g.Parent.Children.Count - 1)
+                    {
+                        menuStrip1.Items[0].Enabled = true; //topmost
+                        menuStrip1.Items[1].Enabled = true; //lift
+                        menuStrip1.Items[2].Enabled = true; //sink
+                        menuStrip1.Items[3].Enabled = true; //lowest
+                    }
+                }
+                if (_g.Parent.Children.IndexOf(_g) == _g.Parent.Children.Count - 1)
+                {
+                    menuStrip1.Items[0].Enabled = false; //topmost
+                    menuStrip1.Items[1].Enabled = false; //lift
+                    menuStrip1.Items[2].Enabled = true; //sink
+                    menuStrip1.Items[3].Enabled = true; //lowest
+                }
+            }
+        }
+        private void topmost_Click(object sender, EventArgs e)
+        {
+            GraphicObject r = _g.Parent;
+            GraphicObject g = r.Children[r.Children.IndexOf(_g)];
+            r.Children.RemoveAt(r.Children.IndexOf(_g));
+            r.Children.Add(g);
 
+            updateMenuButtons();
+            _callingDisplay.Invalidate();
+        }
+
+        private void bottom_Click(object sender, EventArgs e)
+        {
+            GraphicObject r = _g.Parent;
+            GraphicObject g = r.Children[r.Children.IndexOf(_g)];
+            r.Children.RemoveAt(r.Children.IndexOf(_g));
+            r.Children.Insert(0, g);
+
+            updateMenuButtons();
+            _callingDisplay.Invalidate();
+        }
+
+        private void Lift_Click(object sender, EventArgs e)
+        {
+            GraphicObject r = _g.Parent;
+            int i = r.Children.IndexOf(_g);
+            GraphicObject g = r.Children[i];
+            r.Children.RemoveAt(i);
+            r.Children.Insert(i+1, g);
+
+            updateMenuButtons();
+            _callingDisplay.Invalidate();
+        }
+
+        private void Sink_Click(object sender, EventArgs e)
+        {
+            GraphicObject r = _g.Parent;
+            int i = r.Children.IndexOf(_g);
+            GraphicObject g = r.Children[i];
+            r.Children.RemoveAt(i);
+            r.Children.Insert(i - 1, g);
+
+            updateMenuButtons();
+            _callingDisplay.Invalidate();            
         }
     }
 }

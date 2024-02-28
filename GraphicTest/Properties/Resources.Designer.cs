@@ -113,6 +113,26 @@ namespace GraphicTool.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap LiftTopmost {
+            get {
+                object obj = ResourceManager.GetObject("LiftTopmost", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap liftUp {
+            get {
+                object obj = ResourceManager.GetObject("liftUp", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap opendir {
             get {
                 object obj = ResourceManager.GetObject("opendir", resourceCulture);
@@ -126,6 +146,26 @@ namespace GraphicTool.Properties {
         internal static System.Drawing.Bitmap resume {
             get {
                 object obj = ResourceManager.GetObject("resume", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap sinkDown {
+            get {
+                object obj = ResourceManager.GetObject("sinkDown", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap sinkLowest {
+            get {
+                object obj = ResourceManager.GetObject("sinkLowest", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

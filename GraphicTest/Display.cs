@@ -54,8 +54,6 @@ namespace GraphicTool
 
         private string currentFile;
 
-
-
         public Display()
         {
             InitializeComponent();
@@ -545,14 +543,30 @@ namespace GraphicTool
             for (int j = root.Children.Count - 1; j >= 0; j--)
             {
                 GraphicObject g = root.Children[j];
-                if (XY.X > g.Box.X)
-                    if (XY.X < g.Box.X + g.Box.Width)
-                        if (XY.Y > g.Box.Y)
-                            if (XY.Y < g.Box.Y + g.Box.Height)
-                            {
-                                mouseOverObject = j;
-                                break;
-                            }
+                if(g._type == "Polyline") 
+                {
+                    for(int i = 1; i < g.MarkerPoints.Length; i++)
+                    {
+                        if (IsPointOnLine(XY, g.MarkerPoints[i-1], g.MarkerPoints[i]))
+                        {
+                            mouseOverObject = j;
+                            break;
+                        }                        
+                    }
+                    if (mouseOverObject > -2)
+                        break;
+                }
+                else
+                {
+                    if (XY.X > g.Box.X)
+                        if (XY.X < g.Box.X + g.Box.Width)
+                            if (XY.Y > g.Box.Y)
+                                if (XY.Y < g.Box.Y + g.Box.Height)
+                                {
+                                    mouseOverObject = j;
+                                    break;
+                                }
+                }                
             }
             if (mouseOverObject == -2)
             {
@@ -601,6 +615,22 @@ namespace GraphicTool
                 }
             }
             Invalidate();
+        }
+
+        static bool IsPointOnLine(PointF p, PointF lineStart, PointF lineEnd)
+        {
+            // Den zu p nähesten Punkt q auf der Strecke bestimmen
+            PointF startToP = p.Subtract(lineStart);
+            PointF startToEnd = lineEnd.Subtract(lineStart);
+
+            float t = startToP.Scalar(startToEnd) / startToEnd.Scalar(startToEnd);
+            t = Math.Max(0, Math.Min(t, 1));
+            PointF q = lineStart.Add(startToEnd.Scale(t));
+
+            // Abstand zwischen p und q berechnen
+            float threshold = 5f;
+            float squared_distance = (p.Subtract(q)).Scalar(p.Subtract(q));
+            return squared_distance < (threshold * threshold);
         }
 
         private void Display_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
@@ -674,7 +704,7 @@ namespace GraphicTool
             {
                 foreach (GraphicObject g in root.Children)
                     g.Select();
-                backGroundSelected = true;
+                backGroundSelected = false;
                 multiSelect = true;
             }
 
@@ -921,6 +951,29 @@ namespace GraphicTool
             Byte[] buffer = File.ReadAllBytes(filename);
             MemoryStream memstream = new MemoryStream(buffer);
             return new Bitmap(memstream);
+        }
+    }
+
+    public static class PointExtensions
+    {
+        public static float Scalar(this PointF a, PointF b)
+        {
+            return a.X * b.X + a.Y * b.Y;
+        }
+
+        public static PointF Scale(this PointF a, float factor)
+        {
+            return new PointF(a.X * factor, a.Y * factor);
+        }
+
+        public static PointF Add(this PointF a, PointF b)
+        {
+            return new PointF(a.X + b.X, a.Y + b.Y);
+        }
+
+        public static PointF Subtract(this PointF a, PointF b)
+        {
+            return new PointF(a.X - b.X, a.Y - b.Y);
         }
     }
 

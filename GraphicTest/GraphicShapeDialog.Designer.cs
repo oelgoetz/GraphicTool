@@ -65,13 +65,18 @@
             fontPanel = new Panel();
             TabControl1 = new TabControl();
             TextTab = new TabPage();
-            LineTab = new TabPage();
+            ArrowsTab = new TabPage();
             label7 = new Label();
             label6 = new Label();
             label5 = new Label();
             label3 = new Label();
             label4 = new Label();
             imageList1 = new ImageList(components);
+            menuStrip1 = new MenuStrip();
+            topmost = new ToolStripMenuItem();
+            Lift = new ToolStripMenuItem();
+            Sink = new ToolStripMenuItem();
+            Bottom = new ToolStripMenuItem();
             groupBox2.SuspendLayout();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)UpDownLineWidth).BeginInit();
@@ -85,7 +90,8 @@
             fontPanel.SuspendLayout();
             TabControl1.SuspendLayout();
             TextTab.SuspendLayout();
-            LineTab.SuspendLayout();
+            ArrowsTab.SuspendLayout();
+            menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // groupBox2
@@ -95,7 +101,7 @@
             groupBox2.Controls.Add(cBBold);
             groupBox2.Location = new Point(3, 48);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(116, 96);
+            groupBox2.Size = new Size(110, 96);
             groupBox2.TabIndex = 3;
             groupBox2.TabStop = false;
             groupBox2.Text = "Font Style";
@@ -135,8 +141,8 @@
             // 
             // button1
             // 
-            button1.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            button1.Location = new Point(401, 380);
+            button1.Anchor = AnchorStyles.Bottom;
+            button1.Location = new Point(401, 410);
             button1.Name = "button1";
             button1.Size = new Size(81, 29);
             button1.TabIndex = 2;
@@ -146,14 +152,14 @@
             // 
             // groupBox1
             // 
-            groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox1.Anchor = AnchorStyles.Bottom;
             groupBox1.Controls.Add(label2);
             groupBox1.Controls.Add(UpDownLineWidth);
             groupBox1.Controls.Add(rBText);
             groupBox1.Controls.Add(rBBackground);
             groupBox1.Controls.Add(rbLine);
             groupBox1.Controls.Add(colorPalette1);
-            groupBox1.Location = new Point(8, 192);
+            groupBox1.Location = new Point(8, 206);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(492, 148);
             groupBox1.TabIndex = 15;
@@ -223,8 +229,8 @@
             // 
             // button3
             // 
-            button3.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            button3.Location = new Point(310, 380);
+            button3.Anchor = AnchorStyles.Bottom;
+            button3.Location = new Point(310, 410);
             button3.Name = "button3";
             button3.Size = new Size(81, 29);
             button3.TabIndex = 16;
@@ -384,9 +390,9 @@
             groupBox4.Controls.Add(PdRight);
             groupBox4.Controls.Add(PdLeft);
             groupBox4.Controls.Add(PdTop);
-            groupBox4.Location = new Point(125, 48);
+            groupBox4.Location = new Point(119, 48);
             groupBox4.Name = "groupBox4";
-            groupBox4.Size = new Size(259, 96);
+            groupBox4.Size = new Size(265, 96);
             groupBox4.TabIndex = 16;
             groupBox4.TabStop = false;
             groupBox4.Text = "Padding";
@@ -394,7 +400,7 @@
             // PdBottom
             // 
             PdBottom.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            PdBottom.Location = new Point(145, 67);
+            PdBottom.Location = new Point(151, 67);
             PdBottom.Name = "PdBottom";
             PdBottom.Size = new Size(43, 23);
             PdBottom.TabIndex = 24;
@@ -403,7 +409,7 @@
             // PdRight
             // 
             PdRight.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            PdRight.Location = new Point(194, 43);
+            PdRight.Location = new Point(200, 43);
             PdRight.Name = "PdRight";
             PdRight.Size = new Size(43, 23);
             PdRight.TabIndex = 23;
@@ -412,7 +418,7 @@
             // PdLeft
             // 
             PdLeft.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            PdLeft.Location = new Point(96, 43);
+            PdLeft.Location = new Point(102, 43);
             PdLeft.Name = "PdLeft";
             PdLeft.Size = new Size(43, 23);
             PdLeft.TabIndex = 22;
@@ -421,7 +427,7 @@
             // PdTop
             // 
             PdTop.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            PdTop.Location = new Point(145, 17);
+            PdTop.Location = new Point(151, 17);
             PdTop.Name = "PdTop";
             PdTop.Size = new Size(43, 23);
             PdTop.TabIndex = 21;
@@ -482,10 +488,10 @@
             // 
             // TabControl1
             // 
-            TabControl1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            TabControl1.Anchor = AnchorStyles.Bottom;
             TabControl1.Controls.Add(TextTab);
-            TabControl1.Controls.Add(LineTab);
-            TabControl1.Location = new Point(7, 12);
+            TabControl1.Controls.Add(ArrowsTab);
+            TabControl1.Location = new Point(7, 26);
             TabControl1.Name = "TabControl1";
             TabControl1.SelectedIndex = 0;
             TabControl1.Size = new Size(497, 178);
@@ -502,20 +508,20 @@
             TextTab.TabIndex = 0;
             TextTab.Text = "Text";
             // 
-            // LineTab
+            // ArrowsTab
             // 
-            LineTab.BackColor = SystemColors.Control;
-            LineTab.Controls.Add(label7);
-            LineTab.Controls.Add(label6);
-            LineTab.Controls.Add(label5);
-            LineTab.Controls.Add(label3);
-            LineTab.Controls.Add(label4);
-            LineTab.Location = new Point(4, 24);
-            LineTab.Name = "LineTab";
-            LineTab.Padding = new Padding(3);
-            LineTab.Size = new Size(489, 150);
-            LineTab.TabIndex = 1;
-            LineTab.Text = "Arrows";
+            ArrowsTab.BackColor = SystemColors.Control;
+            ArrowsTab.Controls.Add(label7);
+            ArrowsTab.Controls.Add(label6);
+            ArrowsTab.Controls.Add(label5);
+            ArrowsTab.Controls.Add(label3);
+            ArrowsTab.Controls.Add(label4);
+            ArrowsTab.Location = new Point(4, 24);
+            ArrowsTab.Name = "ArrowsTab";
+            ArrowsTab.Padding = new Padding(3);
+            ArrowsTab.Size = new Size(489, 150);
+            ArrowsTab.TabIndex = 1;
+            ArrowsTab.Text = "Arrows";
             // 
             // label7
             // 
@@ -534,7 +540,6 @@
             label6.Size = new Size(40, 15);
             label6.TabIndex = 21;
             label6.Text = "Heads";
-            label6.Click += label6_Click;
             // 
             // label5
             // 
@@ -576,18 +581,60 @@
             imageList1.Images.SetKeyName(5, "0TailAtHead.png");
             imageList1.Images.SetKeyName(6, "1TailAtTail.png");
             imageList1.Images.SetKeyName(7, "0TailAtTail.png");
+            imageList1.Images.SetKeyName(8, "LiftTopmost.png");
+            imageList1.Images.SetKeyName(9, "liftUp.png");
+            imageList1.Images.SetKeyName(10, "sinkDown.png");
+            imageList1.Images.SetKeyName(11, "sinkLowest.png");
+            // 
+            // menuStrip1
+            // 
+            menuStrip1.Items.AddRange(new ToolStripItem[] { topmost, Lift, Sink, Bottom });
+            menuStrip1.Location = new Point(0, 0);
+            menuStrip1.Name = "menuStrip1";
+            menuStrip1.Size = new Size(504, 24);
+            menuStrip1.TabIndex = 23;
+            menuStrip1.Text = "menuStrip1";
+            // 
+            // topmost
+            // 
+            topmost.Image = Properties.Resources.LiftTopmost;
+            topmost.Name = "topmost";
+            topmost.Size = new Size(28, 20);
+            topmost.Click += topmost_Click;
+            // 
+            // Lift
+            // 
+            Lift.Image = Properties.Resources.liftUp;
+            Lift.Name = "Lift";
+            Lift.Size = new Size(28, 20);
+            Lift.Click += Lift_Click;
+            // 
+            // Sink
+            // 
+            Sink.Image = Properties.Resources.sinkDown;
+            Sink.Name = "Sink";
+            Sink.Size = new Size(28, 20);
+            Sink.Click += Sink_Click;
+            // 
+            // Bottom
+            // 
+            Bottom.Image = Properties.Resources.sinkLowest;
+            Bottom.Name = "Bottom";
+            Bottom.Size = new Size(28, 20);
+            Bottom.Click += bottom_Click;
             // 
             // GraphicShapeDialog
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(504, 421);
+            ClientSize = new Size(504, 451);
             Controls.Add(TabControl1);
             Controls.Add(button3);
             Controls.Add(groupBox1);
             Controls.Add(button1);
-            MaximumSize = new Size(520, 460);
-            MinimumSize = new Size(520, 460);
+            Controls.Add(menuStrip1);
+            MaximumSize = new Size(520, 490);
+            MinimumSize = new Size(520, 490);
             Name = "GraphicShapeDialog";
             Text = "GraphicShapeDialog";
             Load += GraphicShapeDialog_Load;
@@ -607,9 +654,12 @@
             fontPanel.PerformLayout();
             TabControl1.ResumeLayout(false);
             TextTab.ResumeLayout(false);
-            LineTab.ResumeLayout(false);
-            LineTab.PerformLayout();
+            ArrowsTab.ResumeLayout(false);
+            ArrowsTab.PerformLayout();
+            menuStrip1.ResumeLayout(false);
+            menuStrip1.PerformLayout();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -649,7 +699,7 @@
         private NumericUpDown PdTop;
         private TabControl TabControl1;
         private TabPage TextTab;
-        private TabPage LineTab;
+        private TabPage ArrowsTab;
         private Label label3;
         private Label label5;
         private NumericUpDown UpDownCenterLength;
@@ -658,5 +708,10 @@
         private ImageList imageList1;
         private Label label7;
         private Label label6;
+        private MenuStrip menuStrip1;
+        private ToolStripMenuItem topmost;
+        private ToolStripMenuItem Lift;
+        private ToolStripMenuItem Sink;
+        private ToolStripMenuItem Bottom;
     }
 }

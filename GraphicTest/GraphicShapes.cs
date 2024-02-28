@@ -531,6 +531,7 @@ namespace GraphicShapes
                 if (arrowHeadAtTail != null) arrowHeadAtTail.SetBrushColor(color);
                 if (arrowTailAtTail != null) arrowTailAtTail.SetBrushColor(color);
                 if (arrowTailAtHead != null) arrowTailAtHead.SetBrushColor(color);
+                //_g.ArrowHeadColor
 
             }
         }
@@ -778,6 +779,26 @@ namespace GraphicShapes
         public override void Reshape(Point d) //Root
         {
             throw new NotImplementedException();
+        }
+
+        public void liftUp(GraphicObject g)
+        {
+
+        }
+
+        public void sinkDown(GraphicObject g)
+        {
+
+        }
+
+        public void liftUpMost(GraphicObject g)
+        {
+
+        }
+
+        public void sinkLowest(GraphicObject g)
+        {
+
         }
     }
 
@@ -1494,6 +1515,7 @@ namespace GraphicShapes
         {
             brush = new SolidBrush(c);
             Parent.ArrowHeadColor = c;
+            Parent.ArrowTailColor = c;
         }
 
         public override void Move(Point d) { }
@@ -1538,6 +1560,7 @@ namespace GraphicShapes
         {
             brush = new SolidBrush(c);
             Parent.ArrowTailColor = c;
+            Parent.ArrowHeadColor = c;
         }
 
         public override void Move(Point d) { }
@@ -1567,6 +1590,7 @@ namespace GraphicShapes
         {
             brush = new SolidBrush(c);
             Parent.ArrowTailColor = c;
+            Parent.ArrowHeadColor = c;
         }
 
         public override void Draw(Graphics g, int extd)
@@ -1610,6 +1634,7 @@ namespace GraphicShapes
         {
             brush = new SolidBrush(c);
             Parent.ArrowHeadColor = c;
+            Parent.ArrowTailColor = c;
         }
 
         public override void Draw(Graphics g, int extd)

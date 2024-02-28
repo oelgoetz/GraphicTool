@@ -1,4 +1,5 @@
-﻿using GraphicTool;
+﻿using GraphicShapes;
+using GraphicTool;
 using System.Diagnostics;
 using System.Windows.Forms;
 
@@ -151,6 +152,7 @@ namespace GraphicTool
                 else
                     MessageBox.Show(_args[0]);
             }
+            splitContainer1.SplitterDistance = 142;
             //LoadTestCase("deleteme");
             //LoadTestCase("FontStyleTest");
             //LoadTestCase("texttest01");
@@ -158,7 +160,8 @@ namespace GraphicTool
             //LoadTestCase("textsizetest");
             //LoadTestCase("texttest05");
             //LoadTestCase("AutoStockPlaceIndexNumbersEx00");
-            LoadTestCase("ArrowTest07");
+            //LoadTestCase("ArrowTest06");
+            LoadTestCase("orderTest");
             //LoadTestCase("tdmCompactToolAssemblyBOMPos");
             //Properties.Settings.Default.COLORS = "#308784;#1d5251;#59d396;#2fa567;#88b720;#628406;#208220;#0b540b;#5ec1e9;#359cbc;#5d8cc2;#306191;#3661a3;#1e457c;#7c67a3;#584877;#f4b425;#c68709;#ef890f;#c66a05;#e56469;#ba363f;#e56493;#b7376c;#8c8c8c;#666666;#636363;#4d4d4d;#ffffff;#dddddd;#000000;#555555";
             //Properties.Settings.Default.Save();
@@ -358,7 +361,7 @@ namespace GraphicTool
             if (File.Exists(currentFileLabel.Text + ".props"))
             {
                 try
-                {                    
+                {
                     if (File.Exists("C:\\Program Files\\Notepad++\\notepad++.exe"))
                         Process.Start("C:\\Program Files\\Notepad++\\notepad++.exe", currentFileLabel.Text + ".props");
                     else
@@ -449,6 +452,11 @@ namespace GraphicTool
             display.AddShape(Properties.Settings.Default.POLYLINE);
             BackgroundXMLRadioButton.Checked = true;
             applyDisplayMode();
+        }
+
+        private void btnLiftTopmost_Click(object sender, EventArgs e)
+        {
+            
         }
     }
 }

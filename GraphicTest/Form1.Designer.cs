@@ -108,34 +108,34 @@
             // loadToolStripMenuItem
             // 
             loadToolStripMenuItem.Name = "loadToolStripMenuItem";
-            loadToolStripMenuItem.Size = new Size(180, 22);
+            loadToolStripMenuItem.Size = new Size(134, 22);
             loadToolStripMenuItem.Text = "Load";
             loadToolStripMenuItem.Click += loadToolStripMenuItem_Click;
             // 
             // saveToolStripMenuItem
             // 
             saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            saveToolStripMenuItem.Size = new Size(180, 22);
+            saveToolStripMenuItem.Size = new Size(134, 22);
             saveToolStripMenuItem.Text = "Save";
             saveToolStripMenuItem.Click += saveToolStripMenuItem_Click;
             // 
             // saveAsToolStripMenuItem
             // 
             saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            saveAsToolStripMenuItem.Size = new Size(180, 22);
+            saveAsToolStripMenuItem.Size = new Size(134, 22);
             saveAsToolStripMenuItem.Text = "Save as";
             saveAsToolStripMenuItem.Click += saveAsToolStripMenuItem_Click;
             // 
             // quitToolStripMenuItem
             // 
             quitToolStripMenuItem.Name = "quitToolStripMenuItem";
-            quitToolStripMenuItem.Size = new Size(180, 22);
+            quitToolStripMenuItem.Size = new Size(134, 22);
             quitToolStripMenuItem.Text = "Quit";
             // 
             // recentFilesToolStripMenuItem
             // 
             recentFilesToolStripMenuItem.Name = "recentFilesToolStripMenuItem";
-            recentFilesToolStripMenuItem.Size = new Size(180, 22);
+            recentFilesToolStripMenuItem.Size = new Size(134, 22);
             recentFilesToolStripMenuItem.Text = "Recent files";
             // 
             // toolStripMenuItem1
@@ -205,7 +205,7 @@
             // 
             splitContainer1.Panel2.Controls.Add(display);
             splitContainer1.Size = new Size(1095, 663);
-            splitContainer1.SplitterDistance = 140;
+            splitContainer1.SplitterDistance = 142;
             splitContainer1.TabIndex = 2;
             // 
             // button6
@@ -393,7 +393,7 @@
             display.Dock = DockStyle.Fill;
             display.Location = new Point(0, 0);
             display.Name = "display";
-            display.Size = new Size(951, 663);
+            display.Size = new Size(949, 663);
             display.TabIndex = 0;
             // 
             // openFileDialog1
