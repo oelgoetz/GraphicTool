@@ -200,6 +200,10 @@ namespace GraphicTool
                 if (shape.NodeType != XmlNodeType.Element) continue;
                 try
                 {
+                    root.setBackGroundImage(BackGroundBmp);
+                    root.setPropsFileImage(PropsFileBmp);
+                    root.setImageFileImage(ImageFileBmp);
+
                     root.Add(shape, root);
                 }
                 catch (Exception ex)

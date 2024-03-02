@@ -1,10 +1,10 @@
 ﻿using GraphicTool;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace GraphicShapes
 {
@@ -17,6 +17,15 @@ namespace GraphicShapes
         internal static Pen SpecialMarkerPen = new Pen(Color.Red, 2);
         internal static Brush SpecialMarkerBrush = new SolidBrush(Color.Red);
         internal static Font defaultFont = new Font("Arial", 10);
+        internal static int defaultArrowCenter = 8;
+        internal static int defaultArrowWidth = 12;
+        internal static int defaultArrowLength = 16;
+        internal static int reshapeThreshold = 5;
+
+        //BackGroundBmp = null; PropsFileBmp = null; ImageFileBmp = null;
+        internal static Bitmap BackGroundImage = null;
+        internal static Bitmap PropsFileImage = null;
+        internal static Bitmap ImageFileImage = null;
 
         public GraphicObject Parent;
         public List<GraphicObject> Children = new List<GraphicObject>();
@@ -81,10 +90,8 @@ namespace GraphicShapes
         internal ArrowTailAtHead arrowTailAtHead = null;
         internal ArrowHeadAtTail arrowHeadAtTail = null;
         internal ArrowTailAtTail arrowTailAtTail = null;
-
-        int defaultCenter = 8;
-        int defaultWidth = 12;
-        int defaultLength = 16;
+        internal ZoomEffect zoom = null;
+        internal BlurEffect blur = null;
 
         public int ArrowHeadCenter = 15;
         public int ArrowHeadLength = 25;
@@ -104,6 +111,33 @@ namespace GraphicShapes
         public abstract void Move(Point d);
 
         public abstract void Reshape(Point d);
+
+        internal void setBackGroundImage(Bitmap image)
+        {
+            BackGroundImage = image;
+        }
+
+        internal void setPropsFileImage(Bitmap image)
+        {
+            PropsFileImage = image;
+        }
+
+        internal void setImageFileImage(Bitmap image)
+        {
+            ImageFileImage = image;
+        }
+
+        internal Bitmap getPropsFileImage()
+        {
+            return PropsFileImage;
+        }
+
+        internal GraphicObject getRoot(GraphicObject g)
+        {
+            while (g._type != "Root")
+                g = g.Parent;                            
+            return g;
+        }
 
         internal void Ungroup(GraphicObject parent)
         {
@@ -569,7 +603,7 @@ namespace GraphicShapes
             updateTextBox();
 
         }
-
+        
         internal void deserialize(XmlNode Node, Point BGOffset)
         {
             for (int i = 0; i < Children.Count; i++)
@@ -761,9 +795,10 @@ namespace GraphicShapes
 
     //-----------------------------------------------
     class Root : GraphicObject
-    {
+    {        
         public Root()
         {
+            _type = "Root";
         }
 
         public override void Draw(Graphics g, int extd) //Root
@@ -784,7 +819,7 @@ namespace GraphicShapes
         public void liftUp(GraphicObject g)
         {
 
-        }
+    }
 
         public void sinkDown(GraphicObject g)
         {
@@ -845,7 +880,7 @@ namespace GraphicShapes
         {
             g.TranslateTransform(Box.X, Box.Y);
 
-            if (this._image != null)
+            if (_image != null)
                 g.DrawImage(_image, Point.Empty);
             if (extd > 0 && this.IsSelected)
             {
@@ -875,17 +910,21 @@ namespace GraphicShapes
             switch (SelectedMarker)
             {
                 case 0: //Top
+                    if (Box.Height <= reshapeThreshold && d.Y > 0) return;
                     Box.Y += d.Y;
                     Box.Height -= d.Y;
                     break;
                 case 1: //Bottom
+                    if (Box.Height <= reshapeThreshold && d.Y < 0) return;
                     Box.Height += d.Y;
                     break;
                 case 2: //Left
+                    if (Box.Width <= reshapeThreshold && d.X > 0) return;
                     Box.Width -= d.X;
                     Box.X += d.X;
                     break;
                 case 3: //Right
+                    if (Box.Width <= reshapeThreshold && d.X < 0) return;
                     Box.Width += d.X;
                     break;
             }
@@ -895,7 +934,7 @@ namespace GraphicShapes
     }
 
     class MyRectangle : GraphicObject
-    {        
+    {
         public MyRectangle(XmlNode shape, GraphicObject parent) //Rectangle
         {
             Parent = parent;
@@ -937,6 +976,56 @@ namespace GraphicShapes
                 }
             }
 
+            if (shape.Attributes["EnableBlurInsideEffect"] != null)
+            {
+                if (shape.Attributes["EnableBlurInsideEffect"].Value == "true")
+                {
+                    //TODO: Implementation
+                    //        //penColor = Color.Aquamarine;
+                    //        //_pen = new Pen(penColor,4);
+                    //        //Rectangle t = new Rectangle(_rect.Left,_rect.Top,_rect.Width-1,_rect.Height-1);
+                    //        if (originalImage != null)
+                    //        {
+                    //            Rectangle t = new Rectangle(0, 0, originalImage.Width, originalImage.Height);
+                    //            t.Intersect(_box);
+                    //            _image = originalImage.Clone(t, System.Drawing.Imaging.PixelFormat.DontCare);
+                    //            //if(image != null) 
+                    //            //	image.Dispose();
+                    //            //image = originalImage.Clone(_rect,0);
+                    //            BitmapFilter.GaussianBlur(_image, 4/* default to 4*/);
+                    //            BitmapFilter.Smooth(_image, 1/* default to 4*/);
+                    //            BitmapFilter.GaussianBlur(_image, 4/* default to 4*/);
+                    //            BitmapFilter.Smooth(_image, 1/* default to 4*/);
+                    //            BitmapFilter.GaussianBlur(_image, 4/* default to 4*/);
+                    //            BitmapFilter.Smooth(_image, 1/* default to 4*/);
+                    //            BitmapFilter.GaussianBlur(_image, 4/* default to 4*/);
+                    //            BitmapFilter.Smooth(_image, 1/* default to 4*/);
+                    //            BitmapFilter.GaussianBlur(_image, 4/* default to 4*/);
+                    //            BitmapFilter.Smooth(_image, 1/* default to 4*/);
+                    //            BitmapFilter.GaussianBlur(_image, 4/* default to 4*/);
+                    //            BitmapFilter.Smooth(_image, 1/* default to 4*/);
+                    //            BitmapFilter.GaussianBlur(_image, 4/* default to 4*/);
+                    //            BitmapFilter.Smooth(_image, 1/* default to 4*/);
+                    //            BitmapFilter.GaussianBlur(_image, 4/* default to 4*/);
+                    //            BitmapFilter.Smooth(_image, 1/* default to 4*/);
+                    //            BitmapFilter.GaussianBlur(_image, 4/* default to 4*/);
+                    //            BitmapFilter.Smooth(_image, 1/* default to 4*/);
+                    //        }
+                    blur = new BlurEffect(shape);
+            //        _fill = false;
+            //        _pen.Width = 0;
+                }
+            }
+
+
+            if (shape.Attributes["EnableZoomEffect"] != null)
+            {
+                if (shape.Attributes["EnableZoomEffect"].Value == "true")
+                {
+                    zoom = new ZoomEffect(shape, this);
+                }
+            }
+
             getTextAttributes(shape);
             _text = shape.InnerText;
             if (_text != "" && _font == null) _font = defaultFont;
@@ -945,10 +1034,26 @@ namespace GraphicShapes
 
         public override void Draw(Graphics g, int extd) //Rectangle
         {
-
             g.TranslateTransform(Box.X, Box.Y);
             if (_fillBrush != null) g.FillRectangle(_fillBrush, 0, 0, Box.Width, Box.Height);
             if(_pen.Width > 0) g.DrawRectangle(_pen, 0, 0, Box.Width, Box.Height);
+
+            //if (_blur)
+            //{
+            //    Pen blur_pen = new Pen(Color.Aquamarine, 4);
+            //    if (_image != null)
+            //        g.DrawImage(_image, _box.Left, _box.Top);
+            //    //else
+            //    g.DrawRectangle(blur_pen, _box);
+            //    //base.bmp = Blur(base.bmp, _rect, 8);
+
+            //    //if(BitmapFilter.GaussianBlur(bmp,4))
+            //    //	this.Invalidate();
+            //}
+
+            if (zoom != null) 
+                zoom.Draw(g, extd);
+
             if (_text != "")
             {
                 setStringAlignment();
@@ -957,8 +1062,8 @@ namespace GraphicShapes
                 {
                     markClipping(g, _text, _font, _textBox, _stringFormat);
                 }
-
             }
+
             if (extd > 0 && this.IsSelected)
             {
                 Brush solidBrush = new SolidBrush(Color.FromArgb(64, 255, 0, 0));
@@ -980,6 +1085,8 @@ namespace GraphicShapes
         {
             Box.X += d.X;
             Box.Y += d.Y;
+            if (zoom != null)
+                zoom.Move(d);
         }
 
         public override void Reshape(Point d) //Rectangle
@@ -987,21 +1094,27 @@ namespace GraphicShapes
             switch (SelectedMarker)
             {
                 case 0: //Top
+                    if (Box.Height <= reshapeThreshold && d.Y > 0) return;
                     Box.Y += d.Y; 
                     Box.Height -= d.Y;
                     break;
                 case 1: //Bottom
+                    if (Box.Height <= reshapeThreshold && d.Y < 0) return;
                     Box.Height += d.Y;
                     break;
                 case 2: //Left
+                    if (Box.Width <= reshapeThreshold && d.X > 0) return;
                     Box.Width -= d.X; 
                     Box.X += d.X;
                      break;                                
                 case 3: //Right
+                    if (Box.Width <= reshapeThreshold && d.X < 0) return;
                     Box.Width += d.X;
                     break;
             }
             MarkerPoints = Rectangle2Array(Box);
+            if (zoom != null)
+                zoom.Reshape(d);
             updateTextBox();
         } 
     }
@@ -1185,17 +1298,21 @@ namespace GraphicShapes
             switch (SelectedMarker)
             {
                 case 0: //Top
+                    if (Box.Height <= reshapeThreshold && d.Y > 0) return;
                     Box.Y += d.Y;
                     Box.Height -= d.Y;
                     break;
                 case 1: //Bottom
+                    if (Box.Height <= reshapeThreshold && d.Y < 0) return;
                     Box.Height += d.Y;
                     break;
                 case 2: //Left
+                    if (Box.Width <= reshapeThreshold && d.X > 0) return;
                     Box.Width -= d.X;
                     Box.X += d.X;
                     break;
                 case 3: //Right
+                    if (Box.Width <= reshapeThreshold && d.X < 0) return;
                     Box.Width += d.X;
                     break;
             }
@@ -1477,7 +1594,7 @@ namespace GraphicShapes
         }
     }
 
-    class ArrowHeadAtHead : GraphicObject
+    internal class ArrowHeadAtHead : GraphicObject
     {
         public PointF _tip;
         PointF[] Points = new PointF[4];
@@ -1523,7 +1640,7 @@ namespace GraphicShapes
         public override void Reshape(Point d) { }
     }
 
-    class ArrowTailAtHead : GraphicObject
+    internal class ArrowTailAtHead : GraphicObject
     {
         public PointF _tip;
         PointF[] Points = new PointF[4];
@@ -1655,5 +1772,166 @@ namespace GraphicShapes
         public override void Move(Point d) { }
 
         public override void Reshape(Point d) { }
+    }
+
+    internal class ZoomEffect: GraphicObject
+    {
+        private float _zoomFactor;
+        private Pen _zoomLinePen;
+        private float _zoomMoveXfactor;
+        private float _zoomMoveYfactor;
+        private Bitmap _image;
+        private Rectangle _zoomBox;
+
+        public ZoomEffect(XmlNode shape, GraphicObject parent) 
+        {
+            _type = "ZoomEffect";
+            Parent = parent;
+            if (shape.Attributes["ZoomEffectFactor"] != null)
+                _zoomFactor = Convert.ToSingle(shape.Attributes["ZoomEffectFactor"].Value, CultureInfo.InvariantCulture.NumberFormat);
+            Color zoomPenColor = Color.Gray;
+            int zoomPenWidth = 2;
+            if (shape.Attributes["ZoomEffectLineColor"] != null)
+                zoomPenColor = ColorTranslator.FromHtml(shape.Attributes["ZoomEffectLineColor"].Value);
+            if (shape.Attributes["ZoomEffectLineWidth"] != null)
+                zoomPenWidth = Convert.ToInt32(shape.Attributes["ZoomEffectLineWidth"].Value);
+            _zoomLinePen = new Pen(zoomPenColor, zoomPenWidth);
+            if (shape.Attributes["ZoomEffectMoveXFactor"] != null)
+                _zoomMoveXfactor = Convert.ToSingle(shape.Attributes["ZoomEffectMoveXFactor"].Value, CultureInfo.InvariantCulture.NumberFormat);
+            if (shape.Attributes["ZoomEffectMoveYFactor"] != null)
+                _zoomMoveYfactor = Convert.ToSingle(shape.Attributes["ZoomEffectMoveYFactor"].Value, CultureInfo.InvariantCulture.NumberFormat);
+            //if (_image != null) 
+            //    _image = BackgroundImage.Clone(Box, 0);
+            Box = Parent.Box;
+            //Box.X = 0; Box.Y = 0;
+            _zoomBox = Box;
+            _zoomBox.X = 0; _zoomBox.Y = 0;
+            int dx = (int)(Box.Width * _zoomMoveXfactor);
+            int dy = (int)(Box.Height * _zoomMoveYfactor);
+            _zoomBox.X += dx;
+            _zoomBox.Y += dy;
+            _zoomBox.Width = (int)(Box.Width * _zoomFactor);
+            _zoomBox.Height = (int)(Box.Height * _zoomFactor);
+
+            //if (_image != null) 
+            //    _image = new Bitmap(_image, _zoomBox.Width, _zoomBox.Height);
+                        //penColor = Color.LightSalmon;
+            _pen = new Pen(DarkMarkerPen.Color, 4);
+            //g.DrawRectangle(_pen, _rect);
+        }
+
+        public override void Draw(Graphics g, int extd)
+        {
+            g.DrawLine(_zoomLinePen, _zoomBox.Left, _zoomBox.Top, 0, 0);
+            g.DrawLine(_zoomLinePen, _zoomBox.Right, _zoomBox.Top, Box.Width, 0);
+            g.DrawLine(_zoomLinePen, _zoomBox.Left, _zoomBox.Bottom, 0, Box.Height);
+            g.DrawLine(_zoomLinePen, _zoomBox.Right, _zoomBox.Bottom, Box.Width, Box.Height);
+
+            GraphicObject r = getRoot(this);
+            _image = r.getPropsFileImage();
+
+            
+            try 
+            {
+                //Prüfen, ob Überlappung
+                RectangleF rectangleF = Box;
+                GraphicsUnit units = GraphicsUnit.Pixel;
+                RectangleF bmpRectangleF = _image.GetBounds(ref units);
+                if (bmpRectangleF.Contains(rectangleF))
+                {
+                    _image = _image.Clone(rectangleF, _image.PixelFormat);
+                }
+                else
+                {
+                    Rectangle rectangle = Rectangle.Empty;
+                    rectangle.X = Convert.ToInt32(bmpRectangleF.X);
+                    rectangle.Y = Convert.ToInt32(bmpRectangleF.Y);
+                    rectangle.Width = Convert.ToInt32(bmpRectangleF.Width);
+                    rectangle.Height = Convert.ToInt32(bmpRectangleF.Height);
+                    if (Box.IntersectsWith(rectangle))
+                    {
+                        Rectangle rectangle3 = Rectangle.Intersect(Box, rectangle);
+                        if (!rectangle3.IsEmpty)
+                        {
+                            _image = _image.Clone(rectangle3, _image.PixelFormat);
+                        }
+                        else
+                            _image = null;
+                    }
+                }
+                //_image = _image.Clone(Box, PixelFormat.DontCare);
+                if (_image != null)
+                {
+                    _image = new Bitmap(_image, new Size(Convert.ToInt32(_image.Width * _zoomFactor), Convert.ToInt32(_image.Height * _zoomFactor)));
+                    g.DrawImage(_image, _zoomBox.Left, _zoomBox.Top);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message,ex.GetType().ToString());
+            }
+                             
+            g.DrawRectangle(_zoomLinePen, _zoomBox);
+        }
+
+        public static Image CaptureScreen1()
+        {
+            Image myImage = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+            Graphics g = Graphics.FromImage(myImage);
+            g.CopyFromScreen(new Point(700, 400), new Point(0, 0), new Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height));
+            IntPtr pDC = g.GetHdc();
+            g.ReleaseHdc(pDC);
+
+            return myImage;
+        }
+
+        public override void Move(Point d)
+        {
+            Box.X += d.X;
+            Box.Y += d.Y;
+            _zoomBox.X += d.X;
+            _zoomBox.Y += d.Y;
+        }
+
+        public override void Reshape(Point d)
+        {
+            Box = Parent.Box;
+            //Box.X = 0; Box.Y = 0;
+            _zoomBox = Box;
+            _zoomBox.X = 0; _zoomBox.Y = 0;
+            int dx = (int)(Box.Width * _zoomMoveXfactor);
+            int dy = (int)(Box.Height * _zoomMoveYfactor);
+            _zoomBox.X += dx;
+            _zoomBox.Y += dy;
+            _zoomBox.Width = (int)(Box.Width * _zoomFactor);
+            _zoomBox.Height = (int)(Box.Height * _zoomFactor);
+        }
+    }
+
+    internal class BlurEffect : GraphicObject
+    {
+        int blurFactor = 6;
+
+        public BlurEffect(XmlNode shape)
+        {
+            _type = "BlurEffect";
+            //EnableBlurInsideEffect = "true"
+            //ImageBlurFactor = "12"
+        }
+
+        public override void Draw(Graphics g, int extd)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Move(Point d)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Reshape(Point d)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

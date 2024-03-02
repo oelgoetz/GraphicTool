@@ -5,6 +5,11 @@ VisualStudioVersion = 17.8.34511.84
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphicTool", "GraphicTest\GraphicTool.csproj", "{A7EBD184-BA8D-4FC9-B56D-083E173DCFF5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projektmappenelemente", "Projektmappenelemente", "{AA518142-D6E3-462E-BC27-F60BCB5B98BF}"
+	ProjectSection(SolutionItems) = preProject
+		..\BlurExample\BlurExample\ImageTools.cs = ..\BlurExample\BlurExample\ImageTools.cs
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
