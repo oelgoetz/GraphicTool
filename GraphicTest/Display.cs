@@ -509,19 +509,21 @@ namespace GraphicTool
 
         private void replaceBackgroundFromClipboard()
         {
-            //MessageBox.Show("Ctrl & V = Loop.");  
-            //return;
             if (Clipboard.ContainsImage())
             {
                 Bitmap _ImgBufferBmp = (Bitmap) Clipboard.GetImage();
                 if ((drawMode & 2) == 2)
+                {
                     ImageFileBmp = (Bitmap)_ImgBufferBmp.Clone();
+                    BackGroundBmp = ImageFileBmp;
+                    root.setPropsFileImage(ImageFileBmp);
+                }                    
                 if ((drawMode & 4) == 4)
+                {
                     PropsFileBmp = (Bitmap)_ImgBufferBmp.Clone();
-                BackGroundBmp = _ImgBufferBmp;
-                //Background.Size = .Size;
-                //this.Size = Background.Size;
-                //drawOriginalImage = true;
+                    BackGroundBmp = PropsFileBmp;
+                    root.setPropsFileImage(PropsFileBmp);
+                }                   
                 backGroundSelected = true;
                 this.Invalidate();
             }
