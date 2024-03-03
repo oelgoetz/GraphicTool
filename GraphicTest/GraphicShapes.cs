@@ -109,6 +109,21 @@ namespace GraphicShapes
             return g;
         }
 
+        internal Point getGroupDisplacement(GraphicObject g)
+        {
+            Point d = new Point();
+            while (g._type != "Root")
+            {
+                if(g._type == "Group")
+                {
+                    d.X += g.Box.X;
+                    d.Y += g.Box.Y;
+                }
+                g = g.Parent;
+            }
+            return d;
+        }
+
         internal void Ungroup(GraphicObject parent)
         {
             foreach (GraphicObject obj in Children)
@@ -1002,6 +1017,12 @@ namespace GraphicShapes
 
             if (shape.Attributes["EnableZoomEffect"] != null)
             {
+                _penColor = Color.Black;
+                if (shape.Attributes["LineColor"] != null) _penColor = ColorTranslator.FromHtml(shape.Attributes["LineColor"].Value);
+                _penWidth = 2;
+                if (shape.Attributes["LineWidth"] != null) _penWidth = Convert.ToInt32(shape.Attributes["LineWidth"].Value);
+                _pen = new Pen(_penColor, _penWidth);
+
                 if (shape.Attributes["EnableZoomEffect"].Value == "true")
                 {
                     zoom = new ZoomEffect(shape, this);
@@ -1782,7 +1803,7 @@ namespace GraphicShapes
             _zoomMoveXfactor = 0.2f;
             if (shape.Attributes["ZoomEffectMoveXFactor"] != null)
                 _zoomMoveXfactor = Convert.ToSingle(shape.Attributes["ZoomEffectMoveXFactor"].Value, CultureInfo.InvariantCulture.NumberFormat);
-            _zoomMoveXfactor = 1.6f;
+            _zoomMoveYfactor = 1.6f;
             if (shape.Attributes["ZoomEffectMoveYFactor"] != null)
                 _zoomMoveYfactor = Convert.ToSingle(shape.Attributes["ZoomEffectMoveYFactor"].Value, CultureInfo.InvariantCulture.NumberFormat);
             //if (_image != null) 
@@ -1814,6 +1835,8 @@ namespace GraphicShapes
 
             GraphicObject r = getRoot(this);
             _image = r.getPropsFileImage();
+
+            Point GroupDisplacement = getGroupDisplacement(this);
             
             try 
             {
@@ -1822,9 +1845,17 @@ namespace GraphicShapes
                 int dx0 = 0; int dx1 = 0;
                 int dy0 = 0; int dy1 = 0;
                 Rectangle rectangleF = Box;
-                GraphicsUnit units = GraphicsUnit.Pixel; RectangleF bmpRectangleF = _image.GetBounds(ref units);
-                Rectangle bmpRectangle = new Rectangle(Convert.ToInt32(bmpRectangleF.X), Convert.ToInt32(bmpRectangleF.Y), Convert.ToInt32(bmpRectangleF.Width), Convert.ToInt32(bmpRectangleF.Height));
-                if (bmpRectangleF.Contains(rectangleF)) _image = _image.Clone(rectangleF, _image.PixelFormat);
+                GraphicsUnit units = GraphicsUnit.Pixel;
+                RectangleF bmpRectangleF = _image.GetBounds(ref units);
+                rectangleF.X += GroupDisplacement.X;
+                rectangleF.Y += GroupDisplacement.Y;
+                Rectangle bmpRectangle = new Rectangle(Convert.ToInt32(bmpRectangleF.X) , Convert.ToInt32(bmpRectangleF.Y),  Convert.ToInt32(bmpRectangleF.Width), Convert.ToInt32(bmpRectangleF.Height));
+                if (bmpRectangleF.Contains(rectangleF))
+                {
+                    //rectangleF.X += GroupDisplacement.X;
+                    //rectangleF.Y += GroupDisplacement.Y;
+                    _image = _image.Clone(rectangleF, _image.PixelFormat);
+                }                    
                 else
                 {
                     if (Box.IntersectsWith(bmpRectangle))

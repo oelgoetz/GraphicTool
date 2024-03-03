@@ -50,12 +50,15 @@
             actionsToolStripMenuItem = new ToolStripMenuItem();
             getAllpropsAttributesToolStripMenuItem = new ToolStripMenuItem();
             getAttributes049ValuesToolStripMenuItem = new ToolStripMenuItem();
+            contextMenuStrip2 = new ContextMenuStrip(components);
+            saveListToClipboardToolStripMenuItem = new ToolStripMenuItem();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             contextMenuStrip1.SuspendLayout();
             tabPage2.SuspendLayout();
             statusStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
+            contextMenuStrip2.SuspendLayout();
             SuspendLayout();
             // 
             // tabControl1
@@ -210,6 +213,7 @@
             // lBHitFiles
             // 
             lBHitFiles.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            lBHitFiles.ContextMenuStrip = contextMenuStrip2;
             lBHitFiles.FormattingEnabled = true;
             lBHitFiles.ItemHeight = 15;
             lBHitFiles.Location = new Point(6, 209);
@@ -266,6 +270,19 @@
             getAttributes049ValuesToolStripMenuItem.Text = "Get Attributes 0-49 values";
             getAttributes049ValuesToolStripMenuItem.Click += getAttributes049ValuesToolStripMenuItem_Click;
             // 
+            // contextMenuStrip2
+            // 
+            contextMenuStrip2.Items.AddRange(new ToolStripItem[] { saveListToClipboardToolStripMenuItem });
+            contextMenuStrip2.Name = "contextMenuStrip2";
+            contextMenuStrip2.Size = new Size(184, 48);
+            // 
+            // saveListToClipboardToolStripMenuItem
+            // 
+            saveListToClipboardToolStripMenuItem.Name = "saveListToClipboardToolStripMenuItem";
+            saveListToClipboardToolStripMenuItem.Size = new Size(183, 22);
+            saveListToClipboardToolStripMenuItem.Text = "Save list to clipboard";
+            saveListToClipboardToolStripMenuItem.Click += saveListToClipboardToolStripMenuItem_Click;
+            // 
             // DevTool01
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -289,6 +306,7 @@
             statusStrip1.PerformLayout();
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
+            contextMenuStrip2.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -317,5 +335,7 @@
         private ToolStripMenuItem getAllpropsAttributesToolStripMenuItem;
         private ToolStripMenuItem getAttributes049ValuesToolStripMenuItem;
         private CheckBox cBValues;
+        private ContextMenuStrip contextMenuStrip2;
+        private ToolStripMenuItem saveListToClipboardToolStripMenuItem;
     }
 }

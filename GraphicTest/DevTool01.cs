@@ -328,7 +328,7 @@ namespace GraphicTool
 
         public void AddXPathToComboBox(string xPath)
         {
-            if(!comboBox1.Items.Contains(xPath))
+            if (!comboBox1.Items.Contains(xPath))
                 comboBox1.Items.Add(xPath);
         }
 
@@ -538,5 +538,17 @@ namespace GraphicTool
             Clipboard.SetText(x);
         }
 
+        private void saveListToClipboardToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string s = "";
+            foreach(string line in lBHitFiles.Items) 
+            {
+                if (line.Contains(" "))
+                    s += line.Substring(line.IndexOf(' ')) + "\n";
+                else
+                    s += line + "\n";
+            }
+            Clipboard.SetText(s);
+        }
     }
 }
