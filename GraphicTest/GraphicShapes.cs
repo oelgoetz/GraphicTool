@@ -1769,17 +1769,20 @@ namespace GraphicShapes
         {
             _type = "ZoomEffect";
             Parent = parent;
+            _zoomFactor = 2.0f;
             if (shape.Attributes["ZoomEffectFactor"] != null)
                 _zoomFactor = Convert.ToSingle(shape.Attributes["ZoomEffectFactor"].Value, CultureInfo.InvariantCulture.NumberFormat);
             Color zoomPenColor = Color.Gray;
-            int zoomPenWidth = 2;
+            int zoomPenWidth = 1;
             if (shape.Attributes["ZoomEffectLineColor"] != null)
                 zoomPenColor = ColorTranslator.FromHtml(shape.Attributes["ZoomEffectLineColor"].Value);
             if (shape.Attributes["ZoomEffectLineWidth"] != null)
                 zoomPenWidth = Convert.ToInt32(shape.Attributes["ZoomEffectLineWidth"].Value);
             _zoomLinePen = new Pen(zoomPenColor, zoomPenWidth);
+            _zoomMoveXfactor = 0.2f;
             if (shape.Attributes["ZoomEffectMoveXFactor"] != null)
                 _zoomMoveXfactor = Convert.ToSingle(shape.Attributes["ZoomEffectMoveXFactor"].Value, CultureInfo.InvariantCulture.NumberFormat);
+            _zoomMoveXfactor = 1.6f;
             if (shape.Attributes["ZoomEffectMoveYFactor"] != null)
                 _zoomMoveYfactor = Convert.ToSingle(shape.Attributes["ZoomEffectMoveYFactor"].Value, CultureInfo.InvariantCulture.NumberFormat);
             //if (_image != null) 
