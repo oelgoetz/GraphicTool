@@ -1711,8 +1711,8 @@ namespace GraphicShapes
     {
         internal float _zoomFactor;
         private Pen _zoomLinePen;
-        internal float _zoomMoveXfactor;
-        internal float _zoomMoveYfactor;
+        public float _zoomMoveXfactor;
+        public float _zoomMoveYfactor;
         private Bitmap _BackGroundImage;
         private Rectangle _zoomBox;
         internal Point Offset = new Point();
