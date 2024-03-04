@@ -25,7 +25,8 @@ namespace GraphicShapes
 
         internal static Bitmap BackGroundImage = null;
         internal static Bitmap PropsFileImage = null;
-        internal static Bitmap ImageFileImage = null;
+        internal static Bitmap ImageFileImage = null;                       
+        internal static Point BackgroundOffset;
 
         public GraphicObject Parent;
         public List<GraphicObject> Children = new List<GraphicObject>();
@@ -73,7 +74,6 @@ namespace GraphicShapes
         public Color ArrowTailColor = Color.Black;
 
         public Point[] MarkerPoints;
-
         public bool IsSelected = false;
 
         public abstract void Draw(Graphics g, int extd);
@@ -443,6 +443,31 @@ namespace GraphicShapes
             }
         }
 
+        internal void reshapePlanarBoxes(Point d)
+        {
+            switch (SelectedMarker)
+            {
+                case 0: //Top
+                    if (Box.Height <= reshapeThreshold && d.Y > 0) return;
+                    Box.Y += d.Y;
+                    Box.Height -= d.Y;
+                    break;
+                case 1: //Bottom
+                    if (Box.Height <= reshapeThreshold && d.Y < 0) return;
+                    Box.Height += d.Y;
+                    break;
+                case 2: //Left
+                    if (Box.Width <= reshapeThreshold && d.X > 0) return;
+                    Box.Width -= d.X;
+                    Box.X += d.X;
+                    break;
+                case 3: //Right
+                    if (Box.Width <= reshapeThreshold && d.X < 0) return;
+                    Box.Width += d.X;
+                    break;
+            }
+        }
+
         internal void updatePolyBox()
         {
             int minX = MarkerPoints[0].X; int maxX = MarkerPoints[0].X;
@@ -552,7 +577,6 @@ namespace GraphicShapes
                 if (arrowTailAtTail != null) arrowTailAtTail.SetBrushColor(color);
                 if (arrowTailAtHead != null) arrowTailAtHead.SetBrushColor(color);
                 //_g.ArrowHeadColor
-
             }
         }
 
@@ -905,27 +929,7 @@ namespace GraphicShapes
 
         public override void Reshape(Point d) //MyImage
         {
-            switch (SelectedMarker)
-            {
-                case 0: //Top
-                    if (Box.Height <= reshapeThreshold && d.Y > 0) return;
-                    Box.Y += d.Y;
-                    Box.Height -= d.Y;
-                    break;
-                case 1: //Bottom
-                    if (Box.Height <= reshapeThreshold && d.Y < 0) return;
-                    Box.Height += d.Y;
-                    break;
-                case 2: //Left
-                    if (Box.Width <= reshapeThreshold && d.X > 0) return;
-                    Box.Width -= d.X;
-                    Box.X += d.X;
-                    break;
-                case 3: //Right
-                    if (Box.Width <= reshapeThreshold && d.X < 0) return;
-                    Box.Width += d.X;
-                    break;
-            }
+            reshapePlanarBoxes(d);
             MarkerPoints = Rectangle2Array(Box);
             updateTextBox();
         }
@@ -1093,27 +1097,7 @@ namespace GraphicShapes
 
         public override void Reshape(Point d) //Rectangle
         {
-            switch (SelectedMarker)
-            {
-                case 0: //Top
-                    if (Box.Height <= reshapeThreshold && d.Y > 0) return;
-                    Box.Y += d.Y; 
-                    Box.Height -= d.Y;
-                    break;
-                case 1: //Bottom
-                    if (Box.Height <= reshapeThreshold && d.Y < 0) return;
-                    Box.Height += d.Y;
-                    break;
-                case 2: //Left
-                    if (Box.Width <= reshapeThreshold && d.X > 0) return;
-                    Box.Width -= d.X; 
-                    Box.X += d.X;
-                     break;                                
-                case 3: //Right
-                    if (Box.Width <= reshapeThreshold && d.X < 0) return;
-                    Box.Width += d.X;
-                    break;
-            }
+            reshapePlanarBoxes(d);
             MarkerPoints = Rectangle2Array(Box);
             if (zoom != null)
                 zoom.Reshape(d);
@@ -1297,27 +1281,7 @@ namespace GraphicShapes
 
         public override void Reshape(Point d) //Ellipse
         {
-            switch (SelectedMarker)
-            {
-                case 0: //Top
-                    if (Box.Height <= reshapeThreshold && d.Y > 0) return;
-                    Box.Y += d.Y;
-                    Box.Height -= d.Y;
-                    break;
-                case 1: //Bottom
-                    if (Box.Height <= reshapeThreshold && d.Y < 0) return;
-                    Box.Height += d.Y;
-                    break;
-                case 2: //Left
-                    if (Box.Width <= reshapeThreshold && d.X > 0) return;
-                    Box.Width -= d.X;
-                    Box.X += d.X;
-                    break;
-                case 3: //Right
-                    if (Box.Width <= reshapeThreshold && d.X < 0) return;
-                    Box.Width += d.X;
-                    break;
-            }
+            reshapePlanarBoxes(d);
             MarkerPoints = Rectangle2Array(Box);
             updateTextBox();
         }
