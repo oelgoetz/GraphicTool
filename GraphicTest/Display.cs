@@ -431,6 +431,15 @@ namespace GraphicTool
                         msg += "\nBGO: " + BackgroundOffset.X.ToString() + " " + BackgroundOffset.Y.ToString();
 
                         msg += "\nmouse over: " + mouseOverObject.ToString();
+
+                        foreach(GraphicObject g in root.Children)
+                        {
+                            if(g.blur != null)
+                            {
+                                msg += "\nzoom:" + g.blur.Box.X.ToString() + " " + g.blur.Box.Y.ToString() + " " + g.blur.Box.Width.ToString() + " " + g.blur.Box.Height.ToString();
+                            }
+                        }
+                        
                         //msg += "\nx:" + origin.X.ToString() + " y:" + origin.Y.ToString();
                         //msg += "\nSEL: x:" + Selection.X.ToString() + " y:" + Selection.Y.ToString() + " w:" + Selection.Width.ToString() + " h:" + Selection.Height.ToString();
                         //msg += "\nBG : x:" + BackgroundBox.X.ToString() + " y:" + BackgroundBox.Y.ToString() + " w:" + BackgroundBox.Width.ToString() + " h:" + BackgroundBox.Height.ToString();

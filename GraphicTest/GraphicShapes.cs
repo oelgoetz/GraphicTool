@@ -1916,25 +1916,8 @@ namespace GraphicShapes
                         _BackGroundImage = null;
                 }
 
-                //if (Box.X > 0)
-                //    delta.X = Box.Left;
-                //else
-                //{
-                //    if (Box.X + Box.Width < _BackGroundImageRectangle.Width)
-                //        delta.X = Box.X + Box.Width - Convert.ToInt32(_BackGroundImage.Width);
-                //    else
-                //        delta.X = Box.X - Convert.ToInt32(Box.X);
-                //}
-
-                //if (Box.Y > 0)
-                //    delta.Y = Box.Top;
-                //else
-                //{
-                //    if (Box.Y + Box.Height < _BackGroundImageRectangle.Height)
-                //        delta.Y = Box.Y + Box.Height - Convert.ToInt32(_BackGroundImage.Height);
-                //    else
-                //        delta.Y = Box.Y - Convert.ToInt32(Box.Y);
-                //}
+                if (Box.X < 0) delta.X = - Box.X;
+                if (Box.Y < 0) delta.Y = -Box.Y;
 
                 if (_BackGroundImage != null && _BackGroundImage.Width > 10 && _BackGroundImage.Height > 10)
                 {
