@@ -758,6 +758,12 @@ namespace GraphicShapes
                     Attribute(Shape, "ZoomEffectMoveXFactor", g.zoom._zoomMoveXfactor.ToString().Replace(',', '.'));
                 }
 
+                if (g.blur != null)
+                {
+                    Attribute(Shape, "EnableBlurInsideEffect", "true");
+                    Attribute(Shape, "ImageBlurFactor", g.blur.blurFactor.ToString());
+                }
+                
                 //Recursive call for Groups
                 if (g._type == "Group")
                     g.deserialize(Shape, BGOffset);
@@ -984,40 +990,7 @@ namespace GraphicShapes
             {
                 if (shape.Attributes["EnableBlurInsideEffect"].Value == "true")
                 {
-                    //TODO: Implementation
-                    //        //penColor = Color.Aquamarine;
-                    //        //_pen = new Pen(penColor,4);
-                    //        //Rectangle t = new Rectangle(_rect.Left,_rect.Top,_rect.Width-1,_rect.Height-1);
-                    //        if (originalImage != null)
-                    //        {
-                    //            Rectangle t = new Rectangle(0, 0, originalImage.Width, originalImage.Height);
-                    //            t.Intersect(_box);
-                    //            _image = originalImage.Clone(t, System.Drawing.Imaging.PixelFormat.DontCare);
-                    //            //if(image != null) 
-                    //            //	image.Dispose();
-                    //            //image = originalImage.Clone(_rect,0);
-                    //            BitmapFilter.GaussianBlur(_image, 4/* default to 4*/);
-                    //            BitmapFilter.Smooth(_image, 1/* default to 4*/);
-                    //            BitmapFilter.GaussianBlur(_image, 4/* default to 4*/);
-                    //            BitmapFilter.Smooth(_image, 1/* default to 4*/);
-                    //            BitmapFilter.GaussianBlur(_image, 4/* default to 4*/);
-                    //            BitmapFilter.Smooth(_image, 1/* default to 4*/);
-                    //            BitmapFilter.GaussianBlur(_image, 4/* default to 4*/);
-                    //            BitmapFilter.Smooth(_image, 1/* default to 4*/);
-                    //            BitmapFilter.GaussianBlur(_image, 4/* default to 4*/);
-                    //            BitmapFilter.Smooth(_image, 1/* default to 4*/);
-                    //            BitmapFilter.GaussianBlur(_image, 4/* default to 4*/);
-                    //            BitmapFilter.Smooth(_image, 1/* default to 4*/);
-                    //            BitmapFilter.GaussianBlur(_image, 4/* default to 4*/);
-                    //            BitmapFilter.Smooth(_image, 1/* default to 4*/);
-                    //            BitmapFilter.GaussianBlur(_image, 4/* default to 4*/);
-                    //            BitmapFilter.Smooth(_image, 1/* default to 4*/);
-                    //            BitmapFilter.GaussianBlur(_image, 4/* default to 4*/);
-                    //            BitmapFilter.Smooth(_image, 1/* default to 4*/);
-                    //        }
                     blur = new BlurEffect(shape, this);
-            //        _fill = false;
-            //        _pen.Width = 0;
                 }
             }
 
@@ -1865,7 +1838,7 @@ namespace GraphicShapes
 
     internal class BlurEffect : GraphicObject
     {
-        int blurFactor = 6;
+        public int blurFactor = 12;
         internal Point Offset = new Point();
         GraphicObject Parent;
 
