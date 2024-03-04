@@ -71,12 +71,15 @@
             label5 = new Label();
             label3 = new Label();
             label4 = new Label();
+            EffectsTab = new TabPage();
             imageList1 = new ImageList(components);
             menuStrip1 = new MenuStrip();
             topmost = new ToolStripMenuItem();
             Lift = new ToolStripMenuItem();
             Sink = new ToolStripMenuItem();
             Bottom = new ToolStripMenuItem();
+            cBBlur = new CheckBox();
+            cBZoom = new CheckBox();
             groupBox2.SuspendLayout();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)UpDownLineWidth).BeginInit();
@@ -91,6 +94,7 @@
             TabControl1.SuspendLayout();
             TextTab.SuspendLayout();
             ArrowsTab.SuspendLayout();
+            EffectsTab.SuspendLayout();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -491,6 +495,7 @@
             TabControl1.Anchor = AnchorStyles.Bottom;
             TabControl1.Controls.Add(TextTab);
             TabControl1.Controls.Add(ArrowsTab);
+            TabControl1.Controls.Add(EffectsTab);
             TabControl1.Location = new Point(7, 26);
             TabControl1.Name = "TabControl1";
             TabControl1.SelectedIndex = 0;
@@ -568,6 +573,17 @@
             label4.TabIndex = 18;
             label4.Text = "Length";
             // 
+            // EffectsTab
+            // 
+            EffectsTab.Controls.Add(cBZoom);
+            EffectsTab.Controls.Add(cBBlur);
+            EffectsTab.Location = new Point(4, 24);
+            EffectsTab.Name = "EffectsTab";
+            EffectsTab.Size = new Size(489, 150);
+            EffectsTab.TabIndex = 2;
+            EffectsTab.Text = "Effects";
+            EffectsTab.UseVisualStyleBackColor = true;
+            // 
             // imageList1
             // 
             imageList1.ColorDepth = ColorDepth.Depth32Bit;
@@ -623,6 +639,26 @@
             Bottom.Size = new Size(28, 20);
             Bottom.Click += bottom_Click;
             // 
+            // cBBlur
+            // 
+            cBBlur.AutoSize = true;
+            cBBlur.Location = new Point(9, 13);
+            cBBlur.Name = "cBBlur";
+            cBBlur.Size = new Size(47, 19);
+            cBBlur.TabIndex = 0;
+            cBBlur.Text = "Blur";
+            cBBlur.UseVisualStyleBackColor = true;
+            // 
+            // cBZoom
+            // 
+            cBZoom.AutoSize = true;
+            cBZoom.Location = new Point(9, 31);
+            cBZoom.Name = "cBZoom";
+            cBZoom.Size = new Size(58, 19);
+            cBZoom.TabIndex = 1;
+            cBZoom.Text = "Zoom";
+            cBZoom.UseVisualStyleBackColor = true;
+            // 
             // GraphicShapeDialog
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -656,6 +692,8 @@
             TextTab.ResumeLayout(false);
             ArrowsTab.ResumeLayout(false);
             ArrowsTab.PerformLayout();
+            EffectsTab.ResumeLayout(false);
+            EffectsTab.PerformLayout();
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             ResumeLayout(false);
@@ -713,5 +751,8 @@
         private ToolStripMenuItem Lift;
         private ToolStripMenuItem Sink;
         private ToolStripMenuItem Bottom;
+        private TabPage EffectsTab;
+        private CheckBox cBZoom;
+        private CheckBox cBBlur;
     }
 }

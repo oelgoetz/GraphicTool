@@ -58,7 +58,15 @@ namespace GraphicTool
             if (_g._type == "Rectangle" || _g._type == "Oval" || _g._type == "Polygon")
             {
                 rBBackground.Checked = true;
-                colorPalette1.showCbTransparent(_g._fillBrush == null, true, true);
+                if(_g.zoom != null || _g.blur != null)
+                {
+                    rbLine.Checked = true;
+                    colorPalette1.showCbTransparent(_g._fillBrush == null, false, false);
+                    if (_g.zoom != null) cBZoom.Checked = true; else cBZoom.Checked = false;
+                    if (_g.blur != null) cBBlur.Checked = true; else cBBlur.Checked = false;
+                } 
+                else
+                    colorPalette1.showCbTransparent(_g._fillBrush == null, true, true);
                 if (_g._fillBrush != null)
                     colorPalette1.setCurrentColor(((SolidBrush)g._fillBrush).Color);
                 else
