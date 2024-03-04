@@ -129,6 +129,7 @@ namespace GraphicShapes
             foreach (GraphicObject g in Children)
             {
                 parent.Children.Add(g);
+                g.Parent = parent;
                 g.Move(new Point(this.Box.X, this.Box.Y));
             }
             this.Children.Clear();
@@ -1087,10 +1088,7 @@ namespace GraphicShapes
         public override void Move(Point d)  //Rectangle
         {
             Box.X += d.X;
-            Box.Y += d.Y;
-            if (zoom != null) 
-                //zoom.Reshape(d);
-                zoom.Move(d); //TODO: Reshape ignoriert d!!
+            Box.Y += d.Y;            
         }
 
         public override void Reshape(Point d) //Rectangle
@@ -1166,6 +1164,7 @@ namespace GraphicShapes
             foreach (GraphicObject g in objects)
             {
                 this.Children.Add(g);
+                g.Parent = this;
                 Parent.Children.Remove(g);
                 g.Move(new Point(-this.Box.X, -this.Box.Y));
             }
@@ -1785,6 +1784,7 @@ namespace GraphicShapes
         internal float _zoomMoveYfactor;
         private Bitmap _BackGroundImage;
         private Rectangle _zoomBox;
+        internal Point ParentDisplacement = new Point();
 
         public ZoomEffect(XmlNode shape, GraphicObject parent) 
         {
@@ -1830,30 +1830,29 @@ namespace GraphicShapes
             g.DrawLine(_zoomLinePen, 0, Box.Height, _zoomBox.Left, _zoomBox.Bottom);
             g.DrawLine(_zoomLinePen, Box.Width, Box.Height, _zoomBox.Right, _zoomBox.Bottom);
 
-            GraphicObject r = getRoot(this);
+            GraphicObject r = getRoot(this.Parent);
             _BackGroundImage = r.getPropsFileImage();
-            Point GroupDisplacement = getGroupDisplacement(this);
-            
+            ParentDisplacement = getGroupDisplacement(this.Parent);
+
             try 
             {
                 Point delta = new Point();
 
                 //Prüfen, ob Überlappung
-                Rectangle viewBox = Box;
-                viewBox.X += GroupDisplacement.X;
-                viewBox.Y += GroupDisplacement.Y;
+                Box.X += ParentDisplacement.X;
+                Box.Y += ParentDisplacement.Y;
 
                 GraphicsUnit units = GraphicsUnit.Pixel;
                 Rectangle _BackGroundImageRectangle = Rectangle.Round(_BackGroundImage.GetBounds(ref units));
-                if (_BackGroundImageRectangle.Contains(viewBox))
+                if (_BackGroundImageRectangle.Contains(Box))
                 {
-                    _BackGroundImage = _BackGroundImage.Clone(viewBox, _BackGroundImage.PixelFormat);
-                }                    
+                    _BackGroundImage = _BackGroundImage.Clone(Box, _BackGroundImage.PixelFormat);
+                }
                 else
                 {
-                    if (viewBox.IntersectsWith(_BackGroundImageRectangle))
+                    if (Box.IntersectsWith(_BackGroundImageRectangle))
                     {
-                        Rectangle intersectBox = Rectangle.Intersect(viewBox, _BackGroundImageRectangle);
+                        Rectangle intersectBox = Rectangle.Intersect(Box, _BackGroundImageRectangle);
                         if (!intersectBox.IsEmpty)
                         {
                             _BackGroundImage = _BackGroundImage.Clone(intersectBox, _BackGroundImage.PixelFormat);
@@ -1863,17 +1862,17 @@ namespace GraphicShapes
                         _BackGroundImage = new Bitmap(1, 1);
                 }
 
-                if (Box.X > 0) 
+                if (Box.X > 0)
                     delta.X = _zoomBox.Left;
                 else
                 {
-                    if(Box.X + Box.Width < _BackGroundImageRectangle.Width) 
+                    if (Box.X + Box.Width < _BackGroundImageRectangle.Width)
                         delta.X = _zoomBox.X + _zoomBox.Width - Convert.ToInt32(_BackGroundImage.Width * _zoomFactor);
                     else
                         delta.X = _zoomBox.X - Convert.ToInt32(Box.X * _zoomFactor);
                 }
 
-                if (Box.Y > 0) 
+                if (Box.Y > 0)
                     delta.Y = _zoomBox.Top;
                 else
                 {
@@ -1882,27 +1881,26 @@ namespace GraphicShapes
                     else
                         delta.Y = _zoomBox.Y - Convert.ToInt32(Box.Y * _zoomFactor);
                 }
-                 
-                g.DrawImage(new Bitmap(_BackGroundImage, 
-                    new Size(Convert.ToInt32(_BackGroundImage.Width * _zoomFactor), 
-                    Convert.ToInt32(_BackGroundImage.Height * _zoomFactor))), 
-                    delta.X, 
+
+                g.DrawImage(new Bitmap(_BackGroundImage,
+                    new Size(Convert.ToInt32(_BackGroundImage.Width * _zoomFactor),
+                    Convert.ToInt32(_BackGroundImage.Height * _zoomFactor))),
+                    delta.X,
                     delta.Y);
+                g.DrawRectangle(_zoomLinePen, _zoomBox);
 
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message,ex.GetType().ToString());
-            }
-                             
-            g.DrawRectangle(_zoomLinePen, _zoomBox);
-        }
+            }                                        
+        } //Draw ZoomEffect
 
         public override void Move(Point d) //ZoomEffect
         {
             //Box.X += d.X;
             //Box.Y += d.Y;
-        }
+        } //Move ZoomEffect
 
         public override void Reshape(Point d) //ZoomEffect
         {
@@ -1912,7 +1910,7 @@ namespace GraphicShapes
             //_zoomBox.Y = (int)(Box.Height * _zoomMoveYfactor);
             //_zoomBox.Width = (int)(Box.Width * _zoomFactor);
             //_zoomBox.Height = (int)(Box.Height * _zoomFactor);
-        }
+        } //Reshape ZoomEffect
     }
 
     internal class BlurEffect : GraphicObject

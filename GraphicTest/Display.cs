@@ -881,8 +881,7 @@ namespace GraphicTool
         {
             List<GraphicObject> objects = new List<GraphicObject>();
             foreach (GraphicObject g in root.Children)
-                if (g.IsSelected)
-                    objects.Add(g);
+                if (g.IsSelected) objects.Add(g);                   
             GraphicObject newGroup = new MyGroup(objects, root);
             newGroup.Select();
             Invalidate();
