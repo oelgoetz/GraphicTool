@@ -728,6 +728,23 @@ namespace GraphicTool
                 focusedGraphicObject = -1;
                 Mode = mode.Default;
             }
+
+            if (e.KeyCode == Keys.Delete)
+            {
+                int i = 0;
+                while(i < root.Children.Count)
+                {
+                    if (root.Children[i].IsSelected)
+                    {
+                        root.Children.RemoveAt(i);
+                    }
+                    else
+                        i++;
+                }
+                if(root.Children.Count == 0)
+                    multiSelect = false;
+            }
+
             Invalidate();
         }
 
@@ -879,7 +896,7 @@ namespace GraphicTool
                 GraphicObject g = root.Children[i];
                 if (g.IsSelected)
                 {
-                    g.Ungroup(root);
+                    g.Ungroup(root);                    
                     break;
                 }
                 i++;
