@@ -6,6 +6,8 @@ using System.Globalization;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
+using SuperfastBlur;
+using System.Diagnostics;
 
 namespace GraphicShapes
 {
@@ -1013,7 +1015,7 @@ namespace GraphicShapes
                     //            BitmapFilter.GaussianBlur(_image, 4/* default to 4*/);
                     //            BitmapFilter.Smooth(_image, 1/* default to 4*/);
                     //        }
-                    blur = new BlurEffect(shape);
+                    blur = new BlurEffect(shape, this);
             //        _fill = false;
             //        _pen.Width = 0;
                 }
@@ -1043,21 +1045,13 @@ namespace GraphicShapes
         public override void Draw(Graphics g, int extd) //Rectangle
         {
             g.TranslateTransform(Box.X, Box.Y);
+            
             if (_fillBrush != null) g.FillRectangle(_fillBrush, 0, 0, Box.Width, Box.Height);
-            if(_pen.Width > 0) g.DrawRectangle(_pen, 0, 0, Box.Width, Box.Height);
-
-            //if (_blur)
-            //{
-            //    Pen blur_pen = new Pen(Color.Aquamarine, 4);
-            //    if (_image != null)
-            //        g.DrawImage(_image, _box.Left, _box.Top);
-            //    //else
-            //    g.DrawRectangle(blur_pen, _box);
-            //    //base.bmp = Blur(base.bmp, _rect, 8);
-
-            //    //if(BitmapFilter.GaussianBlur(bmp,4))
-            //    //	this.Invalidate();
-            //}
+            
+            if (blur != null)
+                blur.Draw(g, extd);
+            
+            if (_pen.Width > 0) g.DrawRectangle(_pen, 0, 0, Box.Width, Box.Height);
 
             if (zoom != null) 
                 zoom.Draw(g, extd);
@@ -1748,7 +1742,7 @@ namespace GraphicShapes
         internal float _zoomMoveYfactor;
         private Bitmap _BackGroundImage;
         private Rectangle _zoomBox;
-        internal Point ParentDisplacement = new Point();
+        internal Point Offset = new Point();
 
         public ZoomEffect(XmlNode shape, GraphicObject parent) 
         {
@@ -1796,15 +1790,15 @@ namespace GraphicShapes
 
             GraphicObject r = getRoot(this.Parent);
             _BackGroundImage = r.getPropsFileImage();
-            ParentDisplacement = getGroupDisplacement(this.Parent);
+            Offset = getGroupDisplacement(this.Parent);
 
             try 
             {
                 Point delta = new Point();
 
                 //Prüfen, ob Überlappung
-                Box.X += ParentDisplacement.X;
-                Box.Y += ParentDisplacement.Y;
+                Box.X += Offset.X;
+                Box.Y += Offset.Y;
 
                 GraphicsUnit units = GraphicsUnit.Pixel;
                 Rectangle _BackGroundImageRectangle = Rectangle.Round(_BackGroundImage.GetBounds(ref units));
@@ -1858,39 +1852,112 @@ namespace GraphicShapes
             {
                 MessageBox.Show(ex.Message,ex.GetType().ToString());
             }                                        
-        } //Draw ZoomEffect
+        }
 
         public override void Move(Point d) //ZoomEffect
         {
-            //Box.X += d.X;
-            //Box.Y += d.Y;
-        } //Move ZoomEffect
+        }
 
         public override void Reshape(Point d) //ZoomEffect
-        {
-            //Box = Parent.Box;
-            //_zoomBox = Box;
-            //_zoomBox.X = (int)(Box.Width * _zoomMoveXfactor);
-            //_zoomBox.Y = (int)(Box.Height * _zoomMoveYfactor);
-            //_zoomBox.Width = (int)(Box.Width * _zoomFactor);
-            //_zoomBox.Height = (int)(Box.Height * _zoomFactor);
-        } //Reshape ZoomEffect
+        {           
+        }
     }
 
     internal class BlurEffect : GraphicObject
     {
         int blurFactor = 6;
+        internal Point Offset = new Point();
+        GraphicObject Parent;
 
-        public BlurEffect(XmlNode shape)
+        public BlurEffect(XmlNode shape, GraphicObject parent)
         {
             _type = "BlurEffect";
+            if (shape.Attributes["ImageBlurFactor"] != null)
+                blurFactor = Convert.ToInt16(shape.Attributes["ImageBlurFactor"].Value);
+            Parent = parent;
+
             //EnableBlurInsideEffect = "true"
             //ImageBlurFactor = "12"
         }
 
         public override void Draw(Graphics g, int extd)
         {
-            throw new NotImplementedException();
+            //Bitmap image = Image.FromFile(fileName);
+            GraphicObject r = getRoot(this.Parent);
+            Bitmap _BackGroundImage = r.getPropsFileImage();
+            Offset = getGroupDisplacement(this.Parent);
+
+            Box = Parent.Box;
+            try
+            {
+                Point delta = new Point();
+
+                //Prüfen, ob Überlappung
+                Box.X += Offset.X;
+                Box.Y += Offset.Y;
+
+                GraphicsUnit units = GraphicsUnit.Pixel;
+                Rectangle _BackGroundImageRectangle = Rectangle.Round(_BackGroundImage.GetBounds(ref units));
+                if (_BackGroundImageRectangle.Contains(Box))
+                {
+                    _BackGroundImage = _BackGroundImage.Clone(Box, _BackGroundImage.PixelFormat);
+                }
+                else
+                {
+                    if (Box.IntersectsWith(_BackGroundImageRectangle))
+                    {
+                        Rectangle intersectBox = Rectangle.Intersect(Box, _BackGroundImageRectangle);
+                        if (!intersectBox.IsEmpty)
+                        {
+                            _BackGroundImage = _BackGroundImage.Clone(intersectBox, _BackGroundImage.PixelFormat);                            
+                        }
+                    }
+                    else
+                        _BackGroundImage = null;
+                }
+
+                //if (Box.X > 0)
+                //    delta.X = Box.Left;
+                //else
+                //{
+                //    if (Box.X + Box.Width < _BackGroundImageRectangle.Width)
+                //        delta.X = Box.X + Box.Width - Convert.ToInt32(_BackGroundImage.Width);
+                //    else
+                //        delta.X = Box.X - Convert.ToInt32(Box.X);
+                //}
+
+                //if (Box.Y > 0)
+                //    delta.Y = Box.Top;
+                //else
+                //{
+                //    if (Box.Y + Box.Height < _BackGroundImageRectangle.Height)
+                //        delta.Y = Box.Y + Box.Height - Convert.ToInt32(_BackGroundImage.Height);
+                //    else
+                //        delta.Y = Box.Y - Convert.ToInt32(Box.Y);
+                //}
+
+                if (_BackGroundImage != null && _BackGroundImage.Width > 10 && _BackGroundImage.Height > 10)
+                {
+                    var blur = new GaussianBlur(_BackGroundImage as Bitmap);
+                    var result = blur.Process((int)blurFactor / 5); //blurFactor
+                    g.DrawImage(new Bitmap(result), delta);
+                }
+                
+                //g.DrawRectangle(_zoomLinePen, _zoomBox);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().ToString());
+            }
+
+
+            //var sw = Stopwatch.StartNew();
+            //var result = blur.Process(10);
+            //Console.WriteLine($"Finished in: {sw.ElapsedMilliseconds}ms");
+            //result.Save("blur.jpg", ImageFormat.Jpeg);
+            //result.Save("blur.png", ImageFormat.Png);
+            //throw new NotImplementedException();
         }
 
         public override void Move(Point d)
