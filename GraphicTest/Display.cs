@@ -240,7 +240,8 @@ namespace GraphicTool
             XmlDocument propsFile = PreparePropsFile();
 
             OriginalImageNode = propsFile.SelectSingleNode("//OriginalImage");
-            OriginalImageNode.InnerText = Image2Base64((Image)PropsFileBmp); //BackGroundBmp); // 
+            if (BackGroundBmp == null) BackGroundBmp = PropsFileBmp;
+            OriginalImageNode.InnerText = Image2Base64((Image)BackGroundBmp); //BackGroundBmp); // 
 
             Attribute(OriginalImageNode, "ComputedWidth", BackGroundBmp.Width.ToString());
             Attribute(OriginalImageNode, "ComputedHeight", BackGroundBmp.Height.ToString());
@@ -313,10 +314,18 @@ namespace GraphicTool
 
         public string Image2Base64(Image bImage)
         {
-            System.IO.MemoryStream ms = new MemoryStream();
-            bImage.Save(ms, ImageFormat.Png);
-            byte[] byteImage = ms.ToArray();
-            return Convert.ToBase64String(byteImage);
+            try
+            {
+                System.IO.MemoryStream ms = new MemoryStream();
+                bImage.Save(ms, ImageFormat.Png);
+                byte[] byteImage = ms.ToArray();
+                return Convert.ToBase64String(byteImage);
+            }
+            catch 
+            {
+                return "";
+            }
+            
         }
 
         public void setPaintMode(int mode)

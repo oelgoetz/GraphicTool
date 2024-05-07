@@ -160,7 +160,7 @@ namespace GraphicTool
             //LoadTestCase("textsizetest");
             //LoadTestCase("texttest05");
             //LoadTestCase("AutoStockPlaceIndexNumbersEx00");
-            LoadTestCase("blurTest00");
+            //LoadTestCase("blurTest00");
             //LoadTestCase("iCMGIBBS15exampleT0702RVQ3");
             //LoadTestCase("complexShapes1");
             //LoadTestCase("tdmCompactToolAssemblyBOMPos");
