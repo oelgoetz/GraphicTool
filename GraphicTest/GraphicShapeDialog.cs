@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Xml;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
+using System.Reflection.Metadata;
 
 namespace GraphicTool
 {
@@ -58,7 +59,30 @@ namespace GraphicTool
             if (_g._type == "Rectangle" || _g._type == "Oval" || _g._type == "Polygon")
             {
                 rBBackground.Checked = true;
-                colorPalette1.showCbTransparent(_g._fillBrush == null, true, true);
+                if (_g.zoom != null || _g.blur != null)
+                {
+                    rbLine.Checked = true;
+                    colorPalette1.showCbTransparent(_g._fillBrush == null, false, false);
+                    if (_g.zoom != null)
+                    {
+                        
+                        UpDownZoom.Value = new decimal((float)_g.zoom._zoomFactor);
+                        UpDownMoveX.Value = new decimal((float)_g.zoom._zoomMoveXfactor);
+                        UpDownMoveY.Value = new decimal((float)_g.zoom._zoomMoveYfactor);
+                        cBZoom.Checked = true;
+                    }
+                    else
+                        cBZoom.Checked = false;
+                    if (_g.blur != null)
+                    {
+                        UpDownBlur.Value = (decimal)_g.blur.blurFactor;
+                        cBBlur.Checked = true;
+                    }
+                    else
+                        cBBlur.Checked = false;
+                }
+                else
+                    colorPalette1.showCbTransparent(_g._fillBrush == null, true, true);
                 if (_g._fillBrush != null)
                     colorPalette1.setCurrentColor(((SolidBrush)g._fillBrush).Color);
                 else
@@ -164,6 +188,9 @@ namespace GraphicTool
             }
             this.Location = Location;
             updateMenuButtons();
+            UpDownMoveX.ValueChanged += UpDownMoveX_ValueChanged;
+            UpDownMoveY.ValueChanged += UpDownMoveY_ValueChanged;
+            UpDownZoom.ValueChanged += UpDownZoom_ValueChanged;
             Invalidate();
         }
 
@@ -407,7 +434,7 @@ namespace GraphicTool
             int i = r.Children.IndexOf(_g);
             GraphicObject g = r.Children[i];
             r.Children.RemoveAt(i);
-            r.Children.Insert(i+1, g);
+            r.Children.Insert(i + 1, g);
 
             updateMenuButtons();
             _callingDisplay.Invalidate();
@@ -422,7 +449,31 @@ namespace GraphicTool
             r.Children.Insert(i - 1, g);
 
             updateMenuButtons();
-            _callingDisplay.Invalidate();            
+            _callingDisplay.Invalidate();
+        }
+
+        private void UpDownBlur_ValueChanged(object sender, EventArgs e)
+        {
+            _g.blur.blurFactor = ((int)UpDownBlur.Value);
+            _callingDisplay.Invalidate();
+        }
+
+        private void UpDownZoom_ValueChanged(object sender, EventArgs e)
+        {
+            _g.zoom._zoomFactor = (float)UpDownZoom.Value;
+            _callingDisplay.Invalidate();
+        }
+
+        private void UpDownMoveX_ValueChanged(object sender, EventArgs e)
+        {
+            _g.zoom._zoomMoveXfactor = (float)UpDownMoveX.Value;
+            _callingDisplay.Invalidate();
+        }
+
+        private void UpDownMoveY_ValueChanged(object sender, EventArgs e)
+        {
+            _g.zoom._zoomMoveYfactor = (float)UpDownMoveY.Value;
+            _callingDisplay.Invalidate();
         }
     }
 }

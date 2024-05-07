@@ -71,6 +71,16 @@
             label5 = new Label();
             label3 = new Label();
             label4 = new Label();
+            EffectsTab = new TabPage();
+            UpDownBlur = new NumericUpDown();
+            cBBlur = new CheckBox();
+            groupBox5 = new GroupBox();
+            UpDownZoom = new NumericUpDown();
+            label9 = new Label();
+            cBZoom = new CheckBox();
+            label8 = new Label();
+            UpDownMoveX = new NumericUpDown();
+            UpDownMoveY = new NumericUpDown();
             imageList1 = new ImageList(components);
             menuStrip1 = new MenuStrip();
             topmost = new ToolStripMenuItem();
@@ -91,6 +101,12 @@
             TabControl1.SuspendLayout();
             TextTab.SuspendLayout();
             ArrowsTab.SuspendLayout();
+            EffectsTab.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)UpDownBlur).BeginInit();
+            groupBox5.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)UpDownZoom).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)UpDownMoveX).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)UpDownMoveY).BeginInit();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -491,6 +507,7 @@
             TabControl1.Anchor = AnchorStyles.Bottom;
             TabControl1.Controls.Add(TextTab);
             TabControl1.Controls.Add(ArrowsTab);
+            TabControl1.Controls.Add(EffectsTab);
             TabControl1.Location = new Point(7, 26);
             TabControl1.Name = "TabControl1";
             TabControl1.SelectedIndex = 0;
@@ -567,6 +584,114 @@
             label4.Size = new Size(44, 15);
             label4.TabIndex = 18;
             label4.Text = "Length";
+            // 
+            // EffectsTab
+            // 
+            EffectsTab.Controls.Add(UpDownBlur);
+            EffectsTab.Controls.Add(cBBlur);
+            EffectsTab.Controls.Add(groupBox5);
+            EffectsTab.Location = new Point(4, 24);
+            EffectsTab.Name = "EffectsTab";
+            EffectsTab.Size = new Size(489, 150);
+            EffectsTab.TabIndex = 2;
+            EffectsTab.Text = "Effects";
+            EffectsTab.UseVisualStyleBackColor = true;
+            // 
+            // UpDownBlur
+            // 
+            UpDownBlur.Location = new Point(80, 12);
+            UpDownBlur.Name = "UpDownBlur";
+            UpDownBlur.Size = new Size(48, 23);
+            UpDownBlur.TabIndex = 2;
+            UpDownBlur.ValueChanged += UpDownBlur_ValueChanged;
+            // 
+            // cBBlur
+            // 
+            cBBlur.AutoSize = true;
+            cBBlur.Location = new Point(19, 13);
+            cBBlur.Name = "cBBlur";
+            cBBlur.Size = new Size(47, 19);
+            cBBlur.TabIndex = 0;
+            cBBlur.Text = "Blur";
+            cBBlur.UseVisualStyleBackColor = true;
+            // 
+            // groupBox5
+            // 
+            groupBox5.Controls.Add(UpDownZoom);
+            groupBox5.Controls.Add(label9);
+            groupBox5.Controls.Add(cBZoom);
+            groupBox5.Controls.Add(label8);
+            groupBox5.Controls.Add(UpDownMoveX);
+            groupBox5.Controls.Add(UpDownMoveY);
+            groupBox5.Location = new Point(13, 31);
+            groupBox5.Name = "groupBox5";
+            groupBox5.Size = new Size(140, 99);
+            groupBox5.TabIndex = 8;
+            groupBox5.TabStop = false;
+            // 
+            // UpDownZoom
+            // 
+            UpDownZoom.DecimalPlaces = 1;
+            UpDownZoom.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
+            UpDownZoom.Location = new Point(67, 12);
+            UpDownZoom.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
+            UpDownZoom.Minimum = new decimal(new int[] { 1, 0, 0, 65536 });
+            UpDownZoom.Name = "UpDownZoom";
+            UpDownZoom.Size = new Size(66, 23);
+            UpDownZoom.TabIndex = 8;
+            UpDownZoom.Value = new decimal(new int[] { 1, 0, 0, 65536 });
+            // 
+            // label9
+            // 
+            label9.AutoSize = true;
+            label9.Location = new Point(15, 68);
+            label9.Name = "label9";
+            label9.Size = new Size(47, 15);
+            label9.TabIndex = 7;
+            label9.Text = "Move Y";
+            // 
+            // cBZoom
+            // 
+            cBZoom.AutoSize = true;
+            cBZoom.Location = new Point(5, 13);
+            cBZoom.Name = "cBZoom";
+            cBZoom.Size = new Size(58, 19);
+            cBZoom.TabIndex = 1;
+            cBZoom.Text = "Zoom";
+            cBZoom.UseVisualStyleBackColor = true;
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new Point(15, 43);
+            label8.Name = "label8";
+            label8.Size = new Size(47, 15);
+            label8.TabIndex = 6;
+            label8.Text = "Move X";
+            // 
+            // UpDownMoveX
+            // 
+            UpDownMoveX.DecimalPlaces = 1;
+            UpDownMoveX.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
+            UpDownMoveX.Location = new Point(67, 41);
+            UpDownMoveX.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
+            UpDownMoveX.Minimum = new decimal(new int[] { 10, 0, 0, int.MinValue });
+            UpDownMoveX.Name = "UpDownMoveX";
+            UpDownMoveX.Size = new Size(66, 23);
+            UpDownMoveX.TabIndex = 4;
+            UpDownMoveX.Value = new decimal(new int[] { 10, 0, 0, 0 });
+            // 
+            // UpDownMoveY
+            // 
+            UpDownMoveY.DecimalPlaces = 1;
+            UpDownMoveY.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
+            UpDownMoveY.Location = new Point(67, 66);
+            UpDownMoveY.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
+            UpDownMoveY.Minimum = new decimal(new int[] { 10, 0, 0, int.MinValue });
+            UpDownMoveY.Name = "UpDownMoveY";
+            UpDownMoveY.Size = new Size(66, 23);
+            UpDownMoveY.TabIndex = 5;
+            UpDownMoveY.Value = new decimal(new int[] { 10, 0, 0, 0 });
             // 
             // imageList1
             // 
@@ -656,6 +781,14 @@
             TextTab.ResumeLayout(false);
             ArrowsTab.ResumeLayout(false);
             ArrowsTab.PerformLayout();
+            EffectsTab.ResumeLayout(false);
+            EffectsTab.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)UpDownBlur).EndInit();
+            groupBox5.ResumeLayout(false);
+            groupBox5.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)UpDownZoom).EndInit();
+            ((System.ComponentModel.ISupportInitialize)UpDownMoveX).EndInit();
+            ((System.ComponentModel.ISupportInitialize)UpDownMoveY).EndInit();
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             ResumeLayout(false);
@@ -713,5 +846,15 @@
         private ToolStripMenuItem Lift;
         private ToolStripMenuItem Sink;
         private ToolStripMenuItem Bottom;
+        private TabPage EffectsTab;
+        private CheckBox cBZoom;
+        private CheckBox cBBlur;
+        private NumericUpDown UpDownBlur;
+        private Label label9;
+        private Label label8;
+        private NumericUpDown UpDownMoveY;
+        private NumericUpDown UpDownMoveX;
+        private GroupBox groupBox5;
+        private NumericUpDown UpDownZoom;
     }
 }
