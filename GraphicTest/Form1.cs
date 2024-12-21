@@ -1,7 +1,10 @@
 ﻿using GraphicShapes;
 using GraphicTool;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Numerics;
 using System.Windows.Forms;
+using System.Windows.Forms.Design;
 
 namespace GraphicTool
 {
@@ -9,62 +12,121 @@ namespace GraphicTool
     {
         int NUMBEROFRECENTFILES = 10;
         string[] _args = null; //https://stackoverflow.com/questions/1179532/#37457463 (alternativ: string[] args = Environment.GetCommandLineArgs();)
+
+
         public Form1(string[] args)
         {
-            if (args.Length > 0)
-                _args = args;
             InitializeComponent();
+            if (args.Length > 0) _args = args;
+            display.Saved += () => CheckPropsFile();
+            display.ShapeCount += () => getShapesCount();
+            //DEBUG argument: C:\temp\test\test.png
+        }
+
+        private void getShapesCount()
+        {
+            int z = display.getShapeCount();
+            if (z > 0)
+                label1.Text = "(" + z.ToString() + ")";
+            else 
+                label1.Text = "";
+        }
+
+        private bool CheckPropsFile()
+        {
+            if (File.Exists(currentFileLabel.Text + ".props"))
+            {
+                lblBgXml.Visible = true;
+                lblShapes.Visible = true;
+                return true;
+            }
+            else
+            {   lblBgXml.Visible = false;
+                lblShapes.Visible = false;
+                return false;
+            }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
             string loc = Properties.Settings.Default.DESKTOPBOUNDS;
             string[] temp = loc.Split(';');
             this.SetDesktopBounds(Convert.ToInt32(temp[0]), Convert.ToInt32(temp[1]), Convert.ToInt32(temp[2]), Convert.ToInt32(temp[3]));
-            //display.PreviewKeyDown += new PreviewKeyDownEventHandler(Display_PreviewKeyDown);
-            display.setPaintMode(5);
-        }
 
-        //public void Display_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
-        //{
-        //    switch (e.KeyCode)
-        //    {
-        //        case Keys.Right:
-        //        case Keys.Left:
-        //        case Keys.Down:
-        //        case Keys.Up:
-        //            e.IsInputKey = true;
-        //            break;
-        //    }
-        //}
+            ShowInfoToolStripMenuItem.Checked = Properties.Settings.Default.SHOWDISPLAYINFO;
+            ConfirmSaveToToolStripMenuItem.Checked = Properties.Settings.Default.SHOWSAVEIMAGETOBACKGROUNDWARNING;
+            GetDisplayModeProperty();
+            InitRecentFileList();
 
-        public void LoadImageFile(string fileName, bool doc)
-        {
-            if (!File.Exists(fileName)) return;
-            display.LoadImageFile(fileName); //, Properties.Settings.Default.DISPLAYMODE, Properties.Settings.Default.SHOWDISPLAYINFO);        
-            currentFileLabel.Text = fileName;
-            //UNDER CONSTRUCTION!!! saveToolStripMenuItem.Enabled = true;
-            if (doc) updateRecentFiles(fileName);
-        }
-
-        private void loadToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            //display.LoadImageFile(@"C:\temp\deleteme.png");
-            string fileName = "";
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            if (_args != null && _args.Length > 0)
             {
-                fileName = openFileDialog1.FileName;
-                if (fileName.EndsWith(".props")) fileName = fileName.Substring(0, fileName.Length - 6);
-                //if (oldD) LoadImageFile(fileName, true);
-
-                if (File.Exists(fileName + ".props")) BackgroundXMLRadioButton.Enabled = true; else BackgroundXMLRadioButton.Enabled = false;
-                if (!File.Exists(fileName + ".props")) BackGroundCheckBox.Checked = true;
-                display.LoadImageFile(fileName); //, Properties.Settings.Default.DISPLAYMODE, Properties.Settings.Default.SHOWDISPLAYINFO);
+                LoadFile(_args[0], true);  //Some test cases - false
+                if (!File.Exists(_args[0])) MessageBox.Show(_args[0], "Invalid file argument");
             }
 
-            currentFileLabel.Text = fileName;
-            //UNDER CONSTRUCTION!!! saveToolStripMenuItem.Enabled = true;
+            // --- TEST CASE for Images where props file is created during the session:
+            //if (File.Exists(@"C:\temp\test\testNoProps.png.props"))  //testNoPropsBAK.png
+            //    File.Delete(@"C:\temp\test\testNoProps.png.props");
+            //if (File.Exists(@"C:\temp\test\testNoPropsBAK.png"))
+            //    File.Copy(@"C:\temp\test\testNoPropsBAK.png", @"C:\temp\test\testNoProps.png", true);
 
-            updateRecentFiles(fileName);
+            //Other Test cases:
+            //("deleteme");
+            //("FontStyleTest");
+            //("texttest01");
+            //("texttest02");
+            //("textsizetest");
+            //("texttest05");
+            //("blurTest00");
+            //("complexShapes1");
+            //Properties.Settings.Default.COLORS = "#308784;#1d5251;#59d396;#2fa567;#88b720;#628406;#208220;#0b540b;#5ec1e9;#359cbc;#5d8cc2;#306191;#3661a3;#1e457c;#7c67a3;#584877;#f4b425;#c68709;#ef890f;#c66a05;#e56469;#ba363f;#e56493;#b7376c;#8c8c8c;#666666;#636363;#4d4d4d;#ffffff;#dddddd;#000000;#555555";
+            //Properties.Settings.Default.Save();
         }
 
-        private void updateRecentFiles(string fileName)
+        public void LoadFile(string fileName, bool doc)
+        {
+            if (fileName.EndsWith(".props")) fileName = fileName.Substring(0, fileName.Length - 6);
+            if (!File.Exists(fileName)) return;
+            display.LoadImageFile(fileName);
+            lblBgImg.Visible = true;
+            if (currentFileLabel.Text != fileName) currentFileLabel.Text = fileName;
+
+            if (CheckPropsFile())
+            {
+                display.loadPropsFile(fileName + ".props");
+                if (doc) UpdateRecentFiles(fileName);
+            }
+        }
+
+        // -------------------- FILE HISTORY -------------------- 
+
+        private void LoadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DialogResult d = DialogResult.OK;
+            if (display.changed)
+            {
+                d = MessageBox.Show("Save changes before opening the new file?",
+                    "Unsaved Changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Exclamation);
+                if (d == DialogResult.Yes)
+                {
+                    display.Save2File(currentFileLabel.Text);
+                }
+                else
+                {
+                    if (d == DialogResult.Cancel)
+                    {
+                        return;
+                    }
+                }
+            }
+            d = openFileDialog1.ShowDialog();
+            if (d == DialogResult.OK)
+            {
+                LoadFile(openFileDialog1.FileName, true);
+            }
+        }
+
+        private void UpdateRecentFiles(string fileName)
         {
             int index = -1;
             int i = 0;
@@ -122,138 +184,101 @@ namespace GraphicTool
 
         private void RecentFileMenuItem_Load(object sender, EventArgs e)
         {
-            //if(oldD) LoadImageFile((sender as ToolStripMenuItem).ToolTipText, true);
             string fileName = (sender as ToolStripMenuItem).ToolTipText;
-            if (!File.Exists(fileName)) return;
             if (fileName.EndsWith(".props")) fileName = fileName.Substring(0, fileName.Length - 6);
-            if (File.Exists(fileName + ".props")) BackgroundXMLRadioButton.Enabled = true; else BackgroundXMLRadioButton.Enabled = false;
-            if (!File.Exists(fileName + ".props")) BackGroundCheckBox.Checked = true;
-            display.LoadImageFile(fileName); //, Properties.Settings.Default.DISPLAYMODE, Properties.Settings.Default.SHOWDISPLAYINFO);
-            currentFileLabel.Text = fileName;
-            //UNDER CONSTRUCTION!!! saveToolStripMenuItem.Enabled = true;
-            updateRecentFiles(fileName);
-        }
+            if (!File.Exists(fileName)) return;
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            ShowInfoToolStripMenuItem.Checked = Properties.Settings.Default.SHOWDISPLAYINFO;
-            ConfirmSaveToToolStripMenuItem.Checked = Properties.Settings.Default.SHOWSAVEIMAGETOBACKGROUNDWARNING;
-            applyFileOpenMode();
-            applyRecentFileList();
-            if (_args != null && _args.Length > 0)
+            DialogResult d = DialogResult.OK;
+            if (display.changed)
             {
-                if (File.Exists(_args[0]))
+                d = MessageBox.Show("Save changes before opening the new file?",
+                    "Unsaved Changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Exclamation);
+                if (d == DialogResult.Yes)
                 {
-                    display.LoadImageFile(_args[0]);
-                    currentFileLabel.Text = _args[0];
-                    //UNDER CONSTRUCTION!!! saveToolStripMenuItem.Enabled = true;
-                    updateRecentFiles(_args[0]);
+                    display.Save2File(currentFileLabel.Text);
                 }
                 else
-                    MessageBox.Show(_args[0]);
+                {
+                    if (d == DialogResult.Cancel)
+                    {
+                        //LoadFile(currentFileLabel.Text, false);
+                        return;
+                    }
+                }
             }
-            splitContainer1.SplitterDistance = 142;
-            //LoadTestCase("deleteme");
-            //LoadTestCase("FontStyleTest");
-            //LoadTestCase("texttest01");
-            //LoadTestCase("texttest02");
-            //LoadTestCase("textsizetest");
-            //LoadTestCase("texttest05");
-            //LoadTestCase("AutoStockPlaceIndexNumbersEx00");
-            //LoadTestCase("blurTest00");
-            //LoadTestCase("iCMGIBBS15exampleT0702RVQ3");
-            //LoadTestCase("complexShapes1");
-            //LoadTestCase("tdmCompactToolAssemblyBOMPos");
-            //Properties.Settings.Default.COLORS = "#308784;#1d5251;#59d396;#2fa567;#88b720;#628406;#208220;#0b540b;#5ec1e9;#359cbc;#5d8cc2;#306191;#3661a3;#1e457c;#7c67a3;#584877;#f4b425;#c68709;#ef890f;#c66a05;#e56469;#ba363f;#e56493;#b7376c;#8c8c8c;#666666;#636363;#4d4d4d;#ffffff;#dddddd;#000000;#555555";
-            //Properties.Settings.Default.Save();
+            LoadFile(fileName, true);
+            currentFileLabel.Text = fileName;
+            UpdateRecentFiles(fileName);
         }
 
-        private void LoadTestCase(string testfile)
-        {
-            if (File.Exists("C:\\temp\\Backup\\" + testfile + ".png"))
-                File.Copy("C:\\temp\\Backup\\" + testfile + ".png", "C:\\temp\\" + testfile + ".png", true);
-            if (File.Exists("C:\\temp\\Backup\\" + testfile + ".png.props"))
-            {
-                File.Copy("C:\\temp\\Backup\\" + testfile + ".png.props", "C:\\temp\\" + testfile + ".png.props", true);
-            }
-            //else if (File.Exists("C:\\temp\\" + testfile + ".png.props"))
-            //    File.Delete("C:\\temp\\" + testfile + ".png.props");
-
-
-            if (File.Exists("C:\\temp\\" + testfile + ".png.props")) BackgroundXMLRadioButton.Enabled = true; else BackgroundXMLRadioButton.Enabled = false;
-            if (!File.Exists("C:\\temp\\" + testfile + ".png.props")) BackgroundImageRadioButton.Checked = true;
-            applyDisplayMode();
-            display.LoadImageFile("C:\\temp\\" + testfile + ".png");//, Properties.Settings.Default.DISPLAYMODE, Properties.Settings.Default.SHOWDISPLAYINFO);
-            currentFileLabel.Text = "C:\\temp\\" + testfile + ".png";
-        }
-
-        private void applyFileOpenMode()
-        {
-            int t = (int)Properties.Settings.Default.DISPLAYMODE;
-            int temp = (t & 1);
-            if (temp >= 1) ShapesCheckBox.Checked = true; else ShapesCheckBox.Checked = false;
-            temp = (t & 2);
-            if (temp >= 1) BackgroundImageRadioButton.Checked = true;
-            temp = t & 4;
-            if (temp >= 1) BackgroundXMLRadioButton.Checked = true;
-            if (t > 1) BackGroundCheckBox.Checked = true;
-            //if (oldD) display.setPaintMode(Properties.Settings.Default.DISPLAYMODE);
-            display.setPaintMode(Properties.Settings.Default.DISPLAYMODE);
-        }
-
-        private void applyRecentFileList()
+        private void InitRecentFileList()
         {
             if (Properties.Settings.Default.RECENTFILES.Length > 0)
             {
                 string[] temp = Properties.Settings.Default.RECENTFILES.Split(';');
                 for (int i = 0; i < temp.Length; i++)
                 {
-                    if (File.Exists(temp[i]))
-                        AddRecentFileMenuItem(temp[i]);
+                    string fileName = temp[i];
+                    if (File.Exists(fileName))
+                        AddRecentFileMenuItem(fileName);
                 }
             }
-
         }
+
+        // -------------------- DISPLAY MODE --------------------
 
         private void cBBackground_MouseUp(object sender, MouseEventArgs e)
         {
-            applyDisplayMode();
+            setDisplayMode();
         }
 
-        private void rBBgImage_MouseUp(object sender, MouseEventArgs e)
+        private void rBBackgroundImage_MouseUp(object sender, MouseEventArgs e)
         {
-            applyDisplayMode();
+            setDisplayMode();
         }
 
-        private void rbBgXml_MouseUp(object sender, MouseEventArgs e)
+        private void rbBackgroundXml_MouseUp(object sender, MouseEventArgs e)
         {
-            applyDisplayMode();
+            setDisplayMode();
         }
 
-        private void ShapesCheckBox_MouseUp(object sender, MouseEventArgs e)
+        private void cBShapes_MouseUp(object sender, MouseEventArgs e)
         {
-            applyDisplayMode();
+            setDisplayMode();
         }
 
-        private void applyDisplayMode()
+        private void setDisplayMode()
         {
             int temp = 0;
-            if (BackGroundCheckBox.Checked)
+            if (cBBackGround.Checked)
             {
-                BackgroundXMLRadioButton.Enabled = true;
-                BackgroundImageRadioButton.Enabled = true;
-                if (BackgroundXMLRadioButton.Checked) temp += 4;
-                if (BackgroundImageRadioButton.Checked) temp += 2;
+                rBBackgroundXML.Enabled = true;
+                rBBackgroundImage.Enabled = true;
+                if (rBBackgroundXML.Checked) temp += 4;
+                if (rBBackgroundImage.Checked) temp += 2;
             }
             else
             {
-                BackgroundXMLRadioButton.Enabled = false;
-                BackgroundImageRadioButton.Enabled = false;
+                rBBackgroundXML.Enabled = false;
+                rBBackgroundImage.Enabled = false;
             }
-            if (ShapesCheckBox.Checked) temp += 1;
+            if (cBShapes.Checked) temp += 1;
             Properties.Settings.Default.DISPLAYMODE = temp;
             Properties.Settings.Default.Save();
-            display.setPaintMode(Properties.Settings.Default.DISPLAYMODE);
+            display.setDrawMode(Properties.Settings.Default.DISPLAYMODE);
+            //display.Invalidate();
+        }
+
+        private void GetDisplayModeProperty()
+        {
+            int b = (byte)Properties.Settings.Default.DISPLAYMODE;
+
+            if ((b & (1 << 0)) > 0) cBShapes.Checked = true; else cBShapes.Checked = false;
+            if ((b & (1 << 1)) > 0) rBBackgroundImage.Checked = true;
+            if ((b & (1 << 2)) > 0) rBBackgroundXML.Checked = true;
+            if (b > 1) cBBackGround.Checked = true;
+
+            display.setDrawMode(Properties.Settings.Default.DISPLAYMODE);
         }
 
         private void ConfirmSaveToToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
@@ -285,7 +310,7 @@ namespace GraphicTool
             Properties.Settings.Default.Save();
         }
 
-        private void zoomSelector_ValueChanged(object sender, EventArgs e)
+        private void ZoomSelector_ValueChanged(object sender, EventArgs e)
         {
             int f = (int)zoomSelector.Value;
             if (f <= 10) return;
@@ -293,41 +318,46 @@ namespace GraphicTool
             display.setZoomFactor(f);
         }
 
-        private void label1_DoubleClick(object sender, EventArgs e)
+        private void ZoomSelector_DoubleClick(object sender, EventArgs e)
         {
             zoomSelector.Value = 100;
         }
 
-        private void currentFileLabel_DoubleClick(object sender, EventArgs e)
+        private void CurrentFileLabel_DoubleClick(object sender, EventArgs e)
         {
             Clipboard.SetText(currentFileLabel.Text);
         }
 
-        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (checkbeforeSaving())
+            if (CheckBgBeforeSaving())
             {
                 display.Save2File(currentFileLabel.Text);
             }
-            if (File.Exists(currentFileLabel.Text + ".props")) BackgroundXMLRadioButton.Enabled = true; else BackgroundXMLRadioButton.Enabled = false;
+            if (File.Exists(currentFileLabel.Text + ".props")) rBBackgroundXML.Enabled = true; else rBBackgroundXML.Enabled = false;
         }
 
-        private bool checkbeforeSaving()
+        private bool CheckBgBeforeSaving()
         {
-            if (Properties.Settings.Default.SHOWSAVEIMAGETOBACKGROUNDWARNING && ((Properties.Settings.Default.DISPLAYMODE & 2) == 2))
-            {
-                string Message = "This will save the current view as OriginalImage in the \".props\" File.\nContinue ?";
-                if (MessageBox.Show(Message, "", MessageBoxButtons.OKCancel) == DialogResult.Cancel)
-                {
-                    return false;
-                }
-            }
+            ////TODO: Offer options to save:
+            ////1. to save current view in Image file, but in XML only background without shapes
+            ////2. to save current view in Image, as well as in XML
+            ////3. Save only view to Image file, skip props file if available.
+            ////4. Cancel
+            //if (Properties.Settings.Default.SHOWSAVEIMAGETOBACKGROUNDWARNING && ((Properties.Settings.Default.DISPLAYMODE & 4) == 4))
+            //{
+            //    string Message = "This will save the current view as OriginalImage in the \".props\" File.\nContinue ?";
+            //    if (MessageBox.Show(Message, "TODO: CheckBgBeforeSaving", MessageBoxButtons.OKCancel) == DialogResult.Cancel)
+            //    {
+            //        return false;
+            //    }
+            //}
             return true;
         }
 
-        private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
+        private void SaveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (checkbeforeSaving())
+            if (CheckBgBeforeSaving())
             {
                 saveFileDialog1.DefaultExt = "png";
                 saveFileDialog1.AddExtension = true;
@@ -336,28 +366,23 @@ namespace GraphicTool
                 if (saveFileDialog1.ShowDialog() == DialogResult.OK)
                 {
                     string fileName = saveFileDialog1.FileName;
-                    //display01.Save2File(fileName);
                     AddRecentFileMenuItem(fileName);
                     //UNDER CONSTRUCTION!!! saveToolStripMenuItem.Enabled = true;
                     if (fileName.EndsWith(".props")) fileName = fileName.Substring(0, fileName.Length - 6);
+                    display.Save2File(currentFileLabel.Text);
                     currentFileLabel.Text = fileName;
                 }
             }
-            if (File.Exists(currentFileLabel.Text + ".props")) BackgroundXMLRadioButton.Enabled = true; else BackgroundXMLRadioButton.Enabled = false;
+            if (File.Exists(currentFileLabel.Text + ".props")) rBBackgroundXML.Enabled = true; else rBBackgroundXML.Enabled = false;
         }
 
-        private void saveFileDialog1_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-
-        }
-
-        private void button1_Click(object sender, EventArgs e)
+        private void BtnExplorer_Click(object sender, EventArgs e)
         {
             string argument = "/select, \"" + currentFileLabel.Text + "\"";
             Process.Start("explorer.exe", argument);
         }
 
-        private void btnxml_Click(object sender, EventArgs e)
+        private void BtnXml_Click(object sender, EventArgs e)
         {
             if (File.Exists(currentFileLabel.Text + ".props"))
             {
@@ -378,15 +403,13 @@ namespace GraphicTool
             }
         }
 
-        private void button1_Click_1(object sender, EventArgs e)
+        private void BtnReloadClick(object sender, EventArgs e)
         {
-            if (File.Exists(currentFileLabel.Text + ".props")) BackgroundXMLRadioButton.Enabled = true; else BackgroundXMLRadioButton.Enabled = false;
-            if (!File.Exists(currentFileLabel.Text + ".props")) BackgroundImageRadioButton.Checked = true;
-            display.LoadImageFile(currentFileLabel.Text); //, Properties.Settings.Default.DISPLAYMODE, Properties.Settings.Default.SHOWDISPLAYINFO);
-            //if(oldD) LoadImageFile(currentFileLabel.Text, false);
+            string fileName = currentFileLabel.Text;
+            LoadFile(fileName, false);
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private void BtnSendToPaint_Click(object sender, EventArgs e)
         {
             if (File.Exists(currentFileLabel.Text))
             {
@@ -394,11 +417,11 @@ namespace GraphicTool
                 procInfo.FileName = ("mspaint.exe");
                 procInfo.Arguments = currentFileLabel.Text;
 
-                System.Diagnostics.Process.Start(procInfo);
+                Process.Start(procInfo);
             }
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void BtnSendToCapture_Click(object sender, EventArgs e)
         {
             if (File.Exists(currentFileLabel.Text))
             {
@@ -410,14 +433,12 @@ namespace GraphicTool
             }
         }
 
-
-
-        private void currentFileLabel_Click(object sender, EventArgs e)
+        private void CurrentFileLabel_Click(object sender, EventArgs e)
         {
             Clipboard.SetText(currentFileLabel.Text);
         }
 
-        private void devToolsToolStripMenuItem_Click(object sender, EventArgs e)
+        private void DevToolsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DevTool01 Devtool = new DevTool01(this);
             Devtool.Top = 0; ;
@@ -426,38 +447,60 @@ namespace GraphicTool
             return;
         }
 
-        private void ShowInfoToolStripMenuItem_Click(object sender, EventArgs e)
+        private void BtnAddRectangle_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            if (!ShapesCheckBox.Checked) ShapesCheckBox.Checked = true;
+            if (!cBShapes.Checked) cBShapes.Checked = true;
             display.AddShape(Properties.Settings.Default.RECTANGLE);
-            BackgroundXMLRadioButton.Checked = true;
-            applyDisplayMode();
+            //rBBackgroundXML.Checked = true;
+            setDisplayMode();
         }
 
-        private void button5_Click(object sender, EventArgs e)
+        private void BtnAddEllipse_Click(object sender, EventArgs e)
         {
-            if (!ShapesCheckBox.Checked) ShapesCheckBox.Checked = true;
+            if (!cBShapes.Checked) cBShapes.Checked = true;
             display.AddShape(Properties.Settings.Default.OVAL);
-            BackgroundXMLRadioButton.Checked = true;
-            applyDisplayMode();
+            //rBBackgroundXML.Checked = true;
+            setDisplayMode();
         }
 
-        private void button6_Click(object sender, EventArgs e)
+        private void BtnAddArrow_Click(object sender, EventArgs e)
         {
-            if (!ShapesCheckBox.Checked) ShapesCheckBox.Checked = true;
+            if (!cBShapes.Checked) cBShapes.Checked = true;
             display.AddShape(Properties.Settings.Default.POLYLINE);
-            BackgroundXMLRadioButton.Checked = true;
-            applyDisplayMode();
+            //rBBackgroundXML.Checked = true;
+            setDisplayMode();
         }
 
-        private void btnLiftTopmost_Click(object sender, EventArgs e)
+        private void QuitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            
+            CloseCancel();
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            CloseCancel();
+        }
+
+        public void CloseCancel()
+        {
+            if (display.changed)
+            {
+                if (MessageBox.Show("There are unsaved changes. Save before closing?",
+                    "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.No)
+                {
+                    display.changed = false;
+                    this.Close();
+                }
+                else
+                {
+                    display.Save2File(currentFileLabel.Text);
+                }
+            }
+        }
+
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

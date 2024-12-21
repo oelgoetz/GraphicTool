@@ -2,8 +2,12 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
+using System.Text;
 using System.Windows.Forms;
 using System.Xml;
+using txtFiles;
+using static GraphicTool.Form1;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
 
 namespace GraphicTool
 {
@@ -23,8 +27,9 @@ namespace GraphicTool
         private bool showInfo = false;
         private Size infoBox;
         private Rectangle CropRectangle;
-        TextBox textBox1;
+        TextBox ShapeTextBox;
         XmlNode buffer;
+        public bool changed = false;
 
         private enum mode
         {
@@ -51,9 +56,12 @@ namespace GraphicTool
         private bool multiSelect;
         private bool backGroundSelected;
         private Point BackgroundOffset = Point.Empty;
+        
 
         private string currentFile;
 
+        public event Action Saved;
+        public event Action ShapeCount;
         public Display()
         {
             InitializeComponent();
@@ -91,45 +99,43 @@ namespace GraphicTool
 
         public void LoadImageFile(string fileName)
         {
+            if (!File.Exists(fileName)) return;
             BackGroundBmp = null; PropsFileBmp = null; ImageFileBmp = null;
             displayOffset = Point.Empty;
             BackgroundOffset = Point.Empty;
             backGroundSelected = false;
             //textBox1.Clear();
-            root = new Root();
-
-            if (fileName.EndsWith(".props"))
-                fileName = fileName.Substring(0, fileName.Length - 6);
-
-            if (File.Exists(fileName))
-                this.LoadBackGroundImageFromFile(fileName, false);
-
-            if (File.Exists(fileName + ".props"))
-            {
-                XmlDocument propsFile = new XmlDocument();
-                propsFile.Load(fileName + ".props");
-
-                XmlNode OriginalImageNode = propsFile.SelectSingleNode("//OriginalImage");                
-                this.LoadBackgroundImageFromPropsFile(propsFile.SelectSingleNode("//OriginalImage"));
-                
-                //EnableCropRectangle="true" CropRectangle="0,0,801,480"
-                if (OriginalImageNode != null && OriginalImageNode.Attributes["EnableCropRectangle"]!= null)
-                {
-                    if(OriginalImageNode.Attributes["EnableCropRectangle"].Value == "true" && OriginalImageNode.Attributes["CropRectangle"] != null)
-                    {
-                        string[] temp = OriginalImageNode.Attributes["CropRectangle"].Value.Split(',');
-                        CropRectangle = new Rectangle(Convert.ToInt16(temp[0]), Convert.ToInt16(temp[1]), Convert.ToInt16(temp[2]), Convert.ToInt16(temp[3]));
-                        PropsFileBmp = PropsFileBmp.Clone(CropRectangle, PixelFormat.DontCare);
-                    }
-                }
-                
-                XmlNode ShapesNode = propsFile.SelectSingleNode("//fileProperties/ImageOverlay/Shapes");
-                this.LoadOverlays(ShapesNode);
-            }
-
+            root = new Root();             
+            this.LoadBackGroundImageFromFile(fileName, false);                                      
             currentFile = fileName;
             Center();
+            changed = false;
+            if (ShapeCount != null) ShapeCount();
             this.Invalidate();
+        }
+
+        public void loadPropsFile(string fileName)
+        {
+            XmlDocument propsFile = new XmlDocument();
+            propsFile.Load(fileName);
+
+            XmlNode OriginalImageNode = propsFile.SelectSingleNode("//OriginalImage");
+            this.LoadBackgroundImageFromPropsFile(propsFile.SelectSingleNode("//OriginalImage"));
+
+            //EnableCropRectangle="true" CropRectangle="0,0,801,480"
+            if (OriginalImageNode != null && OriginalImageNode.Attributes["EnableCropRectangle"] != null)
+            {
+                if (OriginalImageNode.Attributes["EnableCropRectangle"].Value == "true" && OriginalImageNode.Attributes["CropRectangle"] != null)
+                {
+                    string[] temp = OriginalImageNode.Attributes["CropRectangle"].Value.Split(',');
+                    CropRectangle = new Rectangle(Convert.ToInt16(temp[0]), Convert.ToInt16(temp[1]), Convert.ToInt16(temp[2]), Convert.ToInt16(temp[3]));
+                    PropsFileBmp = PropsFileBmp.Clone(CropRectangle, PixelFormat.DontCare);
+                }
+            }
+
+            XmlNode ShapesNode = propsFile.SelectSingleNode("//fileProperties/ImageOverlay/Shapes");
+            this.LoadOverlays(ShapesNode);
+            if (ShapeCount != null) ShapeCount();
         }
 
         public void AddShape(string xml)
@@ -140,6 +146,7 @@ namespace GraphicTool
             try
             {
                 root.Add(shape, root);
+                changed = true;
             }
             catch (Exception ex)
             {
@@ -148,6 +155,7 @@ namespace GraphicTool
                 if (shape.ParentNode.Attributes["Type"] != null) s += shape.ParentNode.Attributes["Type"].Value;
                 MessageBox.Show(ex.Message + "\n" + shape.Name + "\n" + s + "\n" + shape.BaseURI, "Display02.addShape");
             }
+            if (ShapeCount != null) ShapeCount();
             Invalidate();
         }
 
@@ -230,112 +238,9 @@ namespace GraphicTool
 
         }
         
-        public void Save2File(string fileName)
-        {
-            if (fileName == null) return;
-            //if (!Directory.Exists(Path.GetDirectoryName(fileName)))
-            //    tools1.createPath(Path.GetDirectoryName(fileName));
-
-            XmlNode OriginalImageNode;
-            XmlDocument propsFile = PreparePropsFile();
-
-            OriginalImageNode = propsFile.SelectSingleNode("//OriginalImage");
-            if (BackGroundBmp == null) BackGroundBmp = PropsFileBmp;
-            OriginalImageNode.InnerText = Image2Base64((Image)BackGroundBmp); //BackGroundBmp); // 
-
-            Attribute(OriginalImageNode, "ComputedWidth", BackGroundBmp.Width.ToString());
-            Attribute(OriginalImageNode, "ComputedHeight", BackGroundBmp.Height.ToString());
-            Attribute(OriginalImageNode, "Type", "Image");
-            Attribute(OriginalImageNode, "Format", "png");
-            Attribute(OriginalImageNode, "DPI", "96");
-
-            XmlNode ShapesNode = propsFile.SelectSingleNode("//Shapes");
-            //Save Shapes as Xml
-            root.deserialize(ShapesNode, BackgroundOffset);
-            //Draw Shapes on Graphic
-            PaintOnGraphicInstance(graph, 0, Color.White);
-            //Save Graphic
-            BackGroundBmp.Save(fileName);
-            //Update Image File in memory
-            //ImageFileBmp = (Bitmap)BackGroundBmp.Clone();
-            propsFile.Save(fileName + ".props");
-            //tools1.BeautifyXml(fileName + ".props", fileName + ".props");
-        }
-
-        private XmlDocument PreparePropsFile()
-        {
-            XmlDocument propsFile = new XmlDocument();
-            propsFile.LoadXml(
-            "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-            "	<fileProperties>" +
-            "		<ImageOverlay>" +
-            "		    <OriginalImage/>" +
-            "		<Shapes/>" +
-            "		<Shapes IsResourceLayer=\"true\" Name=\"Resources\"/>" +
-            "		<Variables/>" +
-            "		<ConditionTagSet/>" +
-            "	</ImageOverlay>" +
-            "</fileProperties>");
-            return propsFile;
-        }
-
-        private void Attribute(XmlNode node, string name, string value)
-        {
-            if (node.Attributes[name] == null)
-            {
-                XmlAttribute newAtt = node.OwnerDocument.CreateAttribute(name);
-                node.Attributes.Append(newAtt);
-            }
-            node.Attributes[name].Value = value.ToString();
-        }
-
-        private static Image Base642Image(string base64String)
-        {
-            if (base64String == "") return null;
-            try
-            {
-                byte[] buffer = Convert.FromBase64String(base64String);
-                if (buffer != null)
-                {
-                    ImageConverter ic = new ImageConverter();
-                    return ic.ConvertFrom(buffer) as Image;
-                }
-                else
-                    return null;
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-                return null;
-            }
-
-        }
-
-        public string Image2Base64(Image bImage)
-        {
-            try
-            {
-                System.IO.MemoryStream ms = new MemoryStream();
-                bImage.Save(ms, ImageFormat.Png);
-                byte[] byteImage = ms.ToArray();
-                return Convert.ToBase64String(byteImage);
-            }
-            catch 
-            {
-                return "";
-            }
-            
-        }
-
-        public void setPaintMode(int mode)
+        public void setDrawMode(int mode)
         {
             drawMode = mode;
-            BackGroundBmp = new Bitmap(this.Width, this.Height);
-            if ((drawMode & 2) == 2 && ImageFileBmp != null)
-                BackGroundBmp = (Bitmap)ImageFileBmp.Clone();
-            if ((drawMode & 4) == 4 && PropsFileBmp != null)
-                BackGroundBmp = (Bitmap)PropsFileBmp.Clone();
             this.Invalidate();
         }
 
@@ -354,44 +259,62 @@ namespace GraphicTool
 
         private void PaintOnGraphicInstance(Graphics graphic, int marker, Color ClearColor)
         {
-            //if ((drawMode & 2) == 2 && ImageFileBmp != null)
-            //    BackGroundBmp = (Bitmap)ImageFileBmp.Clone();
-            //if ((drawMode & 4) == 4 && PropsFileBmp != null)
-            if (BackGroundBmp != null)
-                BackGroundBmp = (Bitmap) PropsFileBmp.Clone();
-            else
+            ////if ((drawMode & 2) == 2 && ImageFileBmp != null)
+            ////    BackGroundBmp = (Bitmap)ImageFileBmp.Clone();
+            ////if ((drawMode & 4) == 4 && PropsFileBmp != null)
+            try
             {
-                BackGroundBmp = new Bitmap(this.Width, this.Height);
-                MessageBox.Show("No BackgroundImage. Created a white background as big as the work area.");
+                if (BackGroundBmp == null && PropsFileBmp != null) //if (BackGroundBmp != null && PropsFileBmp != null)
+                    BackGroundBmp = (Bitmap)PropsFileBmp.Clone();
+                //else
+                //{
+                //    BackGroundBmp = new Bitmap(this.Width, this.Height);
+                //    MessageBox.Show("No BackgroundImage. Created a white background as big as the work area.");
+                //}
             }
-
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Display.PaintOnGraphicInstance");
+            }
+            
             graphic = Graphics.FromImage(BackGroundBmp);
             graphic.TranslateTransform(-BackgroundOffset.X, -BackgroundOffset.Y);
-            //graphic.TextRenderingHint = TextRenderingHint.AntiAlias;
-            if ((drawMode & 6) > 1)
-            {
-                graphic.DrawImage(BackGroundBmp, BackGroundBmp.Width, BackGroundBmp.Height);
-            }
-            else
-            {
-                graphic.Clear(ClearColor);
-            }
+            ////graphic.TextRenderingHint = TextRenderingHint.AntiAlias;
+            //if ((drawMode & 6) > 1)
+            //{
+            //    graphic.DrawImage(BackGroundBmp, BackGroundBmp.Width, BackGroundBmp.Height);
+            //}
+            //else
+            //{
+            //    graphic.Clear(ClearColor);
+            //}
 
             if ((drawMode & 1) == 1)
             {
-                Point Offset = new Point(0, 0);
-                if ((drawMode & 1) == 1)
+                try
                 {
+                    //MessageBox.Show(drawMode.ToString());
                     foreach (GraphicObject g in root.Children)
                     {
                         g.Draw(graphic, marker);
                     }
                 }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(drawMode.ToString() + "\n" + ex.Message);
+                }
+                    
             }
         }
 
+        public int getShapeCount()
+        {
+            return root.Children.Count;
+        }
         private void Display_Paint(object sender, PaintEventArgs e)
         {
+            if (drawMode < 2) BackGroundBmp = null;
+
             if ((drawMode & 2) == 2 && ImageFileBmp != null)
                 BackGroundBmp = (Bitmap)ImageFileBmp.Clone();
             if ((drawMode & 4) == 4 && PropsFileBmp != null)
@@ -412,7 +335,7 @@ namespace GraphicTool
                     g.Draw(e.Graphics, 1);
                 }
             }
-            if (backGroundSelected)
+            if (backGroundSelected && BackGroundBmp != null)
             {
                 //Brush solidBrush = new SolidBrush(Color.FromArgb(64, 0, 0, 255));
                 e.Graphics.DrawRectangle(new Pen(Color.Gray, 1), new Rectangle(BackgroundOffset.X, BackgroundOffset.Y, BackGroundBmp.Width, BackGroundBmp.Height));
@@ -542,15 +465,15 @@ namespace GraphicTool
                     BackGroundBmp = PropsFileBmp;
                     root.setPropsFileImage(PropsFileBmp);
                 }                   
-                backGroundSelected = true;
+                backGroundSelected = false;
+                changed = true;
                 this.Invalidate();
             }
             else
             {
-                MessageBox.Show("Clipboard is empty. Please Copy Image.");
+                MessageBox.Show("Clipboard is empty. Please copy Image.");
             }
         }
-
 
         private void Display_MouseMove(object sender, MouseEventArgs e)
         {
@@ -603,39 +526,47 @@ namespace GraphicTool
             }
             if (e.Button == MouseButtons.Left)
             {
-                switch (Mode)
+                if ((drawMode != 2) && (drawMode != 4)) //prevent invisible shapes to be moved or resized)
                 {
-                    case mode.Move:
-                        {
-                            foreach (GraphicObject g in root.Children)
+                    switch (Mode)
+                    {
+                        case mode.Move:
                             {
-                                if (g.IsSelected) // && (XY.X >= 0) && (XY.Y >= 0))
-                                    g.Move(new Point(deltaXY.X, deltaXY.Y));
-                            }
-                        }
-                        break;
-                    case mode.ResizeObject:
-                        {
-                            foreach (GraphicObject g in root.Children)
-                            {
-                                if (g.IsSelected)
+                                foreach (GraphicObject g in root.Children)
                                 {
-                                    g.Reshape(deltaXY);
-                                    //if (textBox1.Visible)
-                                    //{
-                                    //    textBox1.Location = new Point(g.Box.X + displayOffset.X + 1, g.Box.Y + displayOffset.Y + 1);
-                                    //    textBox1.Size = new Size(g._textBox.Size.Width - 2, g._textBox.Size.Height - 2);
-                                    //}
+                                    if (g.IsSelected) // && (XY.X >= 0) && (XY.Y >= 0))
+                                    {
+                                        g.Move(new Point(deltaXY.X, deltaXY.Y));
+                                        changed = true;
+                                    }
                                 }
                             }
+                            break;
+                        case mode.ResizeObject:
+                            {
+                                foreach (GraphicObject g in root.Children)
+                                {
+                                    if (g.IsSelected)
+                                    {
+                                        g.Reshape(deltaXY);
+                                        changed = true;
+                                        //if (textBox1.Visible)
+                                        //{
+                                        //    textBox1.Location = new Point(g.Box.X + displayOffset.X + 1, g.Box.Y + displayOffset.Y + 1);
+                                        //    textBox1.Size = new Size(g._textBox.Size.Width - 2, g._textBox.Size.Height - 2);
+                                        //}
+                                    }
+                                }
 
-                        }
-                        break;
+                            }
+                            break;
+                    }
                 }
                 if (backGroundSelected)
                 {
                     BackgroundOffset.X += deltaXY.X;
                     BackgroundOffset.Y += deltaXY.Y;
+                    changed = true;
                 }
             }
             Invalidate();
@@ -643,7 +574,7 @@ namespace GraphicTool
 
         static bool IsPointOnLine(PointF p, PointF lineStart, PointF lineEnd)
         {
-            // Den zu p nähesten Punkt q auf der Strecke bestimmen
+            // Find point q on line closest to p
             PointF startToP = p.Subtract(lineStart);
             PointF startToEnd = lineEnd.Subtract(lineStart);
 
@@ -651,7 +582,7 @@ namespace GraphicTool
             t = Math.Max(0, Math.Min(t, 1));
             PointF q = lineStart.Add(startToEnd.Scale(t));
 
-            // Abstand zwischen p und q berechnen
+            // Calculate distance between p and q
             float threshold = 5f;
             float squared_distance = (p.Subtract(q)).Scalar(p.Subtract(q));
             return squared_distance < (threshold * threshold);
@@ -669,13 +600,13 @@ namespace GraphicTool
             if (e.KeyCode == Keys.ControlKey)
             {
                 multiSelect = true;
-                //AVOIDS UNWANTED MOVING OF SHAPES DURING MULTI-SELECT:
+                //Necessary to avoid moving shapes during multi-select
                 delta.X = 0;
                 delta.Y = 0;
                 Invalidate();
                 return;
             }
-            //Objekt(e) mit Pfeiltasten bewegen
+            //Move shapes with arrow buttons
             if (e.KeyCode == Keys.Left)
             {
                 deltaXY.X = -1;
@@ -720,7 +651,7 @@ namespace GraphicTool
 
                 }
             }
-            //Neues Hintergrundbild einfügen.
+            //Paste a new background image
             if (e.Control && e.KeyCode == Keys.V)
                     replaceBackgroundFromClipboard();
 
@@ -759,16 +690,12 @@ namespace GraphicTool
                     else
                         i++;
                 }
-                if(root.Children.Count == 0)
+                if (ShapeCount != null) ShapeCount();
+                if (root.Children.Count == 0)
                     multiSelect = false;
             }
 
             Invalidate();
-        }
-
-        private void Display_KeyDown(object sender, KeyEventArgs e)
-        {
-
         }
 
         private void Display_KeyUp(object sender, KeyEventArgs e)
@@ -797,48 +724,50 @@ namespace GraphicTool
                     case mode.Default:
                         if (mouseOverObject > -1)
                         {
-                            GraphicObject g;
-                            if (focusedGraphicObject > 0)
-                                g = root.Children[focusedGraphicObject];
-                            else
-                                g = root.Children[mouseOverObject];
-                            if (g != null)
+                            if ((drawMode != 2) && (drawMode != 4))  //Wenn die Shapes unsichtbar sind, soll man sie auch nicht auswählen können
                             {
-                                if ((nSelected == 1 && g._type == "Group")/*GetType() == typeof(MyGroup))*/ || nSelected > 1)
-                                {
-                                    ContextMenuStrip contextMenu = new ContextMenuStrip();
-                                    //string type = g.GetType().Name.ToString();
-                                    if (nSelected == 1 && g._type == "Group") //GetType() == typeof(MyGroup))
-                                    {
-                                        ToolStripMenuItem ungroupToolStripMenuItem = new ToolStripMenuItem();
-                                        ungroupToolStripMenuItem.Text = "ungroup";
-                                        ungroupToolStripMenuItem.Click += ungroupToolStripMenuItem_Click;
-                                        contextMenu.Items.AddRange(new ToolStripItem[] { ungroupToolStripMenuItem });
-                                    }
-                                    if (nSelected > 1)
-                                    {
-                                        ToolStripMenuItem groupToolStripMenuItem = new ToolStripMenuItem();
-                                        groupToolStripMenuItem.Text = "group";
-                                        groupToolStripMenuItem.Click += groupToolStripMenuItem_Click;
-                                        contextMenu.Items.AddRange(new ToolStripItem[] { groupToolStripMenuItem });
-                                    }
-
-                                    contextMenu.Show(Cursor.Position);
-                                    Mode = mode.ContextMenu;
-                                    this.Invalidate();
-                                }
+                                GraphicObject g;
+                                if (focusedGraphicObject > 0)
+                                    g = root.Children[focusedGraphicObject];
                                 else
+                                    g = root.Children[mouseOverObject];
+                                if (g != null)
                                 {
-                                    if(nSelected == 1 && g._type != "Group")
+                                    if ((nSelected == 1 && g._type == "Group")/*GetType() == typeof(MyGroup))*/ || nSelected > 1)
                                     {
-                                        GraphicShapeDialog textForm = new GraphicShapeDialog(this, g, Cursor.Position);
-                                        textForm.ShowDialog();
-                                        textForm.Dispose();
+                                        ContextMenuStrip contextMenu = new ContextMenuStrip();
+                                        //string type = g.GetType().Name.ToString();
+                                        if (nSelected == 1 && g._type == "Group") //GetType() == typeof(MyGroup))
+                                        {
+                                            ToolStripMenuItem ungroupToolStripMenuItem = new ToolStripMenuItem();
+                                            ungroupToolStripMenuItem.Text = "ungroup";
+                                            ungroupToolStripMenuItem.Click += UngroupToolStripMenuItem_Click;
+                                            contextMenu.Items.AddRange(new ToolStripItem[] { ungroupToolStripMenuItem });
+                                        }
+                                        if (nSelected > 1)
+                                        {
+                                            ToolStripMenuItem groupToolStripMenuItem = new ToolStripMenuItem();
+                                            groupToolStripMenuItem.Text = "group";
+                                            groupToolStripMenuItem.Click += GroupToolStripMenuItem_Click;
+                                            contextMenu.Items.AddRange(new ToolStripItem[] { groupToolStripMenuItem });
+                                        }
+
+                                        contextMenu.Show(Cursor.Position);
+                                        Mode = mode.ContextMenu;
                                         this.Invalidate();
+                                    }
+                                    else
+                                    {
+                                        if (nSelected == 1 && g._type != "Group")
+                                        {
+                                            GraphicShapeDialog textForm = new GraphicShapeDialog(this, g, Cursor.Position);
+                                            textForm.ShowDialog();
+                                            textForm.Dispose();
+                                            this.Invalidate();
+                                        }
                                     }
                                 }
                             }
-                            
                         }
                         else
                         {
@@ -852,7 +781,7 @@ namespace GraphicTool
             {
                 if (Mode == mode.EditText) 
                 {
-                    textBox1.Dispose();
+                    ShapeTextBox.Dispose();
                     Mode = mode.Default;
                     Invalidate();
                     return;
@@ -895,17 +824,18 @@ namespace GraphicTool
             }
         }
 
-        private void groupToolStripMenuItem_Click(object? sender, EventArgs e)
+        private void GroupToolStripMenuItem_Click(object? sender, EventArgs e)
         {
             List<GraphicObject> objects = new List<GraphicObject>();
             foreach (GraphicObject g in root.Children)
                 if (g.IsSelected) objects.Add(g);                   
             GraphicObject newGroup = new MyGroup(objects, root);
             newGroup.Select();
+            if (ShapeCount != null) ShapeCount();
             Invalidate();
         }
 
-        private void ungroupToolStripMenuItem_Click(object? sender, EventArgs e)
+        private void UngroupToolStripMenuItem_Click(object? sender, EventArgs e)
         {
             int i = 0;
             while (i < root.Children.Count)
@@ -918,6 +848,7 @@ namespace GraphicTool
                 }
                 i++;
             }
+            if (ShapeCount != null) ShapeCount();
             Invalidate();
         }
 
@@ -936,28 +867,24 @@ namespace GraphicTool
                 else
                     g = root.Children[mouseOverObject];
 
-                //MyGroup dummyGroup = new MyGroup();
-                //string grouptype = dummyGroup.GetType().Name.ToString();
-
-                //if (g.GetType().Name.ToString() != grouptype)
                 if(g._type == "Rectangle" || g._type == "Oval" || g._type == "Polygon")
                 {
                     backGroundSelected = false; //focusedGraphicObject = ?;
-                    textBox1 = new TextBox();
-                    textBox1.Multiline = true;
-                    textBox1.TextChanged += textBox1_TextChanged;
-                    textBox1.Location = new Point(g.Box.X + displayOffset.X, g.Box.Y + displayOffset.Y);
-                    textBox1.Size = new Size(g._textBox.Size.Width - 1, g._textBox.Size.Height - 1);
-                    textBox1.Font = g._font;
-                    textBox1.Text = g._text;
-                    textBox1.BorderStyle = BorderStyle.None;
-                    textBox1.SelectAll();
-                    textBox1.Visible = true;
+                    ShapeTextBox = new TextBox();
+                    ShapeTextBox.Multiline = true;
+                    ShapeTextBox.TextChanged += ShapeTextBox_TextChanged;
+                    ShapeTextBox.Location = new Point(g.Box.X + displayOffset.X, g.Box.Y + displayOffset.Y);
+                    ShapeTextBox.Size = new Size(g._textBox.Size.Width - 1, g._textBox.Size.Height - 1);
+                    ShapeTextBox.Font = g._font;
+                    ShapeTextBox.Text = g._text;
+                    ShapeTextBox.BorderStyle = BorderStyle.None;
+                    ShapeTextBox.SelectAll();
+                    ShapeTextBox.Visible = true;
 
-                    this.Controls.Add(textBox1);
-                    this.Controls.SetChildIndex(textBox1, 0);
-                    textBox1.Focus();
-                    textBox1.Show();
+                    this.Controls.Add(ShapeTextBox);
+                    this.Controls.SetChildIndex(ShapeTextBox, 0);
+                    ShapeTextBox.Focus();
+                    ShapeTextBox.Show();
                     //textBox1.Text = e.KeyData.ToString();
                     //textBox1.SelectionStart = textBox1.Text.Length;
                     //textBox1.SelectionLength = 0;
@@ -969,7 +896,12 @@ namespace GraphicTool
             }
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        /// <summary>
+        /// //Change Shape text
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ShapeTextBox_TextChanged(object sender, EventArgs e)
         {
             if (mouseOverObject > -1)
             {
@@ -978,10 +910,179 @@ namespace GraphicTool
                     g = root.Children[focusedGraphicObject];
                 else
                     g = root.Children[mouseOverObject];
-                g._text = textBox1.Text;
+                g._text = ShapeTextBox.Text;
             }
             Invalidate();
         }
+
+        /// <summary>
+        /// Save the current image
+        /// </summary>
+        /// <param name="fileName"></param>
+        public void Save2File(string fileName)
+        {
+            if (fileName == null) return;
+            //if (!Directory.Exists(Path.GetDirectoryName(fileName)))
+            //    tools1.createPath(Path.GetDirectoryName(fileName));
+
+            try
+            {
+                XmlNode OriginalImageNode;
+                XmlDocument propsFile = PreparePropsFile();
+
+                OriginalImageNode = propsFile.SelectSingleNode("//OriginalImage");
+                if (BackGroundBmp == null) BackGroundBmp = PropsFileBmp;
+                OriginalImageNode.InnerText = Image2Base64((Image)BackGroundBmp); //BackGroundBmp); // 
+
+                Attribute(OriginalImageNode, "ComputedWidth", BackGroundBmp.Width.ToString());
+                Attribute(OriginalImageNode, "ComputedHeight", BackGroundBmp.Height.ToString());
+                Attribute(OriginalImageNode, "Type", "Image");
+                Attribute(OriginalImageNode, "Format", "png");
+                Attribute(OriginalImageNode, "DPI", "96");
+
+                XmlNode ShapesNode = propsFile.SelectSingleNode("//Shapes");
+                //Save Shapes as Xml
+                root.deserialize(ShapesNode, BackgroundOffset);
+                //Draw Shapes on Graphic
+                PaintOnGraphicInstance(graph, 0, Color.White);
+                //Save Graphic
+                BackGroundBmp.Save(fileName);
+                //Update Image File in memory
+                //ImageFileBmp = (Bitmap)BackGroundBmp.Clone();
+                propsFile.Save(fileName + ".props");
+
+                BeautifyXml(fileName + ".props");
+                changed = false;
+                if (Saved != null) Saved();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Display.Save2File:" + fileName);
+            }
+        }
+
+        // --- XML file helper functions
+
+        private void Attribute(XmlNode node, string name, string value)
+        {
+            if (node.Attributes[name] == null)
+            {
+                XmlAttribute newAtt = node.OwnerDocument.CreateAttribute(name);
+                node.Attributes.Append(newAtt);
+            }
+            node.Attributes[name].Value = value.ToString();
+        }
+
+        private static Image Base642Image(string base64String)
+        {
+            if (base64String == "") return null;
+            try
+            {
+                byte[] buffer = Convert.FromBase64String(base64String);
+                if (buffer != null)
+                {
+                    ImageConverter ic = new ImageConverter();
+                    return ic.ConvertFrom(buffer) as Image;
+                }
+                else
+                    return null;
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return null;
+            }
+
+        }
+
+        public string Image2Base64(Image bImage)
+        {
+            try
+            {
+                System.IO.MemoryStream ms = new MemoryStream();
+                bImage.Save(ms, ImageFormat.Png);
+                byte[] byteImage = ms.ToArray();
+                return Convert.ToBase64String(byteImage);
+            }
+            catch
+            {
+                return "";
+            }
+
+        }
+
+        private XmlDocument PreparePropsFile()
+        {
+            XmlDocument propsFile = new XmlDocument();
+            propsFile.LoadXml(
+            "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+            "	<fileProperties>" +
+            "		<ImageOverlay>" +
+            "		    <OriginalImage/>" +
+            "		<Shapes/>" +
+            "		<Shapes IsResourceLayer=\"true\" Name=\"Resources\"/>" +
+            "		<Variables/>" +
+            "		<ConditionTagSet/>" +
+            "	</ImageOverlay>" +
+            "</fileProperties>");
+            return propsFile;
+        }
+
+        public static void BeautifyXml(string filename1, string filename2 = null)
+        {
+            if (filename2 == null) filename2 = filename1;
+            XmlDocument xmlDoc = new System.Xml.XmlDocument();
+            xmlDoc.XmlResolver = null;
+            xmlDoc.PreserveWhitespace = false;
+            xmlDoc.Load(filename1);
+            string txt = IndentXml(xmlDoc, "<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+            //Check for well-formed xml
+            XmlDocument doc = new XmlDocument();
+            doc.PreserveWhitespace = true;
+            try
+            {
+                doc.LoadXml(txt);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + "\nFile will not be saved.", filename2);
+                return;
+            }
+            TextDatei file = new TextDatei();
+
+            file.WriteFile(filename2, txt);
+
+        }
+
+        private static string IndentXml(XmlDocument doc, string prolog)
+        {
+            StringBuilder sb = new StringBuilder();
+            XmlWriterSettings settings = new XmlWriterSettings
+            {
+                Encoding = Encoding.UTF8,
+                OmitXmlDeclaration = true,
+                Indent = true,
+                IndentChars = "  ",
+                NewLineChars = "\r\n",
+                NewLineHandling = NewLineHandling.Replace,
+                NewLineOnAttributes = true
+            };
+            using (XmlWriter writer = XmlWriter.Create(sb, settings))
+            {
+                doc.Save(writer);
+            }
+
+            return prolog + "\r\n" + sb.ToString();
+            /*
+            XmlDeclaration xmldecl;
+            xmldecl = doc.CreateXmlDeclaration("1.0", "utf-8", null);
+
+            XmlElement root = doc.DocumentElement;
+            doc.InsertBefore(xmldecl, root);
+            */
+        }
+
     }
 
     public static class UnlinkedBitmap

@@ -47,7 +47,6 @@
             Size = new Size(688, 646);
             Paint += Display_Paint;
             DoubleClick += Display_DoubleClick;
-            KeyDown += Display_KeyDown;
             KeyUp += Display_KeyUp;
             MouseDown += Display_MouseDown;
             MouseMove += Display_MouseMove;

@@ -137,8 +137,7 @@ namespace GraphicTool
             fileName = fileName.Substring(fileName.IndexOf(" ") + 1);
             try
             {
-                if (fileName.EndsWith(".props")) fileName = fileName.Substring(0, fileName.Length - 6);
-                parent.LoadImageFile(fileName, true);
+                parent.LoadFile(fileName, true);
             }
             catch (Exception ex)
             {

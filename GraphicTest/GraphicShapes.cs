@@ -675,6 +675,10 @@ namespace GraphicShapes
                     Attribute(Shape, "LineWidth", g._pen.Width.ToString());
                     Attribute(Shape, "LineColor", ColorTranslator.ToHtml(g._pen.Color));
                 }
+                else 
+                {
+                    Attribute(Shape, "LineWidth", "0");
+                }
 
                 if (g._fillBrush != null)
                 {
@@ -776,7 +780,7 @@ namespace GraphicShapes
             //Height  ?Coordinates?
             //X
             //Y
-            //LineWidth
+            //LineWidth LineWidth="0"
             //LineColor
             //BackgroundColor
 
