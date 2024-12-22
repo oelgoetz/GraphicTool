@@ -65,10 +65,10 @@ namespace GraphicTool
             }
 
             // --- TEST CASE for Images where props file is created during the session:
-            //if (File.Exists(@"C:\temp\test\testNoProps.png.props"))  //testNoPropsBAK.png
-            //    File.Delete(@"C:\temp\test\testNoProps.png.props");
-            //if (File.Exists(@"C:\temp\test\testNoPropsBAK.png"))
-            //    File.Copy(@"C:\temp\test\testNoPropsBAK.png", @"C:\temp\test\testNoProps.png", true);
+            if (File.Exists(@"C:\temp\test\testNoProps.png.props"))  //testNoPropsBAK.png
+                File.Delete(@"C:\temp\test\testNoProps.png.props");
+            if (File.Exists(@"C:\temp\test\testNoPropsBAK.png"))
+                File.Copy(@"C:\temp\test\testNoPropsBAK.png", @"C:\temp\test\testNoProps.png", true);
 
             //Other Test cases:
             //("deleteme");
@@ -367,10 +367,10 @@ namespace GraphicTool
                 {
                     string fileName = saveFileDialog1.FileName;
                     AddRecentFileMenuItem(fileName);
+                    currentFileLabel.Text = fileName;
                     //UNDER CONSTRUCTION!!! saveToolStripMenuItem.Enabled = true;
                     if (fileName.EndsWith(".props")) fileName = fileName.Substring(0, fileName.Length - 6);
-                    display.Save2File(currentFileLabel.Text);
-                    currentFileLabel.Text = fileName;
+                    display.Save2File(currentFileLabel.Text);                   
                 }
             }
             if (File.Exists(currentFileLabel.Text + ".props")) rBBackgroundXML.Enabled = true; else rBBackgroundXML.Enabled = false;
