@@ -21,14 +21,23 @@ namespace GraphicTool
             display.Saved += () => CheckPropsFile();
             display.ShapeCount += () => getShapesCount();
             //DEBUG argument: C:\temp\test\test.png
+            this.display.Value_Change += this.Form1_GetDisplayStatus;
         }
+
+        // EventHandler
+        public void Form1_GetDisplayStatus(Display sender, DisplayChangesEventArgs e)
+        {
+            //The following could replace these "Saved & ShapeCount - Actions":
+            //label1.Text = "Count: " + e.Count.ToString();
+        }
+
 
         private void getShapesCount()
         {
             int z = display.getShapeCount();
             if (z > 0)
                 label1.Text = "(" + z.ToString() + ")";
-            else 
+            else
                 label1.Text = "";
         }
 
@@ -36,12 +45,11 @@ namespace GraphicTool
         {
             if (File.Exists(currentFileLabel.Text + ".props"))
             {
-                lblBgXml.Visible = true;
                 lblShapes.Visible = true;
                 return true;
             }
             else
-            {   lblBgXml.Visible = false;
+            {
                 lblShapes.Visible = false;
                 return false;
             }
@@ -330,11 +338,10 @@ namespace GraphicTool
 
         private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (CheckBgBeforeSaving())
-            {
-                display.Save2File(currentFileLabel.Text);
-            }
-            if (File.Exists(currentFileLabel.Text + ".props")) rBBackgroundXML.Enabled = true; else rBBackgroundXML.Enabled = false;
+            display.Save2File(currentFileLabel.Text);
+            if (File.Exists(currentFileLabel.Text + ".props")) 
+                rBBackgroundXML.Enabled = true; 
+            else rBBackgroundXML.Enabled = false;
         }
 
         private bool CheckBgBeforeSaving()
@@ -357,21 +364,18 @@ namespace GraphicTool
 
         private void SaveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (CheckBgBeforeSaving())
+            saveFileDialog1.DefaultExt = "png";
+            saveFileDialog1.AddExtension = true;
+            saveFileDialog1.InitialDirectory = Path.GetDirectoryName(currentFileLabel.Text);
+            saveFileDialog1.FileName = Path.GetFileName(currentFileLabel.Text);
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                saveFileDialog1.DefaultExt = "png";
-                saveFileDialog1.AddExtension = true;
-                saveFileDialog1.InitialDirectory = Path.GetDirectoryName(currentFileLabel.Text);
-                saveFileDialog1.FileName = Path.GetFileName(currentFileLabel.Text);
-                if (saveFileDialog1.ShowDialog() == DialogResult.OK)
-                {
-                    string fileName = saveFileDialog1.FileName;
-                    AddRecentFileMenuItem(fileName);
-                    currentFileLabel.Text = fileName;
-                    //UNDER CONSTRUCTION!!! saveToolStripMenuItem.Enabled = true;
-                    if (fileName.EndsWith(".props")) fileName = fileName.Substring(0, fileName.Length - 6);
-                    display.Save2File(currentFileLabel.Text);                   
-                }
+                string fileName = saveFileDialog1.FileName;
+                AddRecentFileMenuItem(fileName);
+                currentFileLabel.Text = fileName;
+                //UNDER CONSTRUCTION!!! saveToolStripMenuItem.Enabled = true;
+                if (fileName.EndsWith(".props")) fileName = fileName.Substring(0, fileName.Length - 6);
+                display.Save2File(currentFileLabel.Text);
             }
             if (File.Exists(currentFileLabel.Text + ".props")) rBBackgroundXML.Enabled = true; else rBBackgroundXML.Enabled = false;
         }
@@ -476,6 +480,10 @@ namespace GraphicTool
             CloseCancel();
         }
 
+        /// <summary>
+        /// wird für das beenden über "x" gebraucht.
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             CloseCancel();
@@ -496,11 +504,22 @@ namespace GraphicTool
                     display.Save2File(currentFileLabel.Text);
                 }
             }
+            else
+                Environment.Exit(0);
         }
 
         private void toolStripMenuItem1_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void lblShapes_Click(object sender, EventArgs e)
+        {
+            if(MessageBox.Show("Do you want to save the current view into the image file and delete the .props file?",
+                     "Delete XML Properties", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                display.SaveCurrentView2File(currentFileLabel.Text);
+            }
         }
     }
 }

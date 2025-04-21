@@ -1,5 +1,6 @@
 ﻿using GraphicShapes;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.Text;
@@ -29,7 +30,6 @@ namespace GraphicTool
         private Rectangle CropRectangle;
         TextBox ShapeTextBox;
         XmlNode buffer;
-        public bool changed = false;
 
         private enum mode
         {
@@ -55,13 +55,21 @@ namespace GraphicTool
         private int nSelected;
         private bool multiSelect;
         private bool backGroundSelected;
-        private Point BackgroundOffset = Point.Empty;
-        
+        private Point BackgroundOffset = Point.Empty;       
 
         private string currentFile;
+        public bool changed = false;
+        public DisplayChangesEventArgs status;
 
         public event Action Saved;
         public event Action ShapeCount;
+
+        // Delegate
+        public delegate void DisplayEventHandler(Display sender, DisplayChangesEventArgs e);
+
+        // Event
+        public event DisplayEventHandler Value_Change;
+
         public Display()
         {
             InitializeComponent();
@@ -69,6 +77,8 @@ namespace GraphicTool
             PropsFileBmp = new Bitmap(this.Width, this.Height);
             ImageFileBmp = new Bitmap(this.Width, this.Height);
             root = new Root();
+            status = new DisplayChangesEventArgs(0, false);
+            //status.Count = 0;
             //PreviewKeyDown += new PreviewKeyDownEventHandler(Display_PreviewKeyDown);
 
         }
@@ -111,6 +121,10 @@ namespace GraphicTool
             Center();
             changed = false;
             if (ShapeCount != null) ShapeCount();
+            status.Count = root.Children.Count;
+            if (Value_Change != null) 
+                Value_Change(this, status);
+
             this.Invalidate();
         }
 
@@ -136,6 +150,7 @@ namespace GraphicTool
             XmlNode ShapesNode = propsFile.SelectSingleNode("//fileProperties/ImageOverlay/Shapes");
             this.LoadOverlays(ShapesNode);
             if (ShapeCount != null) ShapeCount();
+            status.Count = root.Children.Count;
         }
 
         public void AddShape(string xml)
@@ -156,6 +171,7 @@ namespace GraphicTool
                 MessageBox.Show(ex.Message + "\n" + shape.Name + "\n" + s + "\n" + shape.BaseURI, "Display02.addShape");
             }
             if (ShapeCount != null) ShapeCount();
+            status.Count = root.Children.Count;
             Invalidate();
         }
 
@@ -172,7 +188,7 @@ namespace GraphicTool
         {
             if ((drawMode & 2) == 2 && ImageFileBmp != null)
                 BackGroundBmp = (Bitmap)ImageFileBmp.Clone();
-            if ((drawMode & 4) == 4 && PropsFileBmp != null)
+            if ((drawMode & 4) == 4 && PropsFileBmp != null && BackGroundBmp == null)
                 BackGroundBmp = (Bitmap)PropsFileBmp.Clone();
             if (BackGroundBmp != null)
             {
@@ -259,18 +275,10 @@ namespace GraphicTool
 
         private void PaintOnGraphicInstance(Graphics graphic, int marker, Color ClearColor)
         {
-            ////if ((drawMode & 2) == 2 && ImageFileBmp != null)
-            ////    BackGroundBmp = (Bitmap)ImageFileBmp.Clone();
-            ////if ((drawMode & 4) == 4 && PropsFileBmp != null)
             try
             {
                 if (BackGroundBmp == null && PropsFileBmp != null) //if (BackGroundBmp != null && PropsFileBmp != null)
                     BackGroundBmp = (Bitmap)PropsFileBmp.Clone();
-                //else
-                //{
-                //    BackGroundBmp = new Bitmap(this.Width, this.Height);
-                //    MessageBox.Show("No BackgroundImage. Created a white background as big as the work area.");
-                //}
             }
             catch (Exception ex)
             {
@@ -279,21 +287,11 @@ namespace GraphicTool
             
             graphic = Graphics.FromImage(BackGroundBmp);
             graphic.TranslateTransform(-BackgroundOffset.X, -BackgroundOffset.Y);
-            ////graphic.TextRenderingHint = TextRenderingHint.AntiAlias;
-            //if ((drawMode & 6) > 1)
-            //{
-            //    graphic.DrawImage(BackGroundBmp, BackGroundBmp.Width, BackGroundBmp.Height);
-            //}
-            //else
-            //{
-            //    graphic.Clear(ClearColor);
-            //}
 
             if ((drawMode & 1) == 1)
             {
                 try
                 {
-                    //MessageBox.Show(drawMode.ToString());
                     foreach (GraphicObject g in root.Children)
                     {
                         g.Draw(graphic, marker);
@@ -691,6 +689,7 @@ namespace GraphicTool
                         i++;
                 }
                 if (ShapeCount != null) ShapeCount();
+                status.Count = root.Children.Count;
                 if (root.Children.Count == 0)
                     multiSelect = false;
             }
@@ -832,6 +831,7 @@ namespace GraphicTool
             GraphicObject newGroup = new MyGroup(objects, root);
             newGroup.Select();
             if (ShapeCount != null) ShapeCount();
+            status.Count = root.Children.Count;
             Invalidate();
         }
 
@@ -849,6 +849,7 @@ namespace GraphicTool
                 i++;
             }
             if (ShapeCount != null) ShapeCount();
+            status.Count = root.Children.Count;
             Invalidate();
         }
 
@@ -931,7 +932,8 @@ namespace GraphicTool
                 XmlDocument propsFile = PreparePropsFile();
 
                 OriginalImageNode = propsFile.SelectSingleNode("//OriginalImage");
-                if (BackGroundBmp == null) BackGroundBmp = PropsFileBmp;
+                if (BackGroundBmp == null) 
+                    BackGroundBmp = PropsFileBmp;
                 OriginalImageNode.InnerText = Image2Base64((Image)BackGroundBmp); //BackGroundBmp); // 
 
                 Attribute(OriginalImageNode, "ComputedWidth", BackGroundBmp.Width.ToString());
@@ -958,6 +960,55 @@ namespace GraphicTool
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Display.Save2File:" + fileName);
+            }
+        }
+
+
+        /// <summary>
+        /// Save the current image
+        /// </summary>
+        /// <param name="fileName"></param>
+        public void SaveCurrentView2File(string fileName)
+        {
+            if (fileName == null) return;
+            //if (!Directory.Exists(Path.GetDirectoryName(fileName)))
+            //    tools1.createPath(Path.GetDirectoryName(fileName));
+
+            try
+            {
+                //XmlNode OriginalImageNode;
+                //XmlDocument propsFile = PreparePropsFile();
+
+                //OriginalImageNode = propsFile.SelectSingleNode("//OriginalImage");
+                //if (BackGroundBmp == null) BackGroundBmp = PropsFileBmp;
+                //OriginalImageNode.InnerText = Image2Base64((Image)BackGroundBmp); //BackGroundBmp); // 
+
+                //Attribute(OriginalImageNode, "ComputedWidth", BackGroundBmp.Width.ToString());
+                //Attribute(OriginalImageNode, "ComputedHeight", BackGroundBmp.Height.ToString());
+                //Attribute(OriginalImageNode, "Type", "Image");
+                //Attribute(OriginalImageNode, "Format", "png");
+                //Attribute(OriginalImageNode, "DPI", "96");
+
+                //XmlNode ShapesNode = propsFile.SelectSingleNode("//Shapes");
+                ////Save Shapes as Xml
+                //root.deserialize(ShapesNode, BackgroundOffset);
+                //Draw Shapes on Graphic
+                if ((drawMode & 1) == 1)
+                    PaintOnGraphicInstance(graph, 0, Color.White);
+                //Save Graphic
+                BackGroundBmp.Save(fileName);
+                //Update Image File in memory
+                //ImageFileBmp = (Bitmap)BackGroundBmp.Clone();
+                //propsFile.Save(fileName + ".props");
+                //BeautifyXml(fileName + ".props");
+                if (File.Exists(fileName + ".props")) 
+                    File.Delete(fileName + ".props");
+                changed = false;
+                if (Saved != null) Saved();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Display.SaveCurrentView2File:" + fileName);
             }
         }
 
@@ -1083,15 +1134,33 @@ namespace GraphicTool
             */
         }
 
+        internal void SaveBackGroundImage(Image backgroundImage)
+        {
+            //OriginalImageNode.InnerText = Image2Base64((Image)BackGroundBmp); //BackGroundBmp); // 
+
+            //Attribute(OriginalImageNode, "ComputedWidth", BackGroundBmp.Width.ToString());
+            //Attribute(OriginalImageNode, "ComputedHeight", BackGroundBmp.Height.ToString());
+            //Attribute(OriginalImageNode, "Type", "Image");
+            //Attribute(OriginalImageNode, "Format", "png");
+            //Attribute(OriginalImageNode, "DPI", "96");
+        }
     }
 
     public static class UnlinkedBitmap
     {
         public static Bitmap FromFile(string filename)
         {
-            Byte[] buffer = File.ReadAllBytes(filename);
-            MemoryStream memstream = new MemoryStream(buffer);
-            return new Bitmap(memstream);
+            try
+            {
+                Byte[] buffer = File.ReadAllBytes(filename);
+                MemoryStream memstream = new MemoryStream(buffer);
+                return new Bitmap(memstream);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Display.UnlinkedBitmap");
+                return null;
+            }
         }
     }
 

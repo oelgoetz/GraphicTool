@@ -58,7 +58,6 @@
             groupBox1 = new GroupBox();
             label1 = new Label();
             lblShapes = new Button();
-            lblBgXml = new Button();
             lblBgImg = new Button();
             cBShapes = new CheckBox();
             cBBackGround = new CheckBox();
@@ -207,7 +206,7 @@
             // 
             splitContainer1.Panel2.Controls.Add(display);
             splitContainer1.Size = new Size(1095, 663);
-            splitContainer1.SplitterDistance = 142;
+            splitContainer1.SplitterDistance = 166;
             splitContainer1.TabIndex = 2;
             // 
             // dmc1
@@ -216,7 +215,7 @@
             dmc1.BorderStyle = BorderStyle.FixedSingle;
             dmc1.Location = new Point(3, 502);
             dmc1.Name = "dmc1";
-            dmc1.Size = new Size(134, 85);
+            dmc1.Size = new Size(158, 85);
             dmc1.TabIndex = 11;
             dmc1.Visible = false;
             // 
@@ -331,7 +330,7 @@
             // zoomSelector
             // 
             zoomSelector.Increment = new decimal(new int[] { 10, 0, 0, 0 });
-            zoomSelector.Location = new Point(81, 145);
+            zoomSelector.Location = new Point(103, 145);
             zoomSelector.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             zoomSelector.Minimum = new decimal(new int[] { 10, 0, 0, 0 });
             zoomSelector.Name = "zoomSelector";
@@ -343,9 +342,9 @@
             // 
             // groupBox1
             // 
+            groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             groupBox1.Controls.Add(label1);
             groupBox1.Controls.Add(lblShapes);
-            groupBox1.Controls.Add(lblBgXml);
             groupBox1.Controls.Add(lblBgImg);
             groupBox1.Controls.Add(cBShapes);
             groupBox1.Controls.Add(cBBackGround);
@@ -353,7 +352,7 @@
             groupBox1.Controls.Add(rBBackgroundImage);
             groupBox1.Location = new Point(3, 165);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(135, 100);
+            groupBox1.Size = new Size(158, 100);
             groupBox1.TabIndex = 0;
             groupBox1.TabStop = false;
             // 
@@ -368,29 +367,20 @@
             // 
             // lblShapes
             // 
+            lblShapes.BackColor = Color.White;
             lblShapes.FlatAppearance.BorderColor = Color.Silver;
+            lblShapes.FlatAppearance.MouseDownBackColor = Color.White;
+            lblShapes.FlatAppearance.MouseOverBackColor = Color.White;
             lblShapes.FlatStyle = FlatStyle.Flat;
             lblShapes.ForeColor = SystemColors.ControlText;
             lblShapes.Image = (Image)resources.GetObject("lblShapes.Image");
-            lblShapes.Location = new Point(112, 69);
+            lblShapes.Location = new Point(119, 55);
             lblShapes.Name = "lblShapes";
-            lblShapes.Size = new Size(16, 16);
+            lblShapes.Size = new Size(17, 32);
             lblShapes.TabIndex = 14;
-            lblShapes.UseVisualStyleBackColor = true;
+            lblShapes.UseVisualStyleBackColor = false;
             lblShapes.Visible = false;
-            // 
-            // lblBgXml
-            // 
-            lblBgXml.FlatAppearance.BorderColor = Color.Silver;
-            lblBgXml.FlatStyle = FlatStyle.Flat;
-            lblBgXml.ForeColor = SystemColors.ControlText;
-            lblBgXml.Image = (Image)resources.GetObject("lblBgXml.Image");
-            lblBgXml.Location = new Point(112, 53);
-            lblBgXml.Name = "lblBgXml";
-            lblBgXml.Size = new Size(16, 16);
-            lblBgXml.TabIndex = 13;
-            lblBgXml.UseVisualStyleBackColor = true;
-            lblBgXml.Visible = false;
+            lblShapes.Click += lblShapes_Click;
             // 
             // lblBgImg
             // 
@@ -398,7 +388,7 @@
             lblBgImg.FlatStyle = FlatStyle.Flat;
             lblBgImg.ForeColor = SystemColors.ControlText;
             lblBgImg.Image = (Image)resources.GetObject("lblBgImg.Image");
-            lblBgImg.Location = new Point(112, 37);
+            lblBgImg.Location = new Point(120, 37);
             lblBgImg.Name = "lblBgImg";
             lblBgImg.Size = new Size(16, 16);
             lblBgImg.TabIndex = 12;
@@ -457,7 +447,7 @@
             display.Dock = DockStyle.Fill;
             display.Location = new Point(0, 0);
             display.Name = "display";
-            display.Size = new Size(949, 663);
+            display.Size = new Size(925, 663);
             display.TabIndex = 0;
             // 
             // openFileDialog1
@@ -532,7 +522,6 @@
         private DisplayModeControl dmc1;
         private Button lblBgImg;
         private Button lblShapes;
-        private Button lblBgXml;
         private Label label1;
     }
 }
