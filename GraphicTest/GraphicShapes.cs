@@ -613,7 +613,6 @@ namespace GraphicShapes
         {
             _padding = padding;
             updateTextBox();
-
         }
         
         internal void deserialize(XmlNode Node, Point BGOffset)
@@ -1028,7 +1027,8 @@ namespace GraphicShapes
             if (blur != null)
                 blur.Draw(g, extd);
             
-            if (_pen.Width > 0) g.DrawRectangle(_pen, 0, 0, Box.Width, Box.Height);
+            if (_pen.Width > 0) 
+                g.DrawRectangle(_pen, 0, 0, Box.Width, Box.Height);
 
             if (zoom != null) 
                 zoom.Draw(g, extd);
@@ -1550,7 +1550,7 @@ namespace GraphicShapes
 
         }
 
-        public override void Draw(Graphics g, int extd)
+        public override void Draw(Graphics g, int extd) //ArrowHeadAtHead
         {
             PointF p1 = Parent.MarkerPoints[Parent.MarkerPoints.Length - 1];
             PointF p2 = Parent.MarkerPoints[Parent.MarkerPoints.Length - 2];
@@ -1595,7 +1595,7 @@ namespace GraphicShapes
             Points[3].Y = Center - Length; Points[3].X = Width / 2;
         }
 
-        public override void Draw(Graphics g, int extd)
+        public override void Draw(Graphics g, int extd)  //ArrowTailAtHead
         {
             PointF p1 = Parent.MarkerPoints[1];
             PointF p2 = Parent.MarkerPoints[0];
@@ -1647,7 +1647,7 @@ namespace GraphicShapes
             Parent.ArrowHeadColor = c;
         }
 
-        public override void Draw(Graphics g, int extd)
+        public override void Draw(Graphics g, int extd) //ArrowTailAtTail
         {
             PointF p1 = Parent.MarkerPoints[0];
             PointF p2 = Parent.MarkerPoints[1];
@@ -1691,7 +1691,7 @@ namespace GraphicShapes
             Parent.ArrowTailColor = c;
         }
 
-        public override void Draw(Graphics g, int extd)
+        public override void Draw(Graphics g, int extd) //ArrowHeadAtTail
         {
             PointF p1 = Parent.MarkerPoints[0];
             PointF p2 = Parent.MarkerPoints[1];
@@ -1857,7 +1857,7 @@ namespace GraphicShapes
             //ImageBlurFactor = "12"
         }
 
-        public override void Draw(Graphics g, int extd)
+        public override void Draw(Graphics g, int extd)  //BlurEffect
         {
             //Bitmap image = Image.FromFile(fileName);
             GraphicObject r = getRoot(this.Parent);

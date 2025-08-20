@@ -59,6 +59,7 @@ namespace GraphicTool
             if (_g._type == "Rectangle" || _g._type == "Oval" || _g._type == "Polygon")
             {
                 rBBackground.Checked = true;
+                UpDownLineWidth.Value = (decimal) _g._pen.Width;
                 if (_g.zoom != null || _g.blur != null)
                 {
                     rbLine.Checked = true;
@@ -105,7 +106,7 @@ namespace GraphicTool
             if (_g._type == "Polyline")
             {
                 rBBackground.Enabled = false;
-
+                UpDownLineWidth.Value = (decimal)_g._pen.Width;
                 Heads = new ArrowTipControl(g, caller, tipMode.Heads);
                 ArrowsTab.Controls.Add(Heads);
                 Heads.Location = new Point(56, 28);
