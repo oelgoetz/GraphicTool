@@ -53,38 +53,45 @@ namespace GraphicTool
 
             //this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             _callingDisplay = caller;
-            _g = g;
+            //_g = g;
 
             //SHAPE PROPERTIES - BODIES
-            if (_g._type == "Rectangle" || _g._type == "Oval" || _g._type == "Polygon")
+            if (g._type == "Rectangle" || g._type == "Oval" || g._type == "Polygon")
             {
                 rBBackground.Checked = true;
-                UpDownLineWidth.Value = (decimal) _g._pen.Width;
-                if (_g.zoom != null || _g.blur != null)
+                //SpinButton-Defultwerte extra behandeln. Das muss passieren, so lange _g noch nicht zugewiesen ist,
+                //damit die OnChange Events vorzeitig verlassen werden können.
+                UpDownLineWidth.Value = (decimal) g._pen.Width;
+                PdLeft.Value = g._padding.Left;
+                PdTop.Value = g._padding.Top;
+                PdRight.Value = g._padding.Right;
+                PdBottom.Value = g._padding.Bottom;
+
+                if (g.zoom != null || g.blur != null)
                 {
                     rbLine.Checked = true;
-                    colorPalette1.showCbTransparent(_g._fillBrush == null, false, false);
-                    if (_g.zoom != null)
+                    colorPalette1.showCbTransparent(g._fillBrush == null, false, false); //Muss die colorPalette von zoom und blur abhängen?
+                    if (g.zoom != null)
                     {
-                        
-                        UpDownZoom.Value = new decimal((float)_g.zoom._zoomFactor);
-                        UpDownMoveX.Value = new decimal((float)_g.zoom._zoomMoveXfactor);
-                        UpDownMoveY.Value = new decimal((float)_g.zoom._zoomMoveYfactor);
+                        UpDownZoomFactor.Value = new decimal((float)g.zoom._zoomFactor);
+                        UpDownZoomX.Value = new decimal((float)g.zoom._zoomMoveXfactor);
+                        UpDownZoomY.Value = new decimal((float)g.zoom._zoomMoveYfactor);
                         cBZoom.Checked = true;
                     }
                     else
                         cBZoom.Checked = false;
-                    if (_g.blur != null)
+
+                    if (g.blur != null)
                     {
-                        UpDownBlur.Value = (decimal)_g.blur.blurFactor;
+                        UpDownBlur.Value = (decimal)g.blur.blurFactor;
                         cBBlur.Checked = true;
                     }
                     else
                         cBBlur.Checked = false;
                 }
                 else
-                    colorPalette1.showCbTransparent(_g._fillBrush == null, true, true);
-                if (_g._fillBrush != null)
+                    colorPalette1.showCbTransparent(g._fillBrush == null, true, true);
+                if (g._fillBrush != null)
                     colorPalette1.setCurrentColor(((SolidBrush)g._fillBrush).Color);
                 else
                     colorPalette1.hideCurrentColor();
@@ -95,18 +102,19 @@ namespace GraphicTool
             {
                 colorPalette1.showCbTransparent(false, false, false);
                 rbLine.Checked = true;
-                if (_g._pen != null)
-                    colorPalette1.setCurrentColor(_g._pen.Color);
+                if (g._pen != null)
+                    colorPalette1.setCurrentColor(g._pen.Color);
                 else
                     colorPalette1.hideCurrentColor();
                 //TabControl1.TabIndex = 1;
                 TabControl1.SelectedTab = TabControl1.TabPages[1];
             }
+
             //SHAPE PROPERTIES - LINES
-            if (_g._type == "Polyline")
+            if (g._type == "Polyline")
             {
                 rBBackground.Enabled = false;
-                UpDownLineWidth.Value = (decimal)_g._pen.Width;
+                UpDownLineWidth.Value = (decimal)g._pen.Width;
                 Heads = new ArrowTipControl(g, caller, tipMode.Heads);
                 ArrowsTab.Controls.Add(Heads);
                 Heads.Location = new Point(56, 28);
@@ -123,9 +131,13 @@ namespace GraphicTool
                 rBBackground.Enabled = true;
                 ArrowsTab.Enabled = false;
             }
+
             //TEXT PROPERTIES
-            if (_g._text != null && _g._text.Length > 0)
+            if (g._text != null && g._text.Length > 0)
             {
+                FontFamily[] fonts = systemFonts.Families.ToArray();
+                for (int i = 0; i < fonts.Length; i++) CmbFontFamily.Items.Add(fonts[i].Name);
+
                 //cBBold.Checked = _g._fontStyle == FontStyle.Bold;
                 //cBItalic.Checked = _g._fontStyle == FontStyle.Italic;
                 //cBUnderline.Checked = _g._fontStyle == FontStyle.Underline;
@@ -134,7 +146,7 @@ namespace GraphicTool
                 fontPanel.Enabled = true;
                 rBText.Enabled = true;
                 //SET ALIGNMENT SWITCHES
-                switch (_g._flags)
+                switch (g._flags)
                 {
                     case 0: a00.BackColor = cact; break;
                     case 1: a01.BackColor = cact; break;
@@ -160,7 +172,7 @@ namespace GraphicTool
             }
 
             //TODO: MyImages haben keine Definition für pen. Sollen sie das haben?
-            if(_g._pen == null) _g._pen = new Pen(Color.Black,0);
+            if (g._pen == null) g._pen = new Pen(Color.Black,0);
             //try
             //{
             //    UpDownLineWidth.Value = (decimal)_g._pen.Width;
@@ -175,37 +187,40 @@ namespace GraphicTool
             //}
             
 
-            FontFamily[] fonts = systemFonts.Families.ToArray();
-            for (int i = 0; i < fonts.Length; i++) CmbFontFamily.Items.Add(fonts[i].Name);
-
-            if (_g._font != null)
+            if (g._font != null)
             {
                 //FONT_FAMILY
-                CmbFontFamily.Text = _g._font.Name;
+                CmbFontFamily.Text = g._font.Name;
                 //FONT_SIZE
-                UpDownFontSize.Value = Convert.ToInt32(_g._font.Size);
+                UpDownFontSize.Value = Convert.ToInt32(g._font.Size);
                 //FONT_STYLE
-                if (_g._fontStyle.HasFlag(FontStyle.Bold))
+                if (g._fontStyle.HasFlag(FontStyle.Bold))
                 {
                     //rbRegular.Checked = false;
                     cBBold.Checked = true;
                 }
-                if (_g._fontStyle.HasFlag(FontStyle.Italic))
+                if (g._fontStyle.HasFlag(FontStyle.Italic))
                 {
                     //rbRegular.Checked = false;
                     cBItalic.Checked = true;
                 }
-                if (_g._fontStyle.HasFlag(FontStyle.Underline))
+                if (g._fontStyle.HasFlag(FontStyle.Underline))
                 {
                     //rbRegular.Checked = false;
                     cBUnderline.Checked = true;
                 }
             }
             this.Location = Location;
+
+            //Jetzt _g auf g zuweisen.
+            _g = g;
+
             updateMenuButtons();
-            UpDownMoveX.ValueChanged += UpDownMoveX_ValueChanged;
-            UpDownMoveY.ValueChanged += UpDownMoveY_ValueChanged;
-            UpDownZoom.ValueChanged += UpDownZoom_ValueChanged;
+
+
+            UpDownZoomX.ValueChanged += UpDownMoveX_ValueChanged;
+            UpDownZoomY.ValueChanged += UpDownMoveY_ValueChanged;
+            UpDownZoomFactor.ValueChanged += UpDownZoom_ValueChanged;
             Invalidate();
         }
 
@@ -228,6 +243,7 @@ namespace GraphicTool
 
         public void ApplyColor(Color c)
         {
+            if (_g == null) return;
             if (rbLine.Checked)
             {
                 _g.SetLineColor(c);
@@ -249,6 +265,7 @@ namespace GraphicTool
 
         public void ApplyTransparency()
         {
+            if (_g == null) return;
             if (rBBackground.Checked)
                 _g._fillBrush = null;
             _callingDisplay.changed = true;
@@ -257,6 +274,7 @@ namespace GraphicTool
 
         private void UpDownLineWidth_ValueChanged(object sender, EventArgs e)
         {
+            if (_g == null) return;
             _g.SetLineWidth((int)UpDownLineWidth.Value);
             _callingDisplay.changed = true;
             _callingDisplay.Invalidate();
@@ -279,6 +297,7 @@ namespace GraphicTool
 
         private void TextAlignment_Changed(object sender, EventArgs e)
         {
+            if (_g == null) return;
             _g._flags = 0;
             if (a00.ContainsFocus) { _g._flags =  0; a00.BackColor = cact; } else a00.BackColor = cdef;
             if (a01.ContainsFocus) { _g._flags =  1; a01.BackColor = cact; } else a01.BackColor = cdef;
@@ -320,6 +339,7 @@ namespace GraphicTool
 
         private void UpDownFontSize_ValueChanged(object sender, EventArgs e)
         {
+            if(_g == null) return;
             _g.SetFontSize((int)UpDownFontSize.Value);
             _callingDisplay.changed = true;
             _callingDisplay.Invalidate();
@@ -327,6 +347,7 @@ namespace GraphicTool
 
         private void CmbFontFamily_TextChanged(object sender, EventArgs e)
         {
+            if (_g == null) return;
             _g.SetFontFamily(CmbFontFamily.Text);
             _callingDisplay.changed = true;
             _callingDisplay.Invalidate();
@@ -354,6 +375,7 @@ namespace GraphicTool
 
         private void updateFontStyle()
         {
+            if (_g == null) return;
             FontStyle f = FontStyle.Regular;
             if (cBBold.Checked) f |= FontStyle.Bold;
             if (cBItalic.Checked) f |= FontStyle.Italic;
@@ -365,26 +387,28 @@ namespace GraphicTool
 
         private void PdTop_ValueChanged(object sender, EventArgs e)
         {
-            updatePadding();
+            if(_g != null) updatePadding();
         }
 
         private void PdRight_ValueChanged(object sender, EventArgs e)
         {
-            updatePadding();
+            if (_g != null) updatePadding();
         }
 
         private void PdBottom_ValueChanged(object sender, EventArgs e)
         {
-            updatePadding();
+            if (_g != null) updatePadding();
         }
 
         private void PdLeft_ValueChanged(object sender, EventArgs e)
         {
-            updatePadding();
+            if (_g != null) updatePadding();
         }
 
         private void updatePadding()
         {
+            if (_g == null)
+                return;
             Padding padding = new Padding((int)PdLeft.Value, (int)PdTop.Value, (int)PdRight.Value, (int)PdBottom.Value);
             _g.SetPadding(padding);
             _callingDisplay.changed = true;
@@ -393,6 +417,7 @@ namespace GraphicTool
 
         private void updateMenuButtons()
         {
+            //if (_g == null) return; 
             if (_g.Parent.Children.Count == 1)
             {
                 menuStrip1.Items[0].Enabled = false; //topmost
@@ -487,21 +512,21 @@ namespace GraphicTool
 
         private void UpDownZoom_ValueChanged(object sender, EventArgs e)
         {
-            _g.zoom._zoomFactor = (float)UpDownZoom.Value;
+            _g.zoom._zoomFactor = (float)UpDownZoomFactor.Value;
             _callingDisplay.changed = true;
             _callingDisplay.Invalidate();
         }
 
         private void UpDownMoveX_ValueChanged(object sender, EventArgs e)
         {
-            _g.zoom._zoomMoveXfactor = (float)UpDownMoveX.Value;
+            _g.zoom._zoomMoveXfactor = (float)UpDownZoomX.Value;
             _callingDisplay.changed = true;
             _callingDisplay.Invalidate();
         }
 
         private void UpDownMoveY_ValueChanged(object sender, EventArgs e)
         {
-            _g.zoom._zoomMoveYfactor = (float)UpDownMoveY.Value;
+            _g.zoom._zoomMoveYfactor = (float)UpDownZoomY.Value;
             _callingDisplay.changed = true;
             _callingDisplay.Invalidate();
         }
