@@ -339,8 +339,8 @@ namespace GraphicTool
         private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             display.Save2File(currentFileLabel.Text);
-            if (File.Exists(currentFileLabel.Text + ".props")) 
-                rBBackgroundXML.Enabled = true; 
+            if (File.Exists(currentFileLabel.Text + ".props"))
+                rBBackgroundXML.Enabled = true;
             else rBBackgroundXML.Enabled = false;
         }
 
@@ -515,11 +515,19 @@ namespace GraphicTool
 
         private void lblShapes_Click(object sender, EventArgs e)
         {
-            if(MessageBox.Show("Do you want to save the current view into the image file and delete the .props file?",
+            if (MessageBox.Show("Do you want to save the current view into the image file and delete the .props file?",
                      "Delete XML Properties", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 display.SaveCurrentView2File(currentFileLabel.Text);
             }
+        }
+
+        private void butnAddTextBox_Click(object sender, EventArgs e)
+        {
+            if (!cBShapes.Checked) cBShapes.Checked = true;
+            int index = display.AddShape(Properties.Settings.Default.TEXTBOX);
+            display.setFocus(index);
+            setDisplayMode();
         }
     }
 }

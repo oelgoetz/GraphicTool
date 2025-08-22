@@ -153,7 +153,7 @@ namespace GraphicTool
             status.Count = root.Children.Count;
         }
 
-        public void AddShape(string xml)
+        public int AddShape(string xml)
         {
             XmlDocument tempDoc = new XmlDocument();
             tempDoc.LoadXml(xml);
@@ -172,6 +172,16 @@ namespace GraphicTool
             }
             if (ShapeCount != null) ShapeCount();
             status.Count = root.Children.Count;
+            Invalidate();
+            return root.Children.Count - 1; //return the index of the added shape
+        }
+
+        public void setFocus(int index)
+        {
+            if (index < 0 || index >= root.Children.Count) return;
+            focusedGraphicObject = index;
+            root.Children[index].Select();
+            nSelected = 1;
             Invalidate();
         }
 
@@ -594,6 +604,28 @@ namespace GraphicTool
             //    textBox1.Text = e.KeyData.ToString();
             //textBox1.SelectionStart = textBox1.Text.Length;
             //textBox1.SelectionLength = 0;
+            
+            if (e.Control && e.KeyCode == Keys.C)
+            {
+                string s = "";
+                foreach(GraphicObject g in root.Children)
+                {
+                    if (g.IsSelected)
+                    {
+                        
+                        s += g.Box.X.ToString() + "," + g.Box.Y.ToString() + "," + g.Box.Width.ToString() + "," + g.Box.Height.ToString() + ";\r\n";
+                    }
+                }
+                // Strg + C erkannt
+                MessageBox.Show("Strg + C wurde gedrückt!\r\n" + s);
+                // Hier deine Logik einfügen
+            }
+
+            if (e.Control && e.KeyCode == Keys.V)
+            {
+                MessageBox.Show("Strg + V wurde gedrückt!");
+                // Hier deine Logik einfügen
+            }
 
             if (e.KeyCode == Keys.ControlKey)
             {
@@ -858,6 +890,33 @@ namespace GraphicTool
             Center();
         }
 
+        public void editText(GraphicObject g)
+        {
+            backGroundSelected = false; //focusedGraphicObject = ?;
+            ShapeTextBox = new TextBox();
+            ShapeTextBox.Multiline = true;
+            ShapeTextBox.TextChanged += ShapeTextBox_TextChanged;
+            ShapeTextBox.Location = new Point(g.Box.X + displayOffset.X, g.Box.Y + displayOffset.Y);
+            ShapeTextBox.Size = new Size(g._textBox.Size.Width - 1, g._textBox.Size.Height - 1);
+            ShapeTextBox.Font = g._font;
+            ShapeTextBox.Text = g._text;
+            ShapeTextBox.BorderStyle = BorderStyle.None;
+            ShapeTextBox.SelectAll();
+            ShapeTextBox.Visible = true;
+
+            this.Controls.Add(ShapeTextBox);
+            this.Controls.SetChildIndex(ShapeTextBox, 0);
+            ShapeTextBox.Focus();
+            ShapeTextBox.Show();
+            //textBox1.Text = e.KeyData.ToString();
+            //textBox1.SelectionStart = textBox1.Text.Length;
+            //textBox1.SelectionLength = 0;
+            //textBox1.Dispose();
+            //this.Invalidate();
+            Mode = mode.EditText;
+            this.Invalidate();
+        }
+
         private void Display_DoubleClick(object sender, EventArgs e)
         {
             if (mouseOverObject > -1)
@@ -870,29 +929,7 @@ namespace GraphicTool
 
                 if(g._type == "Rectangle" || g._type == "Oval" || g._type == "Polygon")
                 {
-                    backGroundSelected = false; //focusedGraphicObject = ?;
-                    ShapeTextBox = new TextBox();
-                    ShapeTextBox.Multiline = true;
-                    ShapeTextBox.TextChanged += ShapeTextBox_TextChanged;
-                    ShapeTextBox.Location = new Point(g.Box.X + displayOffset.X, g.Box.Y + displayOffset.Y);
-                    ShapeTextBox.Size = new Size(g._textBox.Size.Width - 1, g._textBox.Size.Height - 1);
-                    ShapeTextBox.Font = g._font;
-                    ShapeTextBox.Text = g._text;
-                    ShapeTextBox.BorderStyle = BorderStyle.None;
-                    ShapeTextBox.SelectAll();
-                    ShapeTextBox.Visible = true;
-
-                    this.Controls.Add(ShapeTextBox);
-                    this.Controls.SetChildIndex(ShapeTextBox, 0);
-                    ShapeTextBox.Focus();
-                    ShapeTextBox.Show();
-                    //textBox1.Text = e.KeyData.ToString();
-                    //textBox1.SelectionStart = textBox1.Text.Length;
-                    //textBox1.SelectionLength = 0;
-                    //textBox1.Dispose();
-                    //this.Invalidate();
-                    Mode = mode.EditText;
-                    this.Invalidate();
+                    editText(g);
                 }
             }
         }

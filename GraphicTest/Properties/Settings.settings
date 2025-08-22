@@ -32,5 +32,8 @@
     <Setting Name="COLORS" Type="System.String" Scope="User">
       <Value Profile="(Default)">#308784;#1d5251;#59d396;#2fa567;#88b720;#628406;#208220;#0b540b;#5ec1e9;#359cbc;#5d8cc2;#306191;#3661a3;#1e457c;#7c67a3;#584877;#f4b425;#c68709;#ef890f;#c66a05;#e56469;#ba363f;#e56493;#b7376c;#8c8c8c;#666666;#636363;#4d4d4d;#ffffff;#dddddd;#000000;#555555;transparent</Value>
     </Setting>
+    <Setting Name="TEXTBOX" Type="System.String" Scope="User">
+      <Value Profile="(Default)">&lt;Shape Type="Rectangle" TextAlign="left" VerticalAlign="top" PaddingLeft="5" PaddingBottom="0" PaddingRight="0" PaddingTop="5" X="5" Y="5" Width="50" Height="50" LineColor="#000000" LineWidth="0" BackgroundColor="#FFFFFF" FontFamily="Segoe UI" FontSize="10" FontStyle="normal" Color="Black" FontWeight="normal" Underline="false" Strikeout="false"/&gt;</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

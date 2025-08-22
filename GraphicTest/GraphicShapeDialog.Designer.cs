@@ -614,6 +614,7 @@
             cBBlur.TabIndex = 0;
             cBBlur.Text = "Blur";
             cBBlur.UseVisualStyleBackColor = true;
+            cBBlur.CheckedChanged += cBBlur_CheckedChanged;
             // 
             // groupBox5
             // 
@@ -659,6 +660,7 @@
             cBZoom.TabIndex = 1;
             cBZoom.Text = "Zoom";
             cBZoom.UseVisualStyleBackColor = true;
+            cBZoom.CheckedChanged += cBZoom_CheckedChanged;
             // 
             // label8
             // 

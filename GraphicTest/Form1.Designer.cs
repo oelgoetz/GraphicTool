@@ -44,6 +44,7 @@
             toolsToolStripMenuItem = new ToolStripMenuItem();
             devToolsToolStripMenuItem = new ToolStripMenuItem();
             splitContainer1 = new SplitContainer();
+            butnAddTextBox = new Button();
             dmc1 = new DisplayModeControl();
             btnAddArrow = new Button();
             btnAddEllipse = new Button();
@@ -188,6 +189,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            splitContainer1.Panel1.Controls.Add(butnAddTextBox);
             splitContainer1.Panel1.Controls.Add(dmc1);
             splitContainer1.Panel1.Controls.Add(btnAddArrow);
             splitContainer1.Panel1.Controls.Add(btnAddEllipse);
@@ -209,6 +211,18 @@
             splitContainer1.SplitterDistance = 166;
             splitContainer1.TabIndex = 2;
             // 
+            // butnAddTextBox
+            // 
+            butnAddTextBox.FlatAppearance.BorderColor = Color.Silver;
+            butnAddTextBox.FlatStyle = FlatStyle.Flat;
+            butnAddTextBox.Image = (Image)resources.GetObject("butnAddTextBox.Image");
+            butnAddTextBox.Location = new Point(10, 97);
+            butnAddTextBox.Name = "butnAddTextBox";
+            butnAddTextBox.Size = new Size(34, 34);
+            butnAddTextBox.TabIndex = 12;
+            butnAddTextBox.UseVisualStyleBackColor = true;
+            butnAddTextBox.Click += butnAddTextBox_Click;
+            // 
             // dmc1
             // 
             dmc1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
@@ -224,7 +238,7 @@
             btnAddArrow.FlatAppearance.BorderColor = Color.Silver;
             btnAddArrow.FlatStyle = FlatStyle.Flat;
             btnAddArrow.Image = Properties.Resources._newArrow;
-            btnAddArrow.Location = new Point(85, 98);
+            btnAddArrow.Location = new Point(122, 97);
             btnAddArrow.Name = "btnAddArrow";
             btnAddArrow.Size = new Size(34, 34);
             btnAddArrow.TabIndex = 10;
@@ -236,7 +250,7 @@
             btnAddEllipse.FlatAppearance.BorderColor = Color.Silver;
             btnAddEllipse.FlatStyle = FlatStyle.Flat;
             btnAddEllipse.Image = Properties.Resources._newOval;
-            btnAddEllipse.Location = new Point(47, 98);
+            btnAddEllipse.Location = new Point(84, 97);
             btnAddEllipse.Name = "btnAddEllipse";
             btnAddEllipse.Size = new Size(34, 34);
             btnAddEllipse.TabIndex = 9;
@@ -248,7 +262,7 @@
             btnAddRectangle.FlatAppearance.BorderColor = Color.Silver;
             btnAddRectangle.FlatStyle = FlatStyle.Flat;
             btnAddRectangle.Image = Properties.Resources._newRectangle;
-            btnAddRectangle.Location = new Point(10, 98);
+            btnAddRectangle.Location = new Point(47, 97);
             btnAddRectangle.Name = "btnAddRectangle";
             btnAddRectangle.Size = new Size(34, 34);
             btnAddRectangle.TabIndex = 8;
@@ -523,5 +537,6 @@
         private Button lblBgImg;
         private Button lblShapes;
         private Label label1;
+        private Button butnAddTextBox;
     }
 }

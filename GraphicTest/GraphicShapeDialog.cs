@@ -61,7 +61,7 @@ namespace GraphicTool
                 rBBackground.Checked = true;
                 //SpinButton-Defultwerte extra behandeln. Das muss passieren, so lange _g noch nicht zugewiesen ist,
                 //damit die OnChange Events vorzeitig verlassen werden können.
-                UpDownLineWidth.Value = (decimal) g._pen.Width;
+                UpDownLineWidth.Value = (decimal)g._pen.Width;
                 PdLeft.Value = g._padding.Left;
                 PdTop.Value = g._padding.Top;
                 PdRight.Value = g._padding.Right;
@@ -172,20 +172,20 @@ namespace GraphicTool
             }
 
             //TODO: MyImages haben keine Definition für pen. Sollen sie das haben?
-            if (g._pen == null) g._pen = new Pen(Color.Black,0);
+            if (g._pen == null) g._pen = new Pen(Color.Black, 0);
             //try
             //{
             //    UpDownLineWidth.Value = (decimal)_g._pen.Width;
             //}
             //catch (Exception ex)
             //{ 
-                
+
             //}
             //finally
             //{
-                
+
             //}
-            
+
 
             if (g._font != null)
             {
@@ -218,8 +218,8 @@ namespace GraphicTool
             updateMenuButtons();
 
 
-            UpDownZoomX.ValueChanged += UpDownMoveX_ValueChanged;
-            UpDownZoomY.ValueChanged += UpDownMoveY_ValueChanged;
+            UpDownZoomX.ValueChanged += UpDownZoomX_ValueChanged;
+            UpDownZoomY.ValueChanged += UpDownZoomY_ValueChanged;
             UpDownZoomFactor.ValueChanged += UpDownZoom_ValueChanged;
             Invalidate();
         }
@@ -299,14 +299,14 @@ namespace GraphicTool
         {
             if (_g == null) return;
             _g._flags = 0;
-            if (a00.ContainsFocus) { _g._flags =  0; a00.BackColor = cact; } else a00.BackColor = cdef;
-            if (a01.ContainsFocus) { _g._flags =  1; a01.BackColor = cact; } else a01.BackColor = cdef;
-            if (a02.ContainsFocus) { _g._flags =  2; a02.BackColor = cact; } else a02.BackColor = cdef;
-            if (a10.ContainsFocus) { _g._flags =  4; a10.BackColor = cact; } else a10.BackColor = cdef;
-            if (a11.ContainsFocus) { _g._flags =  5; a11.BackColor = cact; } else a11.BackColor = cdef;
-            if (a12.ContainsFocus) { _g._flags =  6; a12.BackColor = cact; } else a12.BackColor = cdef;
-            if (a20.ContainsFocus) { _g._flags =  8; a20.BackColor = cact; } else a20.BackColor = cdef;
-            if (a21.ContainsFocus) { _g._flags =  9; a21.BackColor = cact; } else a21.BackColor = cdef;
+            if (a00.ContainsFocus) { _g._flags = 0; a00.BackColor = cact; } else a00.BackColor = cdef;
+            if (a01.ContainsFocus) { _g._flags = 1; a01.BackColor = cact; } else a01.BackColor = cdef;
+            if (a02.ContainsFocus) { _g._flags = 2; a02.BackColor = cact; } else a02.BackColor = cdef;
+            if (a10.ContainsFocus) { _g._flags = 4; a10.BackColor = cact; } else a10.BackColor = cdef;
+            if (a11.ContainsFocus) { _g._flags = 5; a11.BackColor = cact; } else a11.BackColor = cdef;
+            if (a12.ContainsFocus) { _g._flags = 6; a12.BackColor = cact; } else a12.BackColor = cdef;
+            if (a20.ContainsFocus) { _g._flags = 8; a20.BackColor = cact; } else a20.BackColor = cdef;
+            if (a21.ContainsFocus) { _g._flags = 9; a21.BackColor = cact; } else a21.BackColor = cdef;
             if (a22.ContainsFocus) { _g._flags = 10; a22.BackColor = cact; } else a22.BackColor = cdef;
             _callingDisplay.changed = true;
             _callingDisplay.Invalidate();
@@ -339,7 +339,7 @@ namespace GraphicTool
 
         private void UpDownFontSize_ValueChanged(object sender, EventArgs e)
         {
-            if(_g == null) return;
+            if (_g == null) return;
             _g.SetFontSize((int)UpDownFontSize.Value);
             _callingDisplay.changed = true;
             _callingDisplay.Invalidate();
@@ -387,7 +387,7 @@ namespace GraphicTool
 
         private void PdTop_ValueChanged(object sender, EventArgs e)
         {
-            if(_g != null) updatePadding();
+            if (_g != null) updatePadding();
         }
 
         private void PdRight_ValueChanged(object sender, EventArgs e)
@@ -505,6 +505,11 @@ namespace GraphicTool
 
         private void UpDownBlur_ValueChanged(object sender, EventArgs e)
         {
+            if (_g.blur == null)
+            {
+                MessageBox.Show("Object has no blur effect.", "Blur Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
             _g.blur.blurFactor = ((int)UpDownBlur.Value);
             _callingDisplay.changed = true;
             _callingDisplay.Invalidate();
@@ -512,23 +517,49 @@ namespace GraphicTool
 
         private void UpDownZoom_ValueChanged(object sender, EventArgs e)
         {
+            if (_g.zoom == null)
+            {
+                MessageBox.Show("Object has no zoom effect.", "Zoom Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
             _g.zoom._zoomFactor = (float)UpDownZoomFactor.Value;
             _callingDisplay.changed = true;
             _callingDisplay.Invalidate();
         }
 
-        private void UpDownMoveX_ValueChanged(object sender, EventArgs e)
+        private void UpDownZoomX_ValueChanged(object sender, EventArgs e)
         {
+            if (_g.zoom == null)
+            {
+                MessageBox.Show("Object has no zoom effect.", "Zoom Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
             _g.zoom._zoomMoveXfactor = (float)UpDownZoomX.Value;
             _callingDisplay.changed = true;
             _callingDisplay.Invalidate();
         }
 
-        private void UpDownMoveY_ValueChanged(object sender, EventArgs e)
+        private void UpDownZoomY_ValueChanged(object sender, EventArgs e)
         {
+            if (_g.zoom == null)
+            {
+                MessageBox.Show("Object has no zoom effect.", "Zoom Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
             _g.zoom._zoomMoveYfactor = (float)UpDownZoomY.Value;
             _callingDisplay.changed = true;
             _callingDisplay.Invalidate();
+        }
+
+        private void cBBlur_CheckedChanged(object sender, EventArgs e)
+        {
+            MessageBox.Show("Adding/removing blur effect is not implemented yet.", "Blur Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        private void cBZoom_CheckedChanged(object sender, EventArgs e)
+        {
+            MessageBox.Show("Adding/removing zoom effect is not implemented yet.", "Zoom Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
         }
     }
 }
