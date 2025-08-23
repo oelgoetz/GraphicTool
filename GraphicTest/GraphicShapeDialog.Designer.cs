@@ -87,6 +87,9 @@
             Lift = new ToolStripMenuItem();
             Sink = new ToolStripMenuItem();
             Bottom = new ToolStripMenuItem();
+            cBBlurInside = new CheckBox();
+            groupBox6 = new GroupBox();
+            label10 = new Label();
             groupBox2.SuspendLayout();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)UpDownLineWidth).BeginInit();
@@ -108,6 +111,7 @@
             ((System.ComponentModel.ISupportInitialize)UpDownZoomX).BeginInit();
             ((System.ComponentModel.ISupportInitialize)UpDownZoomY).BeginInit();
             menuStrip1.SuspendLayout();
+            groupBox6.SuspendLayout();
             SuspendLayout();
             // 
             // groupBox2
@@ -587,8 +591,7 @@
             // 
             // EffectsTab
             // 
-            EffectsTab.Controls.Add(UpDownBlur);
-            EffectsTab.Controls.Add(cBBlur);
+            EffectsTab.Controls.Add(groupBox6);
             EffectsTab.Controls.Add(groupBox5);
             EffectsTab.Location = new Point(4, 24);
             EffectsTab.Name = "EffectsTab";
@@ -599,16 +602,16 @@
             // 
             // UpDownBlur
             // 
-            UpDownBlur.Location = new Point(80, 12);
+            UpDownBlur.Location = new Point(82, 71);
             UpDownBlur.Name = "UpDownBlur";
-            UpDownBlur.Size = new Size(48, 23);
+            UpDownBlur.Size = new Size(52, 23);
             UpDownBlur.TabIndex = 2;
             UpDownBlur.ValueChanged += UpDownBlur_ValueChanged;
             // 
             // cBBlur
             // 
             cBBlur.AutoSize = true;
-            cBBlur.Location = new Point(19, 13);
+            cBBlur.Location = new Point(6, 14);
             cBBlur.Name = "cBBlur";
             cBBlur.Size = new Size(47, 19);
             cBBlur.TabIndex = 0;
@@ -624,7 +627,7 @@
             groupBox5.Controls.Add(label8);
             groupBox5.Controls.Add(UpDownZoomX);
             groupBox5.Controls.Add(UpDownZoomY);
-            groupBox5.Location = new Point(13, 31);
+            groupBox5.Location = new Point(9, 9);
             groupBox5.Name = "groupBox5";
             groupBox5.Size = new Size(140, 99);
             groupBox5.TabIndex = 8;
@@ -645,7 +648,7 @@
             // label9
             // 
             label9.AutoSize = true;
-            label9.Location = new Point(15, 68);
+            label9.Location = new Point(15, 72);
             label9.Name = "label9";
             label9.Size = new Size(47, 15);
             label9.TabIndex = 7;
@@ -687,7 +690,7 @@
             // 
             UpDownZoomY.DecimalPlaces = 1;
             UpDownZoomY.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
-            UpDownZoomY.Location = new Point(67, 66);
+            UpDownZoomY.Location = new Point(67, 70);
             UpDownZoomY.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
             UpDownZoomY.Minimum = new decimal(new int[] { 10, 0, 0, int.MinValue });
             UpDownZoomY.Name = "UpDownZoomY";
@@ -750,6 +753,37 @@
             Bottom.Size = new Size(28, 20);
             Bottom.Click += bottom_Click;
             // 
+            // cBBlurInside
+            // 
+            cBBlurInside.AutoSize = true;
+            cBBlurInside.Location = new Point(6, 43);
+            cBBlurInside.Name = "cBBlurInside";
+            cBBlurInside.Size = new Size(81, 19);
+            cBBlurInside.TabIndex = 9;
+            cBBlurInside.Text = "Blur inside";
+            cBBlurInside.UseVisualStyleBackColor = true;
+            // 
+            // groupBox6
+            // 
+            groupBox6.Controls.Add(label10);
+            groupBox6.Controls.Add(cBBlur);
+            groupBox6.Controls.Add(UpDownBlur);
+            groupBox6.Controls.Add(cBBlurInside);
+            groupBox6.Location = new Point(155, 8);
+            groupBox6.Name = "groupBox6";
+            groupBox6.Size = new Size(143, 100);
+            groupBox6.TabIndex = 10;
+            groupBox6.TabStop = false;
+            // 
+            // label10
+            // 
+            label10.AutoSize = true;
+            label10.Location = new Point(14, 73);
+            label10.Name = "label10";
+            label10.Size = new Size(62, 15);
+            label10.TabIndex = 10;
+            label10.Text = "Blur factor";
+            // 
             // GraphicShapeDialog
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -784,7 +818,6 @@
             ArrowsTab.ResumeLayout(false);
             ArrowsTab.PerformLayout();
             EffectsTab.ResumeLayout(false);
-            EffectsTab.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)UpDownBlur).EndInit();
             groupBox5.ResumeLayout(false);
             groupBox5.PerformLayout();
@@ -793,6 +826,8 @@
             ((System.ComponentModel.ISupportInitialize)UpDownZoomY).EndInit();
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
+            groupBox6.ResumeLayout(false);
+            groupBox6.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -858,5 +893,8 @@
         private NumericUpDown UpDownZoomX;
         private GroupBox groupBox5;
         private NumericUpDown UpDownZoomFactor;
+        private CheckBox cBBlurInside;
+        private GroupBox groupBox6;
+        private Label label10;
     }
 }

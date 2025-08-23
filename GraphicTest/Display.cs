@@ -8,7 +8,6 @@ using System.Windows.Forms;
 using System.Xml;
 using txtFiles;
 using static GraphicTool.Form1;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
 
 namespace GraphicTool
 {
@@ -596,6 +595,74 @@ namespace GraphicTool
             return squared_distance < (threshold * threshold);
         }
 
+        private void CopyGraphicObject(GraphicObject g)
+        {
+            // Deep copy logic for GraphicObject
+            GraphicObject DeepCopy(GraphicObject source, GraphicObject parent)
+            {
+                // Create a new instance of the same type as source
+                GraphicObject copy;
+                var type = source.GetType();
+                copy = (GraphicObject)Activator.CreateInstance(type);
+
+                // Copy primitive and value properties
+                copy.Box = new Rectangle(source.Box.X, source.Box.Y, source.Box.Width, source.Box.Height);
+                copy._text = source._text;
+                copy._type = source._type;
+                copy._stringFormat = source._stringFormat != null ? (StringFormat)source._stringFormat.Clone() : null;
+                copy._textBox = new Rectangle(source._textBox.X, source._textBox.Y, source._textBox.Width, source._textBox.Height);
+                copy._padding = new Padding(source._padding.Left, source._padding.Top, source._padding.Right, source._padding.Bottom);
+                copy._font = source._font != null ? (Font)source._font.Clone() : null;
+                copy._pen = source._pen != null ? (Pen)source._pen.Clone() : null;
+                copy._fontColor = source._fontColor;
+                copy._fontStyle = source._fontStyle;
+                copy._fontBrush = source._fontBrush != null ? (Brush)source._fontBrush.Clone() : null;
+                copy._fillBrush = source._fillBrush != null ? (Brush)source._fillBrush.Clone() : null;
+                copy._flags = source._flags;
+                copy.SelectedMarker = source.SelectedMarker;
+                copy.Parent = parent;
+
+                // Copy arrowTips and Effects
+                if(source.arrowHeadAtHead != null) copy.arrowHeadAtHead = new ArrowHeadAtHead(source.ArrowHeadCenter, source.ArrowHeadLength, source.ArrowHeadWidth, source.ArrowHeadColor, copy);
+                if(source.arrowHeadAtTail != null) copy.arrowHeadAtTail = new ArrowHeadAtTail(source.ArrowTailCenter, source.ArrowTailLength, source.ArrowTailWidth, source.ArrowTailColor, copy);
+                if(source.arrowTailAtHead != null) copy.arrowTailAtHead = new ArrowTailAtHead(source.ArrowTailCenter, source.ArrowTailLength, source.ArrowTailWidth, source.ArrowTailColor, copy);
+                if(source.arrowTailAtTail != null) copy.arrowTailAtTail = new ArrowTailAtTail(source.ArrowHeadCenter, source.ArrowHeadLength, source.ArrowHeadWidth, source.ArrowHeadColor, copy);
+                //Copy effects
+                if (source.blur != null) copy.blur = new BlurEffect(source);
+
+                // Copy children recursively
+                foreach (var child in source.Children)
+                {
+                    var childCopy = DeepCopy(child, copy);
+                    copy.Children.Add(childCopy);
+                }
+
+                // If there are other custom fields (arrays, etc.), copy them here
+                // Example: MarkerPoints, blur, etc.
+                var markerPointsField = type.GetField("MarkerPoints");
+                if (markerPointsField != null)
+                {
+                    var markerPoints = markerPointsField.GetValue(source);
+                    if (markerPoints is PointF[] arr)
+                        markerPointsField.SetValue(copy, arr.ToArray());
+                    else if (markerPoints is Point[] arr2)
+                        markerPointsField.SetValue(copy, arr2.ToArray());
+                }
+                var blurField = type.GetField("blur");
+                if (blurField != null)
+                {
+                    var blur = blurField.GetValue(source);
+                    blurField.SetValue(copy, blur); // If blur is a reference type, consider deep copy if needed
+                }
+                return copy;
+            }
+
+            var newObject = DeepCopy(g, root);
+            root.Children.Add(newObject);
+            newObject.Move(new Point(5, 5));
+            Invalidate();
+        }
+
         private void Display_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
             //KeysConverter converter = new KeysConverter();
@@ -607,17 +674,31 @@ namespace GraphicTool
             
             if (e.Control && e.KeyCode == Keys.C)
             {
-                string s = "";
-                foreach(GraphicObject g in root.Children)
-                {
-                    if (g.IsSelected)
-                    {                       
-                        s += g.Box.X.ToString() + "," + g.Box.Y.ToString() + "," + g.Box.Width.ToString() + "," + g.Box.Height.ToString() + ";\r\n";
-                    }
-                }
-                // Strg + C erkannt
-                MessageBox.Show("Strg + C wurde gedrückt!\r\n" + s);
+                //string s = "";
+                //foreach(GraphicObject g in root.Children)
+                //{
+                //    if (g.IsSelected)
+                //    {                       
+                //        s += g.Box.X.ToString() + "," + g.Box.Y.ToString() + "," + g.Box.Width.ToString() + "," + g.Box.Height.ToString() + ";\r\n";
+                //    }
+                //}
+                //// Strg + C erkannt
+                //MessageBox.Show("Strg + C wurde gedrückt!\r\n" + s);
                 // Hier deine Logik einfügen
+                int i = 0;
+                while(i < root.Children.Count)
+                {
+                    if (root.Children[i].IsSelected)
+                    {
+                        CopyGraphicObject(root.Children[i]);
+                        //break; //ZUM TESTEN: nur das erste ausgewählte Shape kopieren
+                    }
+                    i++;
+                }
+                //foreach (GraphicObject g in root.Children)
+                //{
+                //    if (g.IsSelected) CopyGraphicObjectToBuffer(g);
+                //}
                 multiSelect = false;
                 return;
             }

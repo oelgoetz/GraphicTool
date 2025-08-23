@@ -847,32 +847,16 @@ namespace GraphicShapes
         public override void Reshape(Point d) //Root
         {
             throw new NotImplementedException();
-        }
-
-        public void liftUp(GraphicObject g)
-        {
-
-    }
-
-        public void sinkDown(GraphicObject g)
-        {
-
-        }
-
-        public void liftUpMost(GraphicObject g)
-        {
-
-        }
-
-        public void sinkLowest(GraphicObject g)
-        {
-
-        }
+        }        
     }
 
     class MyImage : GraphicObject
     {
         private Bitmap _image;
+        public MyImage()
+        {
+            _type = "Image";
+        }
 
         public MyImage(XmlNode shape, GraphicObject parent) //MyImage
         {
@@ -948,6 +932,10 @@ namespace GraphicShapes
 
     class MyRectangle : GraphicObject
     {
+        public MyRectangle()
+        {
+            _type = "Rectangle";
+        }
         public MyRectangle(XmlNode shape, GraphicObject parent) //Rectangle
         {
             Parent = parent;
@@ -991,6 +979,8 @@ namespace GraphicShapes
 
             if (shape.Attributes["EnableBlurInsideEffect"] != null)
             {
+                //TODO: EnableBlurInsideEffect ist nicht EnableBlurEffect !!
+                //Es gibt sogar: EnableBlurInsideEffect = "true", EnableBlurEffect = "false"
                 if (shape.Attributes["EnableBlurInsideEffect"].Value == "true")
                 {
                     blur = new BlurEffect(shape, this);
@@ -1078,6 +1068,11 @@ namespace GraphicShapes
 
     class MyGroup : GraphicObject
     {
+        public MyGroup()
+        {
+            _type = "Group";
+        }
+
         public MyGroup(XmlNode shape, GraphicObject parent) //Group
         {
             Parent = parent;
@@ -1125,12 +1120,7 @@ namespace GraphicShapes
             }
             Parent.Children.Add(this);
         }
-
-        public MyGroup() 
-        {
-            _type = "Group";
-        }
-
+        
         public override void Draw(Graphics g, int extd) //Group
         {
             g.TranslateTransform(Box.X, Box.Y);
@@ -1166,6 +1156,10 @@ namespace GraphicShapes
 
     class MyOval : GraphicObject
     {
+        public MyOval() 
+        {
+            _type = "Oval";
+        }
         public MyOval(XmlNode shape, GraphicObject parent) //Oval
         {
             Parent = parent;
@@ -1260,6 +1254,10 @@ namespace GraphicShapes
 
     class MyPolyline : GraphicObject
     {
+        public MyPolyline()
+        {
+            _type = "Polyline";
+        }
         public MyPolyline(XmlNode shape, GraphicObject parent) //Polyline
         {
             Parent = parent;
@@ -1415,6 +1413,10 @@ namespace GraphicShapes
     class MyPolygon : GraphicObject
     {
         //TODO: LineDashPattern="5 10" LineStyleName="Dashed Line"
+        public MyPolygon()
+        {
+            _type = "Polygon";
+        }
         public MyPolygon(XmlNode shape, GraphicObject parent) //Polygon
         {
             Parent = parent;
@@ -1540,7 +1542,10 @@ namespace GraphicShapes
         public ArrowHeadAtHead(int Center, int Length, int Width, Color c, GraphicObject parent)
         {
             Parent = parent;
+            //TODO: Sometimes ArrowHeadColor is passed as black
+
             _type = "ArrowHeadAtHead";
+            ArrowHeadColor = c;
             brush = new SolidBrush(c);// Color.Black);
 
             Points[0].Y = 0;                Points[0].X = 0;
@@ -1846,6 +1851,11 @@ namespace GraphicShapes
         internal Point Offset = new Point();
         GraphicObject Parent;
 
+        public BlurEffect(GraphicObject b)
+        {
+            _type = "BlurEffect";
+            this.blurFactor = b.blur.blurFactor;
+        }
         public BlurEffect(XmlNode shape, GraphicObject parent)
         {
             _type = "BlurEffect";
