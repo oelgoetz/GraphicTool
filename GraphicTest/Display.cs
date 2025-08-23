@@ -611,20 +611,23 @@ namespace GraphicTool
                 foreach(GraphicObject g in root.Children)
                 {
                     if (g.IsSelected)
-                    {
-                        
+                    {                       
                         s += g.Box.X.ToString() + "," + g.Box.Y.ToString() + "," + g.Box.Width.ToString() + "," + g.Box.Height.ToString() + ";\r\n";
                     }
                 }
                 // Strg + C erkannt
                 MessageBox.Show("Strg + C wurde gedrückt!\r\n" + s);
                 // Hier deine Logik einfügen
+                multiSelect = false;
+                return;
             }
 
             if (e.Control && e.KeyCode == Keys.V)
             {
                 MessageBox.Show("Strg + V wurde gedrückt!");
                 // Hier deine Logik einfügen
+                multiSelect = false;
+                return;
             }
 
             if (e.KeyCode == Keys.ControlKey)
