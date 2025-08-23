@@ -113,8 +113,7 @@ namespace GraphicTool
             DialogResult d = DialogResult.OK;
             if (display.changed)
             {
-                d = MessageBox.Show("Save changes before opening the new file?",
-                    "Unsaved Changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Exclamation);
+                d = MessageBox.Show("Save changes before opening the new file?", "Unsaved Changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Exclamation);
                 if (d == DialogResult.Yes)
                 {
                     display.Save2File(currentFileLabel.Text);
@@ -493,15 +492,18 @@ namespace GraphicTool
         {
             if (display.changed)
             {
-                if (MessageBox.Show("There are unsaved changes. Save before closing?",
-                    "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.No)
+                DialogResult d = MessageBox.Show("There are unsaved changes. Save before closing?", "Unsaved Changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Exclamation);
+                if ( d == DialogResult.No)
                 {
                     display.changed = false;
                     this.Close();
                 }
                 else
                 {
-                    display.Save2File(currentFileLabel.Text);
+                    if (d == DialogResult.Cancel)
+                        return;
+                    else
+                        display.Save2File(currentFileLabel.Text);
                 }
             }
             else

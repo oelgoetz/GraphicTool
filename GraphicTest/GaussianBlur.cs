@@ -5,7 +5,7 @@ using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-namespace SuperfastBlur
+namespace Blur
 {
     public class GaussianBlur
     {

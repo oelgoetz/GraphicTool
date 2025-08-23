@@ -559,7 +559,11 @@ namespace GraphicTool
         private void cBZoom_CheckedChanged(object sender, EventArgs e)
         {
             MessageBox.Show("Adding/removing zoom effect is not implemented yet.", "Zoom Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
 
+        private void cBBlurInside_CheckedChanged(object sender, EventArgs e)
+        {
+            MessageBox.Show("Adding/removing blur effect is not implemented yet.", "Blur Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 }
